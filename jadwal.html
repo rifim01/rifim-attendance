@@ -1,1 +1,442 @@
+<!DOCTYPE html>
+<html lang="id">
 
+<head>
+
+  <meta charset="UTF-8" />
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  />
+
+  <title>Jadwal Shift Rifim</title>
+
+  <link
+    href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+    rel="stylesheet"
+  />
+
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+
+  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+
+  <style>
+
+    *{
+      margin:0;
+      padding:0;
+      box-sizing:border-box;
+      font-family:'Poppins',sans-serif;
+    }
+
+    body{
+      background:#050816;
+      color:#fff;
+      padding:20px;
+    }
+
+    .container{
+      max-width:1600px;
+      margin:auto;
+    }
+
+    .header{
+      background:#0d1228;
+      padding:20px;
+      border-radius:20px;
+      margin-bottom:20px;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      flex-wrap:wrap;
+      gap:15px;
+    }
+
+    .title{
+      font-size:30px;
+      font-weight:700;
+      color:#6ea8ff;
+    }
+
+    .controls{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+
+    button{
+      border:none;
+      padding:12px 18px;
+      border-radius:12px;
+      cursor:pointer;
+      font-weight:600;
+      color:#fff;
+    }
+
+    .btn-sync{
+      background:#2563eb;
+    }
+
+    .btn-generate{
+      background:#10b981;
+    }
+
+    .btn-save{
+      background:#ef4444;
+    }
+
+    select{
+      padding:12px;
+      border-radius:10px;
+      border:none;
+      background:#111827;
+      color:#fff;
+    }
+
+    .stats{
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+      gap:15px;
+      margin-bottom:20px;
+    }
+
+    .card{
+      background:#0d1228;
+      padding:20px;
+      border-radius:20px;
+    }
+
+    .card h2{
+      font-size:35px;
+      margin-bottom:5px;
+    }
+
+    table{
+      width:100%;
+      border-collapse:collapse;
+      background:#0d1228;
+      border-radius:20px;
+      overflow:hidden;
+    }
+
+    th{
+      background:#111827;
+      padding:15px;
+      font-size:14px;
+      color:#6ea8ff;
+    }
+
+    td{
+      padding:14px;
+      border-bottom:1px solid rgba(255,255,255,0.05);
+      font-size:14px;
+    }
+
+    tr:hover{
+      background:rgba(255,255,255,0.03);
+    }
+
+    .badge{
+      padding:6px 10px;
+      border-radius:8px;
+      font-size:12px;
+      font-weight:600;
+    }
+
+    .pagi{
+      background:#16a34a;
+    }
+
+    .siang{
+      background:#f59e0b;
+    }
+
+    .libur{
+      background:#ef4444;
+    }
+
+  </style>
+
+</head>
+
+<body>
+
+<div class="container" id="jadwalArea">
+
+  <div class="header">
+
+    <div>
+      <div class="title">
+        Jadwal Shift Rifim
+      </div>
+
+      <div id="tanggalRange"></div>
+    </div>
+
+    <div class="controls">
+
+      <select id="filterCabang">
+        <option value="ALL">
+          Semua Cabang
+        </option>
+      </select>
+
+      <button
+        class="btn-sync"
+        onclick="loadStaff()"
+      >
+        Sync DB Staff
+      </button>
+
+      <button
+        class="btn-generate"
+        onclick="generateSchedule()"
+      >
+        Generate Jadwal
+      </button>
+
+      <button
+        class="btn-save"
+        onclick="savePDF()"
+      >
+        Simpan PDF ke Drive
+      </button>
+
+    </div>
+
+  </div>
+
+  <div class="stats">
+
+    <div class="card">
+      <div>PAGI</div>
+      <h2 id="totalPagi">0</h2>
+    </div>
+
+    <div class="card">
+      <div>SIANG</div>
+      <h2 id="totalSiang">0</h2>
+    </div>
+
+    <div class="card">
+      <div>LIBUR</div>
+      <h2 id="totalLibur">0</h2>
+    </div>
+
+  </div>
+
+  <table>
+
+    <thead>
+
+      <tr>
+
+        <th>Nama</th>
+
+        <th>Cabang</th>
+
+        <th>Jabatan</th>
+
+        <th>Sen</th>
+
+        <th>Sel</th>
+
+        <th>Rab</th>
+
+        <th>Kam</th>
+
+        <th>Jum</th>
+
+        <th>Sab</th>
+
+        <th>Min</th>
+
+      </tr>
+
+    </thead>
+
+    <tbody id="tableBody"></tbody>
+
+  </table>
+
+</div>
+
+<script>
+
+const API_URL =
+"https://script.google.com/macros/s/AKfycbyrUp1IVAOrHpXpDrpOvK4W6J0w6Ky9aI0T5TDTwHbCn7sUBu1U-8laJ5LfPU5Gy-Rd/exec";
+
+let staffData = [];
+
+function getRandomShift(){
+
+  const shifts = [
+    "PAGI",
+    "SIANG",
+    "LIBUR"
+  ];
+
+  return shifts[
+    Math.floor(Math.random()*shifts.length)
+  ];
+
+}
+
+async function loadStaff(){
+
+  try{
+
+    const response =
+    await fetch(API_URL);
+
+    const data =
+    await response.json();
+
+    staffData = data;
+
+    renderCabang();
+    generateSchedule();
+
+  }catch(err){
+
+    console.error(err);
+
+    alert("Gagal load data");
+
+  }
+
+}
+
+function renderCabang(){
+
+  const cabangSet =
+  [...new Set(
+    staffData.map(x=>x.cabang)
+  )];
+
+  const select =
+  document.getElementById("filterCabang");
+
+  select.innerHTML =
+  `<option value="ALL">Semua Cabang</option>`;
+
+  cabangSet.forEach(c=>{
+
+    select.innerHTML +=
+    `<option value="${c}">
+      ${c}
+    </option>`;
+
+  });
+
+}
+
+function generateSchedule(){
+
+  const tbody =
+  document.getElementById("tableBody");
+
+  tbody.innerHTML = "";
+
+  let pagi=0;
+  let siang=0;
+  let libur=0;
+
+  const filter =
+  document.getElementById("filterCabang").value;
+
+  let filtered =
+  staffData;
+
+  if(filter !== "ALL"){
+
+    filtered =
+    staffData.filter(
+      x=>x.cabang === filter
+    );
+
+  }
+
+  filtered.forEach(staff=>{
+
+    let html = `
+      <tr>
+        <td>${staff.nama}</td>
+        <td>${staff.cabang}</td>
+        <td>${staff.jabatan}</td>
+    `;
+
+    for(let i=0;i<7;i++){
+
+      const shift =
+      getRandomShift();
+
+      if(shift==="PAGI") pagi++;
+      if(shift==="SIANG") siang++;
+      if(shift==="LIBUR") libur++;
+
+      html += `
+        <td>
+          <span class="badge ${shift.toLowerCase()}">
+            ${shift}
+          </span>
+        </td>
+      `;
+
+    }
+
+    html += `</tr>`;
+
+    tbody.innerHTML += html;
+
+  });
+
+  document.getElementById("totalPagi").innerText = pagi;
+  document.getElementById("totalSiang").innerText = siang;
+  document.getElementById("totalLibur").innerText = libur;
+
+}
+
+async function savePDF(){
+
+  const area =
+  document.getElementById("jadwalArea");
+
+  const canvas =
+  await html2canvas(area);
+
+  const img =
+  canvas.toDataURL("image/png");
+
+  const { jsPDF } = window.jspdf;
+
+  const pdf =
+  new jsPDF("l","mm","a4");
+
+  pdf.addImage(
+    img,
+    "PNG",
+    5,
+    5,
+    285,
+    200
+  );
+
+  pdf.save("jadwal-shift.pdf");
+
+}
+
+document
+.getElementById("filterCabang")
+.addEventListener(
+  "change",
+  generateSchedule
+);
+
+loadStaff();
+
+</script>
+
+</body>
+</html>
