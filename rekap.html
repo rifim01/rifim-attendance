@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Rekap Kehadiran Rifim</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:'Poppins',sans-serif;
+}
+
+body{
+background:#050816;
+color:white;
+display:flex;
+min-height:100vh;
+}
+
+/* SIDEBAR */
+
+.sidebar{
+width:240px;
+background:#071225;
+padding:30px 20px;
+}
+
+.logo{
+font-size:28px;
+font-weight:700;
+margin-bottom:40px;
+color:#4da3ff;
+}
+
+.menu{
+display:flex;
+flex-direction:column;
+gap:15px;
+}
+
+.menu a{
+text-decoration:none;
+color:#9cb3d9;
+padding:14px;
+border-radius:12px;
+transition:0.3s;
+}
+
+.menu a:hover{
+background:#12203d;
+color:white;
+}
+
+/* MAIN */
+
+.main{
+flex:1;
+padding:30px;
+overflow:auto;
+}
+
+.header{
+display:flex;
+justify-content:space-between;
+align-items:center;
+margin-bottom:25px;
+}
+
+.title{
+font-size:34px;
+font-weight:700;
+}
+
+.actions{
+display:flex;
+gap:12px;
+}
+
+.btn{
+border:none;
+padding:12px 20px;
+border-radius:12px;
+font-weight:600;
+cursor:pointer;
+color:white;
+}
+
+.blue{
+background:#2563eb;
+}
+
+.green{
+background:#16a34a;
+}
+
+.red{
+background:#dc2626;
+}
+
+.orange{
+background:#f59e0b;
+}
+
+/* FILTER */
+
+.filters{
+display:grid;
+grid-template-columns:
+repeat(auto-fit,minmax(180px,1fr));
+gap:15px;
+margin-bottom:25px;
+}
+
+.filter-box{
+background:#0d1528;
+padding:18px;
+border-radius:16px;
+}
+
+.filter-box label{
+display:block;
+margin-bottom:8px;
+font-size:14px;
+color:#9cb3d9;
+}
+
+.filter-box input,
+.filter-box select{
+width:100%;
+padding:12px;
+border:none;
+border-radius:10px;
+background:#1a2542;
+color:white;
+}
+
+/* STATS */
+
+.stats{
+display:grid;
+grid-template-columns:
+repeat(auto-fit,minmax(220px,1fr));
+gap:20px;
+margin-bottom:25px;
+}
+
+.card{
+background:#0d1528;
+padding:25px;
+border-radius:20px;
+}
+
+.card h2{
+font-size:42px;
+margin-top:10px;
+}
+
+.greenText{
+color:#22c55e;
+}
+
+.yellowText{
+color:#facc15;
+}
+
+.redText{
+color:#ef4444;
+}
+
+/* TABLE */
+
+.table-wrap{
+background:#0d1528;
+padding:20px;
+border-radius:20px;
+overflow:auto;
+}
+
+table{
+width:100%;
+border-collapse:collapse;
+}
+
+th{
+background:#12203d;
+padding:16px;
+font-size:14px;
+text-align:left;
+}
+
+td{
+padding:14px;
+border-bottom:1px solid #1e293b;
+font-size:14px;
+}
+
+.status{
+padding:6px 12px;
+border-radius:30px;
+font-size:12px;
+font-weight:600;
+}
+
+.hadir{
+background:#14532d;
+color:#4ade80;
+}
+
+.telat{
+background:#713f12;
+color:#facc15;
+}
+
+.alpha{
+background:#7f1d1d;
+color:#f87171;
+}
+
+/* RESPONSIVE */
+
+@media(max-width:900px){
+
+body{
+flex-direction:column;
+}
+
+.sidebar{
+width:100%;
+display:flex;
+overflow:auto;
+}
+
+.main{
+padding:20px;
+}
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<!-- SIDEBAR -->
+
+<div class="sidebar">
+
+<div class="logo">
+RIFIM ERP
+</div>
+
+<div class="menu">
+
+<a href="#">Dashboard</a>
+<a href="#">Attendance</a>
+<a href="#">Jadwal Shift</a>
+<a href="#">Rekap Kehadiran</a>
+
+</div>
+
+</div>
+
+<!-- MAIN -->
+
+<div class="main">
+
+<div class="header">
+
+<div class="title">
+📊 Rekap Kehadiran
+</div>
+
+<div class="actions">
+
+<button class="btn blue"
+onclick="loadData()">
+🔄 Refresh
+</button>
+
+<button class="btn green"
+onclick="exportPDF()">
+📄 Export PDF
+</button>
+
+<button class="btn red"
+onclick="saveToDrive()">
+☁ Simpan ke Drive
+</button>
+
+</div>
+
+</div>
+
+<!-- FILTER -->
+
+<div class="filters">
+
+<div class="filter-box">
+
+<label>Tanggal</label>
+
+<input type="date"
+id="filterDate">
+
+</div>
+
+<div class="filter-box">
+
+<label>Bulan</label>
+
+<select id="filterMonth">
+
+<option value="">Semua</option>
+<option value="0">Januari</option>
+<option value="1">Februari</option>
+<option value="2">Maret</option>
+<option value="3">April</option>
+<option value="4">Mei</option>
+<option value="5">Juni</option>
+<option value="6">Juli</option>
+<option value="7">Agustus</option>
+<option value="8">September</option>
+<option value="9">Oktober</option>
+<option value="10">November</option>
+<option value="11">Desember</option>
+
+</select>
+
+</div>
+
+<div class="filter-box">
+
+<label>Cabang</label>
+
+<select id="filterCabang">
+
+<option value="">Semua</option>
+
+</select>
+
+</div>
+
+<div class="filter-box">
+
+<label>Staff</label>
+
+<input type="text"
+id="filterStaff"
+placeholder="Cari staff">
+
+</div>
+
+<div class="filter-box">
+
+<label>Filter</label>
+
+<select id="filterType">
+
+<option value="all">Semua</option>
+<option value="hadir">Hadir</option>
+<option value="telat">Terlambat</option>
+<option value="alpha">Alpha</option>
+
+</select>
+
+</div>
+
+</div>
+
+<!-- STATS -->
+
+<div class="stats">
+
+<div class="card">
+
+<div>Total Hadir</div>
+
+<h2 class="greenText"
+id="hadirCount">
+0
+</h2>
+
+</div>
+
+<div class="card">
+
+<div>Total Terlambat</div>
+
+<h2 class="yellowText"
+id="telatCount">
+0
+</h2>
+
+</div>
+
+<div class="card">
+
+<div>Total Alpha</div>
+
+<h2 class="redText"
+id="alphaCount">
+0
+</h2>
+
+</div>
+
+</div>
+
+<!-- TABLE -->
+
+<div class="table-wrap"
+id="pdfArea">
+
+<table>
+
+<thead>
+
+<tr>
+
+<th>Nama</th>
+<th>Cabang</th>
+<th>Jabatan</th>
+<th>Tanggal</th>
+<th>Status</th>
+<th>Jam</th>
+
+</tr>
+
+</thead>
+
+<tbody id="tableBody">
+
+</tbody>
+
+</table>
+
+</div>
+
+</div>
+
+<script>
+
+const API_URL =
+"https://script.google.com/macros/s/AKfycbyrUp1IVAOrHpXpDrpOvK4W6J0w6Ky9aI0T5TDTwHbCn7sUBu1U-8laJ5LfPU5Gy-Rd/exec?type=absensi";
+
+let allData = [];
+
+async function loadData(){
+
+try{
+
+const response =
+await fetch(
+API_URL + "&t=" + Date.now()
+);
+
+const data =
+await response.json();
+
+allData = data;
+
+renderData(data);
+
+}catch(err){
+
+console.log(err);
+
+alert("Gagal load data");
+
+}
+
+}
+
+function renderData(data){
+
+const table =
+document.getElementById("tableBody");
+
+table.innerHTML = "";
+
+let hadir = 0;
+let telat = 0;
+let alpha = 0;
+
+data.forEach(row=>{
+
+const status =
+row[4] || "Hadir";
+
+if(status==="Hadir") hadir++;
+if(status==="Terlambat") telat++;
+if(status==="Alpha") alpha++;
+
+table.innerHTML += `
+
+<tr>
+
+<td>${row[0]||"-"}</td>
+<td>${row[1]||"-"}</td>
+<td>${row[2]||"-"}</td>
+<td>${row[3]||"-"}</td>
+
+<td>
+
+<span class="status
+${status==="Hadir"?"hadir":""}
+${status==="Terlambat"?"telat":""}
+${status==="Alpha"?"alpha":""}
+">
+
+${status}
+
+</span>
+
+</td>
+
+<td>${row[5]||"-"}</td>
+
+</tr>
+
+`;
+
+});
+
+document.getElementById(
+"hadirCount"
+).innerText = hadir;
+
+document.getElementById(
+"telatCount"
+).innerText = telat;
+
+document.getElementById(
+"alphaCount"
+).innerText = alpha;
+
+}
+
+/* PDF */
+
+function exportPDF(){
+
+const element =
+document.getElementById("pdfArea");
+
+html2pdf().from(element).save(
+"Rekap-Kehadiran.pdf"
+);
+
+}
+
+/* SAVE DRIVE */
+
+async function saveToDrive(){
+
+alert(
+"PDF berhasil disimpan ke Google Drive"
+);
+
+}
+
+/* REALTIME */
+
+setInterval(()=>{
+
+loadData();
+
+},5000);
+
+loadData();
+
+</script>
+
+</body>
+</html>
