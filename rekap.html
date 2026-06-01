@@ -6,7 +6,7 @@
 
 const API_URL =
 "https://script.google.com/macros/s/AKfycbyGh43bEXkoWaxXg7rCFzrZ4dpHFD1BLVE6tVmswgC0tB7lXlCuI3bdGRo2KIEKeHqiMw/exec?type=absensi";
-   
+
 /* =========================
    DATA
 ========================= */
@@ -23,7 +23,11 @@ try{
 
 const response =
 await fetch(
-API_URL + "&nocache=" + Date.now()
+
+API_URL +
+"&nocache=" +
+Date.now()
+
 );
 
 const data =
@@ -41,9 +45,27 @@ applyFilter();
 
 console.log(err);
 
-alert(
-"Gagal load data"
-);
+document.getElementById(
+"tableBody"
+).innerHTML = `
+
+<tr>
+
+<td colspan="6"
+style="
+padding:30px;
+text-align:center;
+color:#ff7675;
+font-size:18px;
+">
+
+❌ Gagal koneksi Apps Script
+
+</td>
+
+</tr>
+
+`;
 
 }
 
@@ -55,31 +77,31 @@ alert(
 
 function populateCabang(data){
 
-const cabangSelect =
+const select =
 document.getElementById(
 "filterCabang"
 );
 
-let cabangSet =
+let cabang =
 new Set();
 
 data.forEach(row=>{
 
-cabangSet.add(
+cabang.add(
 row.cabang || "-"
 );
 
 });
 
-cabangSelect.innerHTML =
+select.innerHTML =
 `<option value="">Semua</option>`;
 
-[...cabangSet].forEach(cabang=>{
+[...cabang].forEach(item=>{
 
-cabangSelect.innerHTML += `
+select.innerHTML += `
 
-<option value="${cabang}">
-${cabang}
+<option value="${item}">
+${item}
 </option>
 
 `;
@@ -89,7 +111,7 @@ ${cabang}
 }
 
 /* =========================
-   APPLY FILTER
+   FILTER
 ========================= */
 
 function applyFilter(){
@@ -141,8 +163,10 @@ let match = true;
 
 /* STAFF */
 
-if(staff &&
-!nama.includes(staff)){
+if(
+staff &&
+!nama.includes(staff)
+){
 
 match = false;
 
@@ -150,8 +174,10 @@ match = false;
 
 /* CABANG */
 
-if(cabang &&
-rowCabang !== cabang){
+if(
+cabang &&
+rowCabang !== cabang
+){
 
 match = false;
 
@@ -161,24 +187,41 @@ match = false;
 
 if(type !== "all"){
 
-if(type === "hadir" &&
-status !== "hadir")
+if(
+type === "hadir" &&
+status !== "hadir"
+){
+
 match = false;
 
-if(type === "telat" &&
-status !== "terlambat")
+}
+
+if(
+type === "telat" &&
+status !== "terlambat"
+){
+
 match = false;
 
-if(type === "alpha" &&
-status !== "alpha")
+}
+
+if(
+type === "alpha" &&
+status !== "alpha"
+){
+
 match = false;
+
+}
 
 }
 
 /* DATE */
 
-if(date &&
-tanggal !== date){
+if(
+date &&
+tanggal !== date
+){
 
 match = false;
 
@@ -193,7 +236,9 @@ new Date(tanggal)
 .getMonth()
 .toString();
 
-if(rowMonth !== month){
+if(
+rowMonth !== month
+){
 
 match = false;
 
@@ -205,15 +250,15 @@ return match;
 
 });
 
-renderData(filtered);
+renderTable(filtered);
 
 }
 
 /* =========================
-   RENDER
+   RENDER TABLE
 ========================= */
 
-function renderData(data){
+function renderTable(data){
 
 const table =
 document.getElementById(
@@ -226,47 +271,83 @@ let hadir = 0;
 let telat = 0;
 let alpha = 0;
 
+if(data.length === 0){
+
+table.innerHTML = `
+
+<tr>
+
+<td colspan="6"
+style="
+padding:30px;
+text-align:center;
+color:#aaa;
+">
+
+Tidak ada data
+
+</td>
+
+</tr>
+
+`;
+
+}
+
+/* LOOP */
+
 data.forEach(row=>{
 
 const status =
 row.status || "Hadir";
 
-if(status==="Hadir")
+/* STATS */
+
+if(status === "Hadir")
 hadir++;
 
-if(status==="Terlambat")
+if(status === "Terlambat")
 telat++;
 
-if(status==="Alpha")
+if(status === "Alpha")
 alpha++;
+
+/* BADGE */
+
+let badgeClass = "";
+
+if(status === "Hadir")
+badgeClass = "hadir";
+
+if(status === "Terlambat")
+badgeClass = "telat";
+
+if(status === "Alpha")
+badgeClass = "alpha";
+
+/* TABLE */
 
 table.innerHTML += `
 
 <tr>
 
-<td>${row.nama||"-"}</td>
+<td>${row.nama || "-"}</td>
 
-<td>${row.cabang||"-"}</td>
+<td>${row.cabang || "-"}</td>
 
-<td>${row.jabatan||"-"}</td>
+<td>${row.jabatan || "-"}</td>
 
-<td>${row.tanggal||"-"}</td>
+<td>${row.tanggal || "-"}</td>
 
 <td>
 
-<span class="status
-${status==="Hadir"?"hadir":""}
-${status==="Terlambat"?"telat":""}
-${status==="Alpha"?"alpha":""}
-">
-
+<span class="status ${badgeClass}">
 ${status}
-
 </span>
 
 </td>
 
-<td>${row.jam||"-"}</td>
+<td>${row.jam || "-"}</td>
 
 </tr>
 
@@ -274,7 +355,7 @@ ${status}
 
 });
 
-/* STATS */
+/* UPDATE STATS */
 
 document.getElementById(
 "hadirCount"
@@ -291,7 +372,7 @@ document.getElementById(
 }
 
 /* =========================
-   PDF
+   EXPORT PDF
 ========================= */
 
 function exportPDF(){
@@ -313,7 +394,7 @@ html2pdf()
    SAVE DRIVE
 ========================= */
 
-async function saveToDrive(){
+function saveDrive(){
 
 alert(
 "✅ PDF berhasil disimpan ke Google Drive"
@@ -322,39 +403,49 @@ alert(
 }
 
 /* =========================
-   FILTER EVENTS
+   EVENTS
 ========================= */
 
 document
-.getElementById("filterDate")
+.getElementById(
+"filterDate"
+)
 .addEventListener(
 "change",
 applyFilter
 );
 
 document
-.getElementById("filterMonth")
+.getElementById(
+"filterMonth"
+)
 .addEventListener(
 "change",
 applyFilter
 );
 
 document
-.getElementById("filterCabang")
+.getElementById(
+"filterCabang"
+)
 .addEventListener(
 "change",
 applyFilter
 );
 
 document
-.getElementById("filterStaff")
+.getElementById(
+"filterStaff"
+)
 .addEventListener(
 "keyup",
 applyFilter
 );
 
 document
-.getElementById("filterType")
+.getElementById(
+"filterType"
+)
 .addEventListener(
 "change",
 applyFilter
@@ -364,7 +455,7 @@ applyFilter
    REALTIME
 ========================= */
 
-/* 2 JAM */
+/* UPDATE 2 JAM */
 
 setInterval(()=>{
 
@@ -372,7 +463,9 @@ loadData();
 
 },7200000);
 
-/* FIRST LOAD */
+/* =========================
+   FIRST LOAD
+========================= */
 
 loadData();
 
