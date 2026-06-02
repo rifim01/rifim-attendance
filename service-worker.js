@@ -1,36 +1,4 @@
-const CACHE_NAME = "rifim-erp-v2";
-const ASSETS = [
-  "./",
-  "./index.html",
-  "./dashboard.html",
-  "./attendance.html",
-  "./jadwal.html",
-  "./rekap.html",
-  "./style.css",
-  "./google-drive.js",
-  "./manifest.json",
-];
-
-self.addEventListener("install", e => {
-  e.waitUntil(
-    caches.open(CACHE_NAME)
-      .then(cache => cache.addAll(ASSETS))
-      .then(() => self.skipWaiting())
-  );
-});
-
-self.addEventListener("activate", e => {
-  e.waitUntil(
-    caches.keys().then(keys =>
-      Promise.all(keys.filter(k => k !== CACHE_NAME).map(k => caches.delete(k)))
-    )
-  );
-});
-
-self.addEventListener("fetch", e => {
-  e.respondWith(
-    caches.match(e.request)
-      .then(cached => cached || fetch(e.request))
-      .catch(() => caches.match("./index.html"))
-  );
-});
+const C="rifim-att-v3",A=["./","./index.html","./google-drive.js","./manifest.json"];
+self.addEventListener("install",e=>{e.waitUntil(caches.open(C).then(c=>c.addAll(A)).then(()=>self.skipWaiting()))});
+self.addEventListener("activate",e=>{e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==C).map(k=>caches.delete(k)))))});
+self.addEventListener("fetch",e=>{e.respondWith(caches.match(e.request).then(c=>c||fetch(e.request)).catch(()=>caches.match("./index.html")))});

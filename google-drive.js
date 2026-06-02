@@ -1,73 +1,47 @@
 // ============================================================
-// RIFIM ERP — google-drive.js v3
-// Upload via Apps Script proxy — TANPA gapi, TANPA OAuth popup
+// RIFIM ERP — google-drive.js (Apps Script Proxy)
 // ============================================================
+const RIFIM_GAS = "https://script.google.com/macros/s/AKfycbyrUp1IVAOrHpXpDrpOvK4W6J0w6Ky9aI0T5TDTwHbCn7sUBu1U-8laJ5LfPU5Gy-Rd/exec";
+const RIFIM_FOLDER = "1Ejaz210g3TeM46W6up5BtgHNzEWwOnRQ";
+const RIFIM_SHEET_ABSENSI = "1FU5hKMpYn1qhsl4-xZYUZrXDhTOV6aRRewYEs6gIkxA";
+const RIFIM_SHEET_STAFF = "1fcraq3QHqIaD-13Ebzt6stT9aA6j_loTXeAtpNX12kw";
 
-const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyrUp1IVAOrHpXpDrpOvK4W6J0w6Ky9aI0T5TDTwHbCn7sUBu1U-8laJ5LfPU5Gy-Rd/exec";
-
-const DRIVE_FOLDER_ID = "1Ejaz210g3TeM46W6up5BtgHNzEWwOnRQ";
-
-async function uploadFileToDrive(file) {
-  const statusEl = document.getElementById("upload-status");
-
+async function uploadFileToDrive(file, folderId) {
+  const folder = folderId || RIFIM_FOLDER;
   try {
-    setStatus(statusEl, "⏳ Mengupload selfie ke Drive...", "#dbeafe", "#1e40af");
-
     const base64 = await fileToBase64(file);
-
-    const response = await fetch(APPS_SCRIPT_URL, {
+    const res = await fetch(RIFIM_GAS, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        fileName:   file.name,
-        mimeType:   file.type,
-        base64Data: base64,
-        folderId:   DRIVE_FOLDER_ID,
-      }),
+      body: JSON.stringify({ fileName: file.name, mimeType: file.type, base64Data: base64, folderId: folder })
     });
-
-    const result = await response.json();
-
-    if (result.success && result.fileId) {
-      setStatus(statusEl,
-        "✅ Selfie berhasil diupload ke Google Drive",
-        "#dcfce7", "#166534"
-      );
-      return result.fileId;
-    } else {
-      throw new Error(result.error || "Respons tidak valid dari server");
-    }
-
-  } catch (err) {
-    setStatus(statusEl,
-      "❌ Upload gagal: " + err.message,
-      "#fee2e2", "#991b1b"
-    );
-    console.error("Drive upload error:", err);
+    const r = await res.json();
+    if (r.success && r.fileId) return r.fileId;
+    throw new Error(r.error || "Upload gagal");
+  } catch(e) {
+    console.error("Drive upload:", e);
     return null;
+  }
+}
+
+async function gasAction(params) {
+  try {
+    const res = await fetch(RIFIM_GAS, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(params)
+    });
+    return await res.json();
+  } catch(e) {
+    return { success: false, error: e.message };
   }
 }
 
 function fileToBase64(file) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
-    reader.onload  = () => resolve(reader.result.split(",")[1]);
-    reader.onerror = () => reject(new Error("Gagal membaca file"));
+    reader.onload = () => resolve(reader.result.split(",")[1]);
+    reader.onerror = () => reject(new Error("Read failed"));
     reader.readAsDataURL(file);
   });
-}
-
-function setStatus(el, msg, bg, color) {
-  if (!el) return;
-  Object.assign(el.style, {
-    display: "block",
-    background: bg,
-    color: color,
-    padding: "12px 16px",
-    borderRadius: "12px",
-    fontWeight: "600",
-    fontSize: "15px",
-    marginTop: "10px",
-  });
-  el.textContent = msg;
 }
