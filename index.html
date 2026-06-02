@@ -982,20 +982,22 @@ window.addEventListener("DOMContentLoaded",()=>{
   loadJadwalFromStorage(); // poin 1: load jadwal dari storage
   // onAuthStateChanged - safe guard if firebase not ready
   const proceedAfterSplash = () => {
-    document.getElementById("splash").classList.add("exit");
+    const spl = document.getElementById("splash");
+    if(spl) spl.classList.add("exit");
     setTimeout(()=>{
       const s=lsGet("rifim_sess");
       if(s){const f=STAFF.find(u=>u.nama===s.nama);if(f){CU=f;showApp();return;}}
       showLogin();
     },400);
   };
+  let proceeded = false;
+  const safeProceed = () => { if(!proceeded){proceeded=true; proceedAfterSplash();} };
+
+  // Paksa lanjut setelah 3 detik (anti-stuck)
+  setTimeout(safeProceed, 3000);
+
   if(auth) {
-    auth.onAuthStateChanged(()=>{
-      setTimeout(proceedAfterSplash, 2800);
-    });
-  } else {
-    // Firebase tidak tersedia — tetap lanjut ke login tanpa auth
-    setTimeout(proceedAfterSplash, 2800);
+    auth.onAuthStateChanged(()=>{ safeProceed(); });
   }
 });
 
