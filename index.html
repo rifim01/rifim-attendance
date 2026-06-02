@@ -100,6 +100,11 @@ body{
   display:flex;flex-direction:column;align-items:center;justify-content:center;
   gap:0;
 }
+#splash::before{
+  content:'';position:absolute;inset:0;
+  background:url('assets/bg.jpg') center center/cover no-repeat;
+  opacity:.06;pointer-events:none;
+}
 .spl-ring{
   position:relative;width:96px;height:96px;
   animation:spl-ring-in .7s cubic-bezier(.34,1.56,.64,1) .2s both;
@@ -138,6 +143,11 @@ body{
   display:none;position:fixed;inset:0;z-index:200;
   background:var(--srf-bg);overflow-y:auto;overscroll-behavior:contain;
   padding:calc(var(--sft) + 24px) 0 40px;
+}
+#loginScr::before{
+  content:'';position:fixed;inset:0;z-index:-1;
+  background:url('assets/bg.jpg') center center/cover no-repeat;
+  opacity:.08;pointer-events:none;
 }
 #loginScr.on{display:block;}
 .lgn-wrap{max-width:400px;margin:0 auto;padding:0 20px;display:flex;flex-direction:column;align-items:center;min-height:80vh;justify-content:center;}
@@ -868,14 +878,14 @@ function initFirebase() {
 const MO=["Jan","Feb","Mar","Apr","Mei","Jun","Jul","Agu","Sep","Okt","Nov","Des"];
 const HR=["MIN","SEN","SEL","RAB","KAM","JUM","SAB"];
 const AIRPORTS={
-  "ID Rifim Airport Batam":      {lat:1.1210, lng:104.1186,r:500,  admin:false},
-  "ID Rifim Airport Jambi":      {lat:-1.6381,lng:103.6441,r:500,  admin:false},
-  "ID Rifim Airport Balikpapan": {lat:1.2675, lng:116.8946,r:500,  admin:false},
-  "ID Rifim Airport Manado":     {lat:1.5493, lng:124.9260,r:500,  admin:false},
-  "ID Rifim Airport Pekanbaru":  {lat:0.4609, lng:101.4454,r:500,  admin:false},
-  "ID Rifim Batam":              {lat:1.1211, lng:104.0402,r:2000, admin:false},
-  "ID Rifim Jambi Luar":         {lat:-1.6500,lng:103.6300,r:2000, admin:false},
-  "Admin":                       {lat:0,     lng:0,        r:999999,admin:true}
+  "ID Rifim Airport Batam":      {lat:1.1222699737600552,  lng:104.11830538258901, r:500,   admin:false},
+  "ID Rifim Airport Jambi":      {lat:-1.636867558115533,  lng:103.6442494672467,  r:500,   admin:false},
+  "ID Rifim Airport Balikpapan": {lat:-1.267625979363085,  lng:116.89423472491762, r:500,   admin:false},
+  "ID Rifim Airport Manado":     {lat:1.550165772441465,   lng:124.9254933960822,  r:500,   admin:false},
+  "ID Rifim Airport Pekanbaru":  {lat:0.46454514194723073, lng:101.44817503840943, r:500,   admin:false},
+  "ID Rifim Batam":              {lat:1.1211,              lng:104.0402,           r:2000,  admin:false},
+  "ID Rifim Jambi Luar":         {lat:-1.6500,             lng:103.6300,           r:2000,  admin:false},
+  "Admin":                       {lat:0,                   lng:0,                  r:999999,admin:true}
 };
 const JD_RULES=[
   {cabang:"ID Rifim Airport Jambi",a:"Audra Agung pratama",b:"Dwi Fitrianti"},
@@ -889,7 +899,7 @@ const JD_RULES=[
 let STAFF=[
   {nama:"Nabilla",              pw:"rifim2024",jabatan:"Admin Editor",  cabang:"Admin",                       id:"RIF0139",role:"editor"},
   {nama:"govin 2",              pw:"rifim2024",jabatan:"Admin",         cabang:"Admin",                       id:"RIF0143",role:"admin"},
-  {nama:"febriany sandra",      pw:"rifim2024",jabatan:"Pickup Point",  cabang:"Admin",                       id:"RIF0147",role:"staff"},
+  {nama:"febriany sandra",      pw:"rifim2024",jabatan:"Admin",         cabang:"Admin",                       id:"RIF0147",role:"admin"},
   {nama:"Audra Agung pratama",  pw:"rifim2024",jabatan:"Staff Konter",  cabang:"ID Rifim Airport Jambi",      id:"RIF0125",role:"staff"},
   {nama:"Putri Amalia",         pw:"rifim2024",jabatan:"Koordinator",   cabang:"ID Rifim Airport Jambi",      id:"RIF0126",role:"staff"},
   {nama:"Dwi Fitrianti",        pw:"rifim2024",jabatan:"Staff Konter",  cabang:"ID Rifim Airport Jambi",      id:"RIF0126",role:"staff"},
@@ -1026,7 +1036,11 @@ function autoGenIfExpired(){
 function populateDropdowns(){
   // User login selector
   const su=document.getElementById("selUser");
-  if(su)STAFF.forEach(u=>{const o=document.createElement("option");o.value=u.nama;o.textContent=u.nama+" — "+u.jabatan;su.appendChild(o);});
+  if(su){
+    const blank=document.createElement("option");blank.value="";blank.textContent="— Pilih nama Anda —";su.appendChild(blank);
+    STAFF.forEach(u=>{const o=document.createElement("option");o.value=u.nama;o.textContent=u.nama+" — "+u.jabatan;su.appendChild(o);});
+    su.value=""; // kosongkan default
+  }
   // Cabang selects
   const cabs=Object.keys(AIRPORTS);
   ["selCab","jCab","rkCab","sfCab"].forEach(id=>{
@@ -1048,7 +1062,13 @@ function populateDropdowns(){
 }
 
 // ─── Login ────────────────────────────────────────────────
-function showLogin(){document.getElementById("loginScr").classList.add("on");document.getElementById("app").classList.remove("on");}
+function showLogin(){
+  document.getElementById("loginScr").classList.add("on");
+  document.getElementById("app").classList.remove("on");
+  // Kosongkan form setiap kali tampil login
+  const su=document.getElementById("selUser");if(su)su.value="";
+  const pi=document.getElementById("pwIn");if(pi)pi.value="";
+}
 function showApp(){
   loadPW();
   document.getElementById("loginScr").classList.remove("on");
@@ -1077,6 +1097,8 @@ function doLogout(){
   if(!confirm("Yakin logout?"))return;
   if(auth)auth.signOut();CU=null;localStorage.removeItem("rifim_sess");
   if(camStream){camStream.getTracks().forEach(t=>t.stop());camStream=null;}
+  const su=document.getElementById("selUser");if(su)su.value="";
+  const pi=document.getElementById("pwIn");if(pi)pi.value="";
   showLogin();
 }
 function lgnErr(m){const e=document.getElementById("lgnErr");e.textContent="❌ "+m;e.style.display="block";setTimeout(()=>e.style.display="none",3000);}
@@ -1236,10 +1258,30 @@ async function submitAbs(){
       tanggal:now.toISOString().slice(0,10)
     });
     // Kirim ke Google Sheets
-    try{await appendToSheet(RIFIM_SHEET_ABSENSI,"ABSENSI",[
-      now.toLocaleString("id-ID"),CU.nama,cab,absTipe,`${gLat},${gLng}`,
-      validGPS?"Dalam Radius":"Di Luar Radius",fid||""
-    ]);}catch{}
+    // Kirim ke Google Sheets ABSENSI
+    try{
+      const sheetRes=await fetch(RIFIM_GAS,{
+        method:"POST",
+        headers:{"Content-Type":"application/json"},
+        body:JSON.stringify({
+          action:"absensi",
+          sheetId:RIFIM_SHEET_ABSENSI,
+          sheetName:"ABSENSI",
+          timestamp:now.toLocaleString("id-ID"),
+          namaSPG:CU.nama,
+          bandara:cab,
+          tipeAbsen:absTipe,
+          koordinatGPS:gLat.toFixed(6)+","+gLng.toFixed(6),
+          statusJarak:validGPS?"Dalam Radius ("+Math.round(dist)+"m)":"Di Luar Radius ("+Math.round(dist)+"m)",
+          buktiFoto:fid?"https://drive.google.com/file/d/"+fid+"/view":""
+        })
+      });
+      const sheetData=await sheetRes.json();
+      if(!sheetData.success)throw new Error(sheetData.error||"Sheet error");
+    }catch(sheetErr){
+      console.warn("Sheet append failed:",sheetErr.message);
+      // Tidak batalkan absensi - data sudah di Firestore
+    }
     sBlob=null;sFile=null;
     g("camPrev").style.display="none";g("camPlaceholder").style.display="flex";
     g("btnUpl").disabled=true;g("btnTP").disabled=true;
@@ -1610,17 +1652,53 @@ function delStaff(nm){
 }
 async function syncStaff(){
   if(!canEdit()){alert("Hanya Nabilla dan Owner!");return;}
+  const btn=document.getElementById("btnSyncS");
+  if(btn){btn.disabled=true;btn.textContent="⏳ Sync...";}
   try{
-    const url=`https://opensheet.elk.sh/${RIFIM_SHEET_STAFF}/MASTER%20DATA%20STAFF`;
-    const res=await fetch(url);const data=await res.json();
-    if(!Array.isArray(data)||!data.length)throw new Error("Data kosong");
-    const keep=STAFF.filter(u=>u.role==="editor"||u.role==="owner");
-    data.forEach(r=>{const nm=(r["Nama"]||"").trim();if(!nm||keep.find(k=>k.nama===nm))return;
-      keep.push({nama:nm,jabatan:(r["Jabatan"]||"").trim(),cabang:(r["ID CABANG"]||r["Cabang"]||"").trim(),
-        id:(r["ID Staff"]||"").trim(),pw:STAFF.find(s=>s.nama===nm)?.pw||"rifim2024",role:"staff"});});
-    STAFF=keep;alert(`✅ ${data.length} baris sync dari Database Staff!`);
-    filterStaff("","");
-  }catch(e){alert("❌ Sync gagal: "+e.message);}
+    // Coba via GAS proxy (lebih reliable)
+    const res=await fetch(RIFIM_GAS,{
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({action:"getStaff"})
+    });
+    const data=await res.json();
+    if(data.error)throw new Error(data.error);
+    if(!data.staff||!data.staff.length)throw new Error("Data staff kosong dari sheet");
+    
+    const keep=STAFF.filter(u=>u.role==="editor"||u.role==="owner"||u.role==="admin");
+    data.staff.forEach(r=>{
+      const nm=r.nama.trim();
+      if(!nm||keep.find(k=>k.nama===nm))return;
+      keep.push({
+        nama:nm,jabatan:r.jabatan||"Staff",
+        cabang:r.cabang||"Admin",id:r.idStaff||"",
+        pw:STAFF.find(s=>s.nama===nm)?.pw||"rifim2024",role:"staff"
+      });
+    });
+    STAFF=keep;
+    populateDropdowns(); // refresh dropdowns
+    alert("✅ "+data.staff.length+" staff berhasil di-sync dari Google Sheets!");
+    renderStaff("","");
+  }catch(e){
+    // Fallback: coba opensheet
+    try{
+      const url="https://opensheet.elk.sh/"+RIFIM_SHEET_STAFF+"/MASTER%20DATA%20STAFF";
+      const res2=await fetch(url);const data2=await res2.json();
+      if(!Array.isArray(data2)||!data2.length)throw new Error("Data kosong");
+      const keep=STAFF.filter(u=>u.role==="editor"||u.role==="owner"||u.role==="admin");
+      data2.forEach(r=>{const nm=(r["Nama"]||"").trim();if(!nm||keep.find(k=>k.nama===nm))return;
+        keep.push({nama:nm,jabatan:(r["Jabatan"]||"").trim(),cabang:(r["ID CABANG"]||r["Cabang"]||"").trim(),
+          id:(r["ID Staff"]||"").trim(),pw:STAFF.find(s=>s.nama===nm)?.pw||"rifim2024",role:"staff"});});
+      STAFF=keep;alert("✅ "+data2.length+" staff sync (via opensheet)");
+      renderStaff("","");
+    }catch(e2){
+      alert("❌ Sync gagal: "+e.message+"
+Fallback juga gagal: "+e2.message);
+      sendErrorEmail("syncStaff",e.message);
+    }
+  }finally{
+    if(btn){btn.disabled=false;btn.textContent="📥 Sync DB";}
+  }
 }
 
 // ─── Cabang page ──────────────────────────────────────────
