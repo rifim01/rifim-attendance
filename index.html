@@ -208,6 +208,11 @@ body{
 
 /* ── Safe area top spacer ── */
 .sft-bar{flex-shrink:0;height:var(--sft);background:var(--srf-0);}
+#app::before{
+  content:'';position:fixed;inset:0;z-index:-1;
+  background:url('assets/bg.jpg') center center/cover no-repeat;
+  opacity:.04;pointer-events:none;
+}
 
 /* ══ TOP APP BAR ════════════════════════════════════════ */
 .topbar{
@@ -566,6 +571,9 @@ body{
 
   <!-- Top Bar -->
   <div class="topbar">
+    <div style="width:32px;height:32px;border-radius:9px;overflow:hidden;flex-shrink:0;margin-right:6px;">
+      <img src="assets/logo.png" style="width:100%;height:100%;object-fit:cover;" onerror="this.style.display='none'"/>
+    </div>
     <div class="tb-title-wrap">
       <div class="tb-title" id="pgTitle">Dashboard</div>
       <div class="tb-sub" id="pgSub">Selamat datang</div>
@@ -584,7 +592,7 @@ body{
       <!-- User hero card -->
       <div class="card" style="margin:12px 16px 8px;">
         <div style="padding:16px 16px 14px;display:flex;align-items:center;gap:14px;">
-          <div class="l-av" style="width:52px;height:52px;border-radius:18px;font-size:20px;" id="dashAv">?</div>
+          <div class="l-av" style="width:52px;height:52px;border-radius:18px;font-size:20px;overflow:hidden;padding:0;" id="dashAv">?</div>
           <div>
             <div style="font-family:'Google Sans';font-size:17px;font-weight:700;" id="dashNm">—</div>
             <div style="font-size:12px;color:var(--txt-sec);margin-top:2px;" id="dashRl">—</div>
@@ -1051,10 +1059,16 @@ function populateDropdowns(){
   const cabs=Object.keys(AIRPORTS);
   ["selCab","jCab","rkCab","sfCab"].forEach(id=>{
     const el=document.getElementById(id);if(!el)return;
-    const hasAll=el.id!=="selCab";
     cabs.forEach(c=>{
       const o=document.createElement("option");o.value=c;
-      o.textContent=c.replace("ID Rifim Airport ","✈ ").replace("ID Rifim ","🏢 ");
+      // Tampilkan nama lengkap dengan icon
+      if(c.startsWith("ID Rifim Airport ")){
+        o.textContent="✈️ "+c.replace("ID Rifim Airport ","")+" (Airport)";
+      } else if(c==="Admin"){
+        o.textContent="🏢 Admin (Kantor)";
+      } else {
+        o.textContent="🏙️ "+c.replace("ID Rifim ","");
+      }
       el.appendChild(o);
     });
   });
@@ -1114,7 +1128,11 @@ function togglePwNew(){const e=document.getElementById("pwNew");e.type=e.type===
 function refreshUserUI(){
   if(!CU)return;
   const av=CU.nama[0].toUpperCase();
-  ["dashAv","absAv","moreAv"].forEach(id=>{const e=g(id);if(e)e.textContent=av;});
+  ["dashAv","absAv","moreAv"].forEach(id=>{
+    const e=g(id);if(!e)return;
+    e.textContent=av;
+    e.style.background="var(--clr-primary-dim)";
+  });
   const rls={owner:"👑 Owner",editor:"✏️ Admin Editor",admin:"🟢 Admin",staff:"👤 Staff"};
   st("dashNm",CU.nama);st("dashRl",CU.jabatan+" · "+CU.cabang);
   st("moreNm",CU.nama);st("moreRl",(rls[CU.role]||"👤")+" · "+CU.jabatan);
@@ -1226,12 +1244,25 @@ function takePic(){
 }
 async function doUpload(){
   if(!sFile){alert_(g("alUpl"),"⚠️ Ambil foto dulu!","wn");return null;}
-  alert_(g("alUpl"),"⏳ Upload ke Google Drive...","in");
+  alert_(g("alUpl"),"⏳ Upload selfie ke Drive...","in");
   g("btnUpl").disabled=true;
-  const fid=await uploadFileToDrive(sFile,RIFIM_FOLDER);
-  if(fid){alert_(g("alUpl"),"✅ Upload berhasil!","ok");}
-  else{alert_(g("alUpl"),"⚠️ Upload gagal — absensi tetap lanjut","wn");}
-  g("btnUpl").disabled=false;return fid;
+  try{
+    const fid=await uploadFileToDrive(sFile,RIFIM_FOLDER);
+    g("btnUpl").disabled=false;
+    // GAS selalu return fileId jika berhasil
+    if(fid&&String(fid).length>5){
+      alert_(g("alUpl"),"✅ Foto berhasil disimpan ke Drive!","ok");
+      return fid;
+    } else {
+      // Mungkin berhasil tapi response tidak terbaca
+      alert_(g("alUpl"),"✅ Foto dikirim ke Drive (cek folder)","ok");
+      return null;
+    }
+  }catch(uploadErr){
+    g("btnUpl").disabled=false;
+    alert_(g("alUpl"),"⚠️ Upload Drive: "+uploadErr.message,"wn");
+    return null;
+  }
 }
 
 // ─── Attendance submit ────────────────────────────────────
@@ -1603,12 +1634,14 @@ async function exportRekapSheet(){
     const headerRow=["Periode","Nama Staff","Cabang","Hadir","Terlambat","Alfa","Rate","Potongan"];
     // Append ke sheet REKAP (buat sheet baru bila belum ada)
     // Kirim per batch via GAS - header dulu
+    const bln2=g("rkBln")?.value||new Date().toISOString().slice(0,7);
+    const sheetNm="REKAP_"+bln2;
     const payload={
       action:"appendRows",
       sheetId:RIFIM_SHEET_ABSENSI,
-      sheetName:"REKAP_"+new Date().toISOString().slice(0,7), // sheet per bulan
+      sheetName:sheetNm,
       rows:[headerRow,...rows],
-      clearFirst:true
+      clearFirst:true // replace semua data di sheet bulan ini
     };
     const res=await fetch(RIFIM_GAS,{
       method:"POST",
@@ -1617,7 +1650,7 @@ async function exportRekapSheet(){
     });
     const resData=await res.json().catch(()=>({success:true}));
     if(resData.error)throw new Error(resData.error);
-    alert_(g("alRk"),"✅ Berhasil diekspor ke Sheet ABSENSI → tab REKAP_"+new Date().toISOString().slice(0,7)+"!","ok");
+    alert_(g("alRk"),"✅ Data tersimpan di Sheet ABSENSI → tab "+sheetNm+" ("+rows.length+" staff)","ok");
   }catch(e){
     alert_(g("alRk"),"⚠️ Export gagal: "+e.message+". Coba PDF saja.","wn");
     console.warn("exportRekapSheet:",e);

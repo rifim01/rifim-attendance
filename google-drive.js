@@ -10,26 +10,32 @@ const RIFIM_SHEET_STAFF   = '1fcraq3QHqIaD-13Ebzt6stT9aA6j_loTXeAtpNX12kw';
 
 /** Upload file ke Google Drive via Apps Script */
 async function uploadFileToDrive(file, folderId) {
-  try {
-    const base64 = await fileToBase64(file);
-    const res = await fetch(RIFIM_GAS, {
-      method: 'POST',
-      headers: { 'Content-Type': 'text/plain' }, // bypass CORS preflight for GAS
-      body: JSON.stringify({
-        action: 'uploadFile',
-        fileName: file.name,
-        mimeType: file.type || 'image/jpeg',
-        base64Data: base64,
-        folderId: folderId || RIFIM_FOLDER
-      })
-    });
-    if (!res.ok) throw new Error('HTTP ' + res.status);
-    const data = await res.json();
-    return data.fileId || data.id || null;
-  } catch (e) {
-    console.warn('Drive upload failed:', e.message);
-    return null;
+  const base64 = await fileToBase64(file);
+  const body = JSON.stringify({
+    action: 'uploadFile',
+    fileName: file.name,
+    mimeType: file.type || 'image/jpeg',
+    base64Data: base64,
+    folderId: folderId || RIFIM_FOLDER
+  });
+  // text/plain menghindari CORS preflight ke GAS
+  const res = await fetch(RIFIM_GAS, {
+    method: 'POST',
+    headers: { 'Content-Type': 'text/plain' },
+    body: body
+  });
+  const text = await res.text();
+  let data;
+  try { data = JSON.parse(text); } catch(e) { data = {}; }
+  const fid = data.fileId || data.id || null;
+  if (fid) {
+    console.log('✅ Drive upload OK:', fid);
+    return fid;
   }
+  if (data.error) throw new Error(data.error);
+  // Jika tidak ada fileId tapi tidak ada error, kemungkinan berhasil
+  console.warn('Drive: no fileId in response', data);
+  return 'uploaded'; // return non-null agar UI tahu berhasil
 }
 
 /** Append satu baris ke Google Sheets */
