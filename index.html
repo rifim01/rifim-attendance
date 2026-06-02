@@ -1283,9 +1283,11 @@ async function submitAbs(){
       });
       const sheetData=await sheetRes.json();
       if(!sheetData.success)throw new Error(sheetData.error||"Sheet error");
+      console.log("✅ Sheet ABSENSI updated");
     }catch(sheetErr){
-      console.warn("Sheet append failed:",sheetErr.message);
-      // Tidak batalkan absensi - data sudah di Firestore
+      console.warn("⚠️ Sheet append failed:",sheetErr.message);
+      // Data tetap tersimpan di Firestore - sheet optional
+      setSt("alSub","⚠️ Absensi tersimpan di sistem. Sheet belum update ("+sheetErr.message+")","wn");
     }
     sBlob=null;sFile=null;
     g("camPrev").style.display="none";g("camPlaceholder").style.display="flex";
@@ -1540,7 +1542,15 @@ async function doFilterRekap(){
       tbody.innerHTML=data.map(r=>{
         const t=r.H+r.T;
         const p=t>0?Math.round((r.H/t)*100):0;
-        const sn=r.cabang.replace("ID Rifim Airport ","").replace("ID Rifim ","");
+        const sn=r.cabang
+          .replace("ID Rifim Airport Balikpapan","Balikpapan")
+          .replace("ID Rifim Airport Batam","Batam")
+          .replace("ID Rifim Airport Jambi","Jambi")
+          .replace("ID Rifim Airport Manado","Manado")
+          .replace("ID Rifim Airport Pekanbaru","Pekanbaru")
+          .replace("ID Rifim Batam","Batam Kota")
+          .replace("ID Rifim Jambi Luar","Jambi Luar")
+          .replace("Admin","Admin");
         return `<tr style="border-bottom:1px solid var(--out-var);">
           <td style="padding:9px 10px;font-size:12px;font-weight:500;">${r.nama}</td>
           <td style="padding:9px 6px;font-size:10px;color:var(--txt-sec);text-align:center;">${sn}</td>
@@ -1640,12 +1650,14 @@ function renderStaff(q,cab){
       <div class="l-av" style="border-radius:14px;">${u.nama[0]}</div>
       <div class="l-main">
         <div class="l-title">${u.nama}</div>
-        <div class="l-sub">${u.jabatan} · ${u.id||"—"}</div>
+        <div class="l-sub" id="jab_${esc(u.nama)}">${u.jabatan} · ${u.id||"—"}</div>
         <div class="l-sub" style="margin-top:1px;">${u.cabang}</div>
       </div>
-      <div class="l-trail">
-        <div class="chip ${u.role==="editor"?"chip-info":u.role==="admin"?"chip-ok":"chip-primary"}" style="margin-bottom:4px;">${u.role}</div>
-        ${canEdit()?`<div onclick="delStaff('${esc(u.nama)}');event.stopPropagation();" style="font-size:11px;color:var(--clr-err);cursor:pointer;padding:2px 4px;">🗑 Hapus</div>`:""}
+      <div class="l-trail" style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;">
+        <div class="chip ${u.role==="editor"?"chip-info":u.role==="admin"?"chip-ok":"chip-primary"}">${u.role}</div>
+        ${canEdit()?`
+        <div onclick="editJabatan('${esc(u.nama)}');event.stopPropagation();" style="font-size:11px;color:var(--clr-info);cursor:pointer;padding:2px 4px;">✏️ Jabatan</div>
+        <div onclick="delStaff('${esc(u.nama)}');event.stopPropagation();" style="font-size:11px;color:var(--clr-err);cursor:pointer;padding:2px 4px;">🗑 Hapus</div>`:""}
       </div>
     </div>`).join("")||'<div style="padding:24px;text-align:center;color:var(--txt-sec);">Tidak ditemukan</div>';
 }
@@ -1654,6 +1666,19 @@ function delStaff(nm){
   if(!confirm(`Hapus ${nm}?`))return;
   STAFF=STAFF.filter(u=>u.nama!==nm);savePW();
   filterStaff(g("sfQ")?.value||"");
+}
+function editJabatan(nm){
+  if(!canEdit()){alert("Hanya Nabilla dan Owner!");return;}
+  const u=STAFF.find(s=>s.nama===nm);if(!u)return;
+  const jabList=["STAFF KONTER","PICKUP POINT","KOORDINATOR","ADMIN","DIREKTUR UTAMA"];
+  const cur=u.jabatan;
+  const opts=jabList.map((j,i)=>`${i+1}. ${j}${j===cur?" (sekarang)":""}`).join("\n");
+  const inp=prompt(`Jabatan untuk ${nm}:\n\n${opts}\n\nKetik nama jabatan baru:`,cur);
+  if(!inp||inp===cur)return;
+  u.jabatan=inp.trim().toUpperCase();
+  savePW();
+  filterStaff(g("sfQ")?.value||"");
+  alert("✅ Jabatan "+nm+" diubah ke: "+u.jabatan);
 }
 async function syncStaff(){
   if(!canEdit()){alert("Hanya Nabilla dan Owner!");return;}
@@ -1670,17 +1695,35 @@ async function syncStaff(){
     if(data.error)throw new Error(data.error);
     if(!data.staff||!data.staff.length)throw new Error("Data staff kosong dari sheet");
     
+    // Pertahankan editor/owner/admin + staff dari sheet
     const keep=STAFF.filter(u=>u.role==="editor"||u.role==="owner"||u.role==="admin");
     data.staff.forEach(r=>{
       const nm=r.nama.trim();
-      if(!nm||keep.find(k=>k.nama===nm))return;
-      keep.push({
-        nama:nm,jabatan:r.jabatan||"Staff",
-        cabang:r.cabang||"Admin",id:r.idStaff||"",
-        pw:STAFF.find(s=>s.nama===nm)?.pw||"rifim2024",role:"staff"
-      });
+      if(!nm)return;
+      const existing=keep.find(k=>k.nama===nm);
+      if(existing){
+        // Update jabatan dan cabang dari sheet
+        existing.jabatan=r.jabatan||existing.jabatan;
+        existing.cabang=r.cabang||existing.cabang;
+        existing.id=r.idStaff||existing.id;
+      } else {
+        keep.push({
+          nama:nm,
+          jabatan:r.jabatan||"Staff",
+          cabang:r.cabang||"Admin",
+          id:r.idStaff||"",
+          pw:STAFF.find(s=>s.nama===nm)?.pw||"rifim2024",
+          role:"staff"
+        });
+      }
     });
-    STAFF=keep;
+    // Hapus staff yang sudah tidak ada di sheet (kecuali editor/owner/admin)
+    const sheetNames=data.staff.map(r=>r.nama.trim());
+    const final=keep.filter(u=>
+      u.role==="editor"||u.role==="owner"||u.role==="admin"||
+      sheetNames.includes(u.nama)
+    );
+    STAFF=final;
     populateDropdowns(); // refresh dropdowns
     alert("✅ "+data.staff.length+" staff berhasil di-sync dari Google Sheets!");
     renderStaff("","");
