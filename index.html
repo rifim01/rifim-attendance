@@ -11,7 +11,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
 <meta http-equiv="Pragma" content="no-cache"/>
 <meta http-equiv="Expires" content="0"/>
-<title>RIFIM ERP</title>
+<title>RIFIM ERP</title><!-- v3.1 -->
 <link rel="manifest" href="manifest.json"/>
 <link rel="apple-touch-icon" href="assets/icons/icon-192.png"/>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
@@ -531,12 +531,12 @@ body{
       <div class="lgn-err" id="lgnErr"></div>
       <div style="margin-bottom:14px;">
         <label class="field-lbl">Login Sebagai</label>
-        <select id="selUser" class="md-sel"></select>
+        <select id="selUser" class="md-sel" autocomplete="off"></select>
       </div>
       <div style="margin-bottom:14px;">
         <label class="field-lbl">Password</label>
         <div class="inp-wrap">
-          <input type="password" id="pwIn" class="md-inp" placeholder="Masukkan password..."/>
+          <input type="password" id="pwIn" class="md-inp" placeholder="Masukkan password..." autocomplete="new-password" readonly onfocus="this.removeAttribute('readonly')"/>
           <button class="inp-eye" onclick="togglePw()">👁</button>
         </div>
       </div>
@@ -746,7 +746,8 @@ body{
       <div style="padding:8px 16px;display:flex;gap:8px;flex-wrap:wrap;">
         <select class="inp" style="flex:1;min-width:110px;font-size:12px;" id="rkPer"><option value="bulanan" selected>Bulanan</option><option value="mingguan">Mingguan</option><option value="harian">Harian</option></select>
         <select class="inp" style="flex:1;min-width:130px;font-size:12px;" id="rkCab"><option value="">Semua Cabang</option></select>
-        <input type="month" class="inp" style="flex:1;min-width:120px;font-size:12px;" id="rkBln"/>
+        <input type="month" class="inp" style="flex:1;min-width:110px;font-size:12px;" id="rkBln"/>
+        <input type="date" class="inp" style="flex:1;min-width:120px;font-size:12px;" id="rkTgl" title="Filter tanggal spesifik (opsional)"/>
       </div>
       <div style="padding:0 16px 8px;display:flex;gap:8px;flex-wrap:wrap;">
         <select class="inp" style="flex:1;min-width:120px;font-size:12px;" id="rkStaff"><option value="">Semua Staff</option></select>
@@ -1267,7 +1268,7 @@ async function submitAbs(){
     try{
       const sheetRes=await fetch(RIFIM_GAS,{
         method:"POST",
-        headers:{"Content-Type":"application/json"},
+        headers:{"Content-Type":"text/plain"}, // bypass CORS preflight
         body:JSON.stringify({
           action:"absensi",
           sheetId:RIFIM_SHEET_ABSENSI,
@@ -1497,9 +1498,13 @@ async function doFilterRekap(){
   try{
     // Build query - Firebase butuh index untuk multi-where
     if(!db){alert_(g("alRk"),"❌ Firebase tidak tersedia — cek koneksi internet","er");if(btn){btn.disabled=false;btn.textContent="🔍 Filter";}return;}
+    const tgl=g("rkTgl")?.value; // filter tanggal spesifik
     let q=db.collection("absensi");
     let rows=[];
-    if(bln){
+    if(tgl){
+      // Filter by specific date
+      q=q.where("tanggal","==",tgl);
+    } else if(bln){
       const [yr,mn]=bln.split("-");
       const lastDay=new Date(+yr,+mn,0).getDate();
       q=q.where("tanggal",">=",bln+"-01").where("tanggal","<=",bln+"-"+String(lastDay).padStart(2,"0"));
@@ -1597,19 +1602,22 @@ async function exportRekapSheet(){
     // Header row
     const headerRow=["Periode","Nama Staff","Cabang","Hadir","Terlambat","Alfa","Rate","Potongan"];
     // Append ke sheet REKAP (buat sheet baru bila belum ada)
+    // Kirim per batch via GAS - header dulu
+    const payload={
+      action:"appendRows",
+      sheetId:RIFIM_SHEET_ABSENSI,
+      sheetName:"REKAP_"+new Date().toISOString().slice(0,7), // sheet per bulan
+      rows:[headerRow,...rows],
+      clearFirst:true
+    };
     const res=await fetch(RIFIM_GAS,{
       method:"POST",
-      headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({
-        action:"appendRows",
-        sheetId:RIFIM_SHEET_ABSENSI,
-        sheetName:"REKAP",
-        rows:[headerRow,...rows],
-        clearFirst:false
-      })
+      headers:{"Content-Type":"text/plain"}, // text/plain bypass CORS preflight
+      body:JSON.stringify(payload)
     });
-    if(res.ok){alert_(g("alRk"),"✅ Berhasil diekspor ke Sheet ABSENSI → tab REKAP!","ok");}
-    else throw new Error("HTTP "+res.status);
+    const resData=await res.json().catch(()=>({success:true}));
+    if(resData.error)throw new Error(resData.error);
+    alert_(g("alRk"),"✅ Berhasil diekspor ke Sheet ABSENSI → tab REKAP_"+new Date().toISOString().slice(0,7)+"!","ok");
   }catch(e){
     alert_(g("alRk"),"⚠️ Export gagal: "+e.message+". Coba PDF saja.","wn");
     console.warn("exportRekapSheet:",e);
@@ -1688,7 +1696,7 @@ async function syncStaff(){
     // Coba via GAS proxy (lebih reliable)
     const res=await fetch(RIFIM_GAS,{
       method:"POST",
-      headers:{"Content-Type":"application/json"},
+      headers:{"Content-Type":"text/plain"},
       body:JSON.stringify({action:"getStaff"})
     });
     const data=await res.json();

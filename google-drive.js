@@ -14,7 +14,7 @@ async function uploadFileToDrive(file, folderId) {
     const base64 = await fileToBase64(file);
     const res = await fetch(RIFIM_GAS, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'text/plain' }, // bypass CORS preflight for GAS
       body: JSON.stringify({
         action: 'uploadFile',
         fileName: file.name,
@@ -37,7 +37,7 @@ async function appendToSheet(sheetId, sheetName, values) {
   try {
     const res = await fetch(RIFIM_GAS, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'text/plain' }, // bypass CORS preflight for GAS
       body: JSON.stringify({ action: 'appendRow', sheetId, sheetName, values })
     });
     if (!res.ok) throw new Error('HTTP ' + res.status);
@@ -53,7 +53,7 @@ async function appendRowsToSheet(sheetId, sheetName, rows, clearFirst=false) {
   try {
     const res = await fetch(RIFIM_GAS, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'text/plain' }, // bypass CORS preflight for GAS
       body: JSON.stringify({ action: 'appendRows', sheetId, sheetName, rows, clearFirst })
     });
     if (!res.ok) throw new Error('HTTP ' + res.status);

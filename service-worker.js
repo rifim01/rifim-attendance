@@ -1,27 +1,22 @@
-// RIFIM ERP Service Worker v4 - cache buster
-const CACHE = 'rifim-v4-' + Date.now();
+// RIFIM ERP Service Worker v5 - force no cache
+const VER = 'rifim-v5';
 
-// Install - skip waiting langsung aktif
-self.addEventListener('install', e => {
-  self.skipWaiting();
-});
+self.addEventListener('install', () => self.skipWaiting());
 
-// Activate - hapus semua cache lama
 self.addEventListener('activate', e => {
   e.waitUntil(
-    caches.keys().then(keys => 
-      Promise.all(keys.map(k => caches.delete(k)))
-    ).then(() => self.clients.claim())
+    caches.keys()
+      .then(keys => Promise.all(keys.map(k => caches.delete(k))))
+      .then(() => self.clients.claim())
   );
 });
 
-// Fetch - network first, no cache (untuk development)
+// Network only - no caching
 self.addEventListener('fetch', e => {
-  if(e.request.method !== 'GET') return;
-  // Selalu ambil dari network (bypass cache)
+  if (e.request.method !== 'GET') return;
   e.respondWith(
-    fetch(e.request).catch(() => {
-      return new Response('Offline', {status: 503});
-    })
+    fetch(e.request.url + (e.request.url.includes('?') ? '&' : '?') + '_sw=' + VER)
+      .catch(() => fetch(e.request))
+      .catch(() => new Response('', {status: 204}))
   );
 });
