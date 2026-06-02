@@ -1697,8 +1697,7 @@ async function syncStaff(){
       STAFF=keep;alert("✅ "+data2.length+" staff sync (via opensheet)");
       renderStaff("","");
     }catch(e2){
-      alert("❌ Sync gagal: "+e.message+"
-Fallback juga gagal: "+e2.message);
+      alert("❌ Sync gagal: "+e.message+"\nFallback juga gagal: "+e2.message);
       sendErrorEmail("syncStaff",e.message);
     }
   }finally{
