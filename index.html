@@ -8,6 +8,9 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
 <meta name="apple-mobile-web-app-title" content="RIFIM"/>
 <meta name="theme-color" content="#090910"/>
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
+<meta http-equiv="Pragma" content="no-cache"/>
+<meta http-equiv="Expires" content="0"/>
 <title>RIFIM ERP</title>
 <link rel="manifest" href="manifest.json"/>
 <link rel="apple-touch-icon" href="assets/icons/icon-192.png"/>
@@ -994,7 +997,7 @@ window.addEventListener("DOMContentLoaded",()=>{
   const safeProceed = () => { if(!proceeded){proceeded=true; proceedAfterSplash();} };
 
   // Paksa lanjut setelah 3 detik (anti-stuck)
-  setTimeout(safeProceed, 3000);
+  setTimeout(safeProceed, 2500);
 
   if(auth) {
     auth.onAuthStateChanged(()=>{ safeProceed(); });
@@ -1808,8 +1811,17 @@ async function reqPushPerm(){
 
 // ─── Service Worker ───────────────────────────────────────
 if("serviceWorker" in navigator){
-  navigator.serviceWorker.register("service-worker.js")
-    .then(reg=>{console.log("SW registered:",reg.scope);reqPushPerm();})
+  // Unregister semua SW lama dulu (bersihkan cache)
+  navigator.serviceWorker.getRegistrations().then(regs=>{
+    regs.forEach(r=>r.unregister());
+  });
+  // Clear semua cache lama
+  if(window.caches){
+    caches.keys().then(keys=>keys.forEach(k=>caches.delete(k)));
+  }
+  // Register SW baru
+  navigator.serviceWorker.register("service-worker.js?v="+Date.now())
+    .then(reg=>{console.log("SW registered v3:",reg.scope);reqPushPerm();})
     .catch(e=>console.warn("SW:",e));
 }
 </script>
