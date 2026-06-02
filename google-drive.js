@@ -3,7 +3,7 @@
 // Via Apps Script proxy (tanpa OAuth popup)
 // ─────────────────────────────────────────────────────────────
 
-const RIFIM_GAS    = 'https://script.google.com/macros/s/AKfycbyrUp1IVAOrHpXpDrpOvK4W6J0w6Ky9aI0T5TDTwHbCn7sUBu1U-8laJ5LfPU5Gy-Rd/exec';
+const RIFIM_GAS    = 'https://script.google.com/macros/s/AKfycbzd_X11jphLlMTGQYqDTcqbjjoJ1aizeoAY7-9ks5f1S2ZaDJqcRsuKR4FCluET1l65/exec';
 const RIFIM_FOLDER = '1Ejaz210g3TeM46W6up5BtgHNzEWwOnRQ';
 const RIFIM_SHEET_ABSENSI = '1FU5hKMpYn1qhsl4-xZYUZrXDhTOV6aRRewYEs6gIkxA';
 const RIFIM_SHEET_STAFF   = '1fcraq3QHqIaD-13Ebzt6stT9aA6j_loTXeAtpNX12kw';
