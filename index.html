@@ -2,1412 +2,1736 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0"/>
-<title>RIFIM ERP — Absensi</title>
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no,viewport-fit=cover"/>
+<meta name="mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-title" content="RIFIM"/>
+<meta name="theme-color" content="#090910"/>
+<title>RIFIM ERP</title>
 <link rel="manifest" href="manifest.json"/>
-<link rel="icon" href="assets/icons/icon-192.png"/>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<link rel="apple-touch-icon" href="assets/icons/icon-192.png"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&family=Google+Sans+Text:wght@400;500&family=Google+Sans+Mono:wght@400;500&display=swap" rel="stylesheet"/>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<!-- Firebase loaded synchronously (compat version requires this) -->
 <style>
+/*──────────────────────────────────────────────────────────
+  RIFIM ERP  ·  Material Design 3 · Android 14 Aesthetic
+  PT. Rifim International Gemilang
+──────────────────────────────────────────────────────────*/
 :root{
-  --bg:#0a0a0f;--sur:#131320;--sur2:#1a1a2e;--sur3:#1f1f35;
-  --bdr:rgba(255,255,255,.07);--bdr2:rgba(255,255,255,.13);
-  --red:#E53935;--red2:#ff1744;--red3:#ff5252;--rg:rgba(229,57,53,.3);
-  --grn:#00e676;--yel:#ffd740;--blu:#40c4ff;--pur:#ce93d8;
-  --txt:#f0f0ff;--txt2:#a0a0c0;--txt3:#606080;
-  --glh:rgba(255,255,255,.06);
+  /* MD3 Baseline */
+  --clr-primary:#E53935;
+  --clr-primary-dim:rgba(229,57,53,.15);
+  --clr-primary-glow:rgba(229,57,53,.35);
+  --clr-on-primary:#fff;
+  --clr-secondary:#FF8A80;
+  --clr-tertiary:#FF6F00;
+
+  /* Surface ramp */
+  --srf-bg:#090910;
+  --srf-0:#0F0F17;
+  --srf-1:#14141E;
+  --srf-2:#1A1A25;
+  --srf-3:#20202D;
+  --srf-4:#252533;
+
+  /* Text */
+  --txt-pri:#F1EFF8;
+  --txt-sec:#A8A4B8;
+  --txt-dis:#5A5770;
+
+  /* Outline */
+  --out-var:rgba(255,255,255,.07);
+  --out:rgba(255,255,255,.13);
+
+  /* Semantic */
+  --clr-ok:#00E676;
+  --clr-warn:#FFD740;
+  --clr-err:#FF5252;
+  --clr-info:#40C4FF;
+
+  /* Elevation */
+  --e1:0 1px 3px rgba(0,0,0,.45),0 1px 2px rgba(0,0,0,.3);
+  --e2:0 3px 8px rgba(0,0,0,.45),0 1px 3px rgba(0,0,0,.3);
+  --e3:0 6px 16px rgba(0,0,0,.5),0 2px 6px rgba(0,0,0,.3);
+
+  /* Layout */
+  --nav-h:68px;
+  --topbar-h:60px;
+  --sfi:env(safe-area-inset-bottom,0px);
+  --sft:env(safe-area-inset-top,0px);
+
+  /* Radius */
+  --r-xs:8px;
+  --r-sm:12px;
+  --r-md:16px;
+  --r-lg:24px;
+  --r-xl:32px;
+  --r-full:100px;
 }
-*{margin:0;padding:0;box-sizing:border-box;}
-body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--txt);min-height:100vh;overflow-x:hidden;}
 
-/* SPLASH */
-#splash{position:fixed;inset:0;z-index:9999;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;}
-.spl-logo{width:76px;height:76px;border-radius:20px;background:var(--red);display:flex;align-items:center;justify-content:center;overflow:hidden;box-shadow:0 0 60px var(--rg);animation:spp 1.5s ease-in-out infinite;}
-.spl-logo img{width:100%;height:100%;object-fit:cover;}
-@keyframes spp{0%,100%{box-shadow:0 0 40px var(--rg)}50%{box-shadow:0 0 80px var(--rg)}}
-.spl-t{font-family:'Syne',sans-serif;font-size:24px;font-weight:800;letter-spacing:2px;}
-.spl-s{color:var(--txt3);font-size:11px;letter-spacing:2px;}
-.spl-bar{width:160px;height:3px;background:rgba(255,255,255,.1);border-radius:99px;overflow:hidden;margin-top:4px;}
-.spl-fill{height:100%;background:var(--red);border-radius:99px;animation:spl 2.6s ease forwards;}
-@keyframes spl{from{width:0}to{width:100%}}
-#splash.hide{animation:fo .5s forwards;}
-@keyframes fo{to{opacity:0;pointer-events:none;visibility:hidden;}}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;touch-action:manipulation;}
+html{height:100%;overflow:hidden;background:var(--srf-bg);}
+body{
+  font-family:'Google Sans Text','Google Sans',sans-serif;
+  background:var(--srf-bg);color:var(--txt-pri);
+  height:100%;overflow:hidden;overscroll-behavior:none;
+  -webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;
+}
 
-/* LOGIN */
-#login{display:none;position:fixed;inset:0;z-index:100;background:var(--bg);align-items:center;justify-content:center;padding:20px;background-image:radial-gradient(ellipse at 20% 50%,rgba(229,57,53,.07) 0%,transparent 50%);}
-#login.on{display:flex;}
-.lgn-w{width:100%;max-width:420px;display:flex;flex-direction:column;align-items:center;gap:20px;}
-.lgn-logo{width:74px;height:74px;border-radius:20px;background:var(--red);overflow:hidden;box-shadow:0 8px 40px var(--rg);}
-.lgn-logo img{width:100%;height:100%;object-fit:cover;border-radius:18px;}
-.lgn-logo span{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-size:24px;font-weight:900;color:#fff;}
-.lgn-brand{text-align:center;}
-.lgn-brand h1{font-family:'Syne',sans-serif;font-size:24px;font-weight:800;letter-spacing:1.5px;background:linear-gradient(135deg,#fff,#ff8a80);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
-.lgn-brand p{color:var(--txt3);font-size:11px;margin-top:3px;letter-spacing:.6px;}
-.lgn-card{width:100%;background:var(--sur);border:1px solid var(--bdr2);border-radius:22px;padding:28px;box-shadow:0 20px 60px rgba(0,0,0,.5);}
-.fld{margin-bottom:14px;}
-.fld label{display:block;font-size:10px;font-weight:700;color:var(--txt3);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:6px;}
-.inp{width:100%;background:var(--sur2);border:1.5px solid var(--bdr);border-radius:10px;padding:12px 14px;color:var(--txt);font-size:13px;font-family:'DM Sans',sans-serif;outline:none;transition:.2s;appearance:none;}
-.inp:focus{border-color:var(--red);box-shadow:0 0 0 3px rgba(229,57,53,.12);background:var(--sur3);}
-.pw-w{position:relative;}
-.pw-w .inp{padding-right:44px;}
-.pw-eye{position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--txt3);cursor:pointer;font-size:16px;}
-.lgn-btn{width:100%;padding:14px;background:linear-gradient(135deg,var(--red),var(--red2));border:none;border-radius:12px;color:#fff;font-size:14px;font-weight:700;font-family:'DM Sans',sans-serif;cursor:pointer;transition:.2s;margin-top:6px;box-shadow:0 8px 24px var(--rg);display:flex;align-items:center;justify-content:center;gap:8px;}
-.lgn-btn:hover{transform:translateY(-2px);box-shadow:0 12px 32px var(--rg);}
-.lgn-btn:disabled{opacity:.6;transform:none;cursor:not-allowed;}
-.lgn-foot{text-align:center;color:var(--txt3);font-size:9px;font-weight:700;letter-spacing:1.5px;margin-top:16px;}
-#lgn-err{background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.25);border-radius:9px;padding:9px 12px;color:#ff8a80;font-size:12px;font-weight:600;display:none;margin-bottom:10px;}
+/* ══ RIPPLE ENGINE ══════════════════════════════════════ */
+.ripple-host{position:relative;overflow:hidden;}
+@keyframes md-ripple{from{transform:scale(0);opacity:.35}to{transform:scale(4.5);opacity:0}}
+.md-ripple-el{
+  position:absolute;border-radius:50%;
+  background:rgba(255,255,255,.28);
+  animation:md-ripple .55s cubic-bezier(.4,0,.2,1);
+  pointer-events:none;transform:scale(0);
+}
 
-/* APP */
-#app{display:none;}
-#app.on{display:flex;min-height:100vh;}
+/* ══ SPLASH ═════════════════════════════════════════════ */
+#splash{
+  position:fixed;inset:0;z-index:9999;
+  background:var(--srf-bg);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:0;
+}
+.spl-ring{
+  position:relative;width:96px;height:96px;
+  animation:spl-ring-in .7s cubic-bezier(.34,1.56,.64,1) .2s both;
+}
+@keyframes spl-ring-in{from{transform:scale(0) rotate(-90deg);opacity:0}to{transform:scale(1) rotate(0);opacity:1}}
+.spl-icon{
+  width:96px;height:96px;border-radius:28px;
+  background:var(--clr-primary);
+  display:flex;align-items:center;justify-content:center;overflow:hidden;
+  box-shadow:0 12px 40px rgba(229,57,53,.45);
+}
+.spl-icon img{width:100%;height:100%;object-fit:cover;border-radius:26px;}
+.spl-title{
+  font-family:'Google Sans',sans-serif;
+  font-size:30px;font-weight:700;letter-spacing:3px;
+  margin-top:26px;color:var(--txt-pri);
+  animation:spl-txt .5s ease .75s both;
+}
+.spl-sub{
+  font-size:11px;color:var(--txt-sec);letter-spacing:2.5px;
+  margin-top:6px;
+  animation:spl-txt .5s ease .9s both;
+}
+@keyframes spl-txt{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.spl-bar-wrap{
+  position:absolute;bottom:0;left:0;right:0;height:3px;
+  background:rgba(255,255,255,.06);overflow:hidden;
+}
+.spl-bar{height:100%;background:var(--clr-primary);animation:spl-load 2.6s ease forwards;}
+@keyframes spl-load{0%{width:0%;opacity:.8}60%{width:75%;opacity:1}100%{width:100%;opacity:1}}
+#splash.exit{animation:spl-exit .35s ease forwards;}
+@keyframes spl-exit{to{opacity:0;pointer-events:none;visibility:hidden;}}
 
-/* SIDEBAR */
-.sb{width:252px;min-height:100vh;background:var(--sur);border-right:1px solid var(--bdr);display:flex;flex-direction:column;position:sticky;top:0;flex-shrink:0;transition:.3s;}
-.sb-top{padding:20px 16px;border-bottom:1px solid var(--bdr);}
-.sb-brand{display:flex;align-items:center;gap:10px;}
-.sb-lg{width:38px;height:38px;border-radius:10px;background:var(--red);overflow:hidden;box-shadow:0 4px 14px var(--rg);flex-shrink:0;}
-.sb-lg img{width:100%;height:100%;object-fit:cover;}
-.sb-lg span{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-size:12px;font-weight:900;color:#fff;}
-.sb-title{font-family:'Syne',sans-serif;font-size:14px;font-weight:800;}
-.sb-sub{font-size:8px;color:var(--txt3);font-weight:700;letter-spacing:.8px;margin-top:1px;}
-.sb-nav{flex:1;padding:12px 8px;display:flex;flex-direction:column;gap:2px;overflow-y:auto;}
-.nav-sec{font-size:8px;font-weight:700;color:var(--txt3);letter-spacing:2px;text-transform:uppercase;padding:7px 11px 3px;margin-top:5px;}
-.nav-btn{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;color:var(--txt2);cursor:pointer;transition:.18s;border:none;background:none;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;width:100%;text-align:left;}
-.nav-btn:hover{background:var(--glh);color:var(--txt);}
-.nav-btn.on{background:rgba(229,57,53,.14);color:var(--red3);border:1px solid rgba(229,57,53,.18);}
-.nav-btn.readonly{opacity:.6;}
-.nav-btn .ic{font-size:15px;flex-shrink:0;}
-.nav-lock{margin-left:auto;font-size:10px;color:var(--txt3);}
-.sb-user{padding:13px 16px;border-top:1px solid var(--bdr);display:flex;align-items:center;gap:10px;}
-.u-av{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--red),#ff5252);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:#fff;flex-shrink:0;}
-.u-nm{font-size:12px;font-weight:700;}
-.u-rl{font-size:9px;margin-top:1px;}
-.u-rl.owner{color:#ffd740;}
-.u-rl.admin{color:#00e676;}
-.u-rl.editor{color:#40c4ff;}
-.u-rl.staff{color:var(--txt3);}
-.lo-btn{margin-left:auto;background:none;border:none;color:var(--txt3);cursor:pointer;font-size:14px;padding:5px;border-radius:7px;transition:.2s;}
-.lo-btn:hover{color:var(--red);background:rgba(229,57,53,.1);}
+/* ══ LOGIN ══════════════════════════════════════════════ */
+#loginScr{
+  display:none;position:fixed;inset:0;z-index:200;
+  background:var(--srf-bg);overflow-y:auto;overscroll-behavior:contain;
+  padding:calc(var(--sft) + 24px) 0 40px;
+}
+#loginScr.on{display:block;}
+.lgn-wrap{max-width:400px;margin:0 auto;padding:0 20px;display:flex;flex-direction:column;align-items:center;min-height:80vh;justify-content:center;}
+.lgn-brand{
+  width:88px;height:88px;border-radius:26px;
+  background:var(--clr-primary);overflow:hidden;
+  box-shadow:0 10px 36px rgba(229,57,53,.4);
+  margin-bottom:20px;
+}
+.lgn-brand img{width:100%;height:100%;object-fit:cover;}
+.lgn-brand-fb{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-family:'Google Sans';font-size:32px;font-weight:700;color:#fff;}
+.lgn-h{font-family:'Google Sans';font-size:28px;font-weight:700;text-align:center;letter-spacing:.5px;}
+.lgn-p{font-size:12px;color:var(--txt-sec);text-align:center;margin-top:5px;letter-spacing:.5px;}
+.lgn-card{
+  width:100%;margin-top:28px;
+  background:var(--srf-1);border-radius:var(--r-xl);
+  border:1px solid var(--out-var);padding:22px 20px;
+}
+.field-lbl{font-size:10px;font-weight:700;letter-spacing:1.2px;color:var(--txt-sec);text-transform:uppercase;margin-bottom:7px;display:block;}
+.md-sel,.md-inp{
+  width:100%;height:52px;border-radius:var(--r-md);
+  background:var(--srf-2);border:1.5px solid var(--out-var);
+  color:var(--txt-pri);font-family:'Google Sans Text',sans-serif;
+  font-size:14px;padding:0 14px;outline:none;
+  transition:border-color .2s,box-shadow .2s,background .2s;
+  appearance:none;
+}
+.md-sel{cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24'%3E%3Cpath fill='%23A8A4B8' d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center;padding-right:38px;}
+.md-inp:focus,.md-sel:focus{border-color:var(--clr-primary);background:var(--srf-3);box-shadow:0 0 0 3px rgba(229,57,53,.14);}
+.inp-wrap{position:relative;margin-bottom:14px;}
+.inp-wrap .md-inp{padding-right:48px;}
+.inp-eye{position:absolute;right:2px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--txt-sec);cursor:pointer;width:44px;height:44px;display:flex;align-items:center;justify-content:center;font-size:17px;border-radius:50%;}
+.btn-filled{
+  width:100%;height:52px;border:none;border-radius:var(--r-md);
+  background:var(--clr-primary);color:#fff;
+  font-family:'Google Sans';font-size:15px;font-weight:700;
+  cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;
+  box-shadow:0 4px 16px rgba(229,57,53,.4);
+  transition:box-shadow .2s,transform .1s;
+  margin-top:4px;position:relative;overflow:hidden;
+}
+.btn-filled:hover{box-shadow:0 6px 22px rgba(229,57,53,.5);}
+.btn-filled:active{transform:scale(.98);}
+.btn-filled:disabled{opacity:.45;pointer-events:none;}
+.lgn-err{
+  background:rgba(255,82,82,.09);border:1px solid rgba(255,82,82,.22);
+  border-radius:var(--r-sm);padding:10px 13px;color:#FF8A80;
+  font-size:12px;font-weight:500;display:none;margin-bottom:12px;
+}
+.lgn-foot{font-size:9px;color:var(--txt-dis);letter-spacing:2px;margin-top:20px;text-align:center;}
 
-/* MAIN */
-.main{flex:1;display:flex;flex-direction:column;min-width:0;}
-.topbar{padding:13px 24px;background:var(--sur);border-bottom:1px solid var(--bdr);display:flex;align-items:center;justify-content:space-between;gap:12px;position:sticky;top:0;z-index:10;}
-.tb-l h2{font-family:'Syne',sans-serif;font-size:16px;font-weight:800;}
-.tb-l p{font-size:10px;color:var(--txt3);margin-top:1px;}
-.tb-r{display:flex;align-items:center;gap:10px;}
-.tb-clk{font-family:'Syne',sans-serif;font-size:11px;color:var(--txt2);background:var(--sur2);padding:5px 12px;border-radius:20px;border:1px solid var(--bdr);}
-.mob-btn{display:none;background:none;border:none;color:var(--txt2);font-size:18px;cursor:pointer;}
-.live-dot{display:inline-flex;align-items:center;gap:5px;font-size:10px;color:var(--grn);font-weight:700;}
-.live-dot::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--grn);box-shadow:0 0 6px var(--grn);animation:lp 1.5s infinite;}
+/* ══ APP SHELL ══════════════════════════════════════════ */
+#app{display:none;position:fixed;inset:0;flex-direction:column;}
+#app.on{display:flex;}
+
+/* ── Safe area top spacer ── */
+.sft-bar{flex-shrink:0;height:var(--sft);background:var(--srf-0);}
+
+/* ══ TOP APP BAR ════════════════════════════════════════ */
+.topbar{
+  flex-shrink:0;height:var(--topbar-h);
+  background:var(--srf-0);
+  border-bottom:1px solid var(--out-var);
+  display:flex;align-items:center;padding:0 6px 0 16px;gap:8px;
+  position:relative;z-index:10;
+}
+.tb-title-wrap{flex:1;min-width:0;}
+.tb-title{font-family:'Google Sans';font-size:19px;font-weight:700;line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.tb-sub{font-size:11px;color:var(--txt-sec);margin-top:1px;line-height:1;}
+.tb-right{display:flex;align-items:center;gap:2px;margin-left:auto;flex-shrink:0;}
+.icon-btn{
+  width:42px;height:42px;border-radius:50%;border:none;
+  background:none;color:var(--txt-sec);font-size:18px;
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;position:relative;overflow:hidden;transition:.15s;
+}
+.icon-btn:active{background:var(--srf-3);}
+.clock-pill{
+  background:var(--srf-2);border:1px solid var(--out-var);
+  border-radius:var(--r-full);padding:5px 13px;
+  font-family:'Google Sans Mono','Google Sans',monospace;
+  font-size:12px;color:var(--txt-sec);letter-spacing:.5px;
+  white-space:nowrap;
+}
+
+/* ══ CONTENT AREA ════════════════════════════════════════ */
+#content{
+  flex:1;overflow-y:auto;overflow-x:hidden;
+  overscroll-behavior-y:contain;
+  -webkit-overflow-scrolling:touch;
+  padding-bottom:calc(var(--nav-h) + var(--sfi) + 20px);
+  scroll-behavior:smooth;
+}
+#content::-webkit-scrollbar{display:none;}
+
+/* ══ PAGES ═══════════════════════════════════════════════ */
+.pg{display:none;animation:pg-in .28s cubic-bezier(.4,0,.2,1);}
+.pg.on{display:block;}
+@keyframes pg-in{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+
+/* ══ BOTTOM NAV ══════════════════════════════════════════ */
+.bnav{
+  position:fixed;bottom:0;left:0;right:0;z-index:30;
+  height:calc(var(--nav-h) + var(--sfi));
+  padding-bottom:var(--sfi);
+  background:var(--srf-0);
+  border-top:1px solid var(--out-var);
+  display:flex;align-items:flex-start;padding-top:8px;
+  box-shadow:0 -4px 20px rgba(0,0,0,.4);
+  backdrop-filter:blur(20px);
+  -webkit-backdrop-filter:blur(20px);
+}
+.bn-btn{
+  flex:1;border:none;background:none;
+  display:flex;flex-direction:column;align-items:center;gap:3px;
+  cursor:pointer;padding:0;font-family:'Google Sans Text',sans-serif;
+  position:relative;overflow:hidden;
+}
+.bn-pill{
+  width:60px;height:32px;border-radius:var(--r-full);
+  display:flex;align-items:center;justify-content:center;
+  font-size:20px;transition:.25s cubic-bezier(.34,1.2,.64,1);
+  position:relative;overflow:hidden;
+}
+.bn-btn:active .bn-pill{transform:scale(.88);}
+.bn-btn.on .bn-pill{background:rgba(229,57,53,.18);width:68px;}
+.bn-lbl{font-size:11px;font-weight:500;color:var(--txt-sec);transition:.15s;line-height:1;}
+.bn-btn.on .bn-lbl{color:var(--clr-primary);font-weight:700;}
+.bn-badge{
+  position:absolute;top:0;right:10px;
+  width:8px;height:8px;border-radius:50%;
+  background:var(--clr-primary);display:none;
+  box-shadow:0 0 6px rgba(229,57,53,.6);
+}
+.bn-badge.on{display:block;}
+
+/* ══ FAB ═════════════════════════════════════════════════ */
+#fab{
+  position:fixed;right:18px;
+  bottom:calc(var(--nav-h) + var(--sfi) + 14px);
+  z-index:25;
+  width:56px;height:56px;border-radius:18px;border:none;
+  background:var(--clr-primary);color:#fff;font-size:24px;
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;
+  box-shadow:var(--e3),0 4px 18px var(--clr-primary-glow);
+  transition:.25s cubic-bezier(.34,1.56,.64,1);
+  animation:fab-in .5s cubic-bezier(.34,1.56,.64,1) 1.2s both;
+  position:fixed;overflow:hidden;
+}
+@keyframes fab-in{from{transform:scale(0);opacity:0}to{transform:scale(1);opacity:1}}
+#fab:active{transform:scale(.9);}
+#fab.hide{transform:scale(0)!important;opacity:0;pointer-events:none;}
+
+/* ══ COMPONENTS ══════════════════════════════════════════ */
+
+/* Card */
+.card{background:var(--srf-1);border-radius:var(--r-lg);border:1px solid var(--out-var);overflow:hidden;margin:8px 16px;}
+.card.fill{background:var(--srf-2);border:none;}
+.card.outline{background:transparent;border-color:var(--out);}
+
+/* Section header */
+.sec-hdr{display:flex;align-items:center;justify-content:space-between;padding:16px 16px 8px;}
+.sec-lbl{font-size:12px;font-weight:700;color:var(--txt-sec);text-transform:uppercase;letter-spacing:1.2px;}
+
+/* Stat chips row */
+.stats-row{display:flex;gap:10px;padding:8px 16px 4px;overflow-x:auto;}
+.stats-row::-webkit-scrollbar{display:none;}
+.stat-chip{
+  flex-shrink:0;min-width:100px;
+  background:var(--srf-1);border:1px solid var(--out-var);
+  border-radius:var(--r-md);padding:14px 14px 12px;
+}
+.stat-val{font-family:'Google Sans';font-size:28px;font-weight:700;line-height:1;}
+.stat-lbl{font-size:11px;color:var(--txt-sec);margin-top:4px;font-weight:500;}
+
+/* List item */
+.list-item{
+  display:flex;align-items:center;gap:14px;
+  padding:12px 16px;border-bottom:1px solid var(--out-var);
+  position:relative;overflow:hidden;cursor:pointer;
+  transition:background .12s;
+}
+.list-item:last-child{border-bottom:none;}
+.list-item:active{background:var(--srf-2);}
+.l-av{
+  width:42px;height:42px;border-radius:14px;flex-shrink:0;
+  background:var(--clr-primary-dim);color:var(--clr-secondary);
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Google Sans';font-size:16px;font-weight:700;
+}
+.l-main{flex:1;min-width:0;}
+.l-title{font-size:14px;font-weight:500;color:var(--txt-pri);}
+.l-sub{font-size:12px;color:var(--txt-sec);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.l-trail{text-align:right;flex-shrink:0;}
+
+/* Chips */
+.chip{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:var(--r-xs);font-size:11px;font-weight:700;letter-spacing:.3px;}
+.chip-ok{background:rgba(0,230,118,.09);color:var(--clr-ok);border:1px solid rgba(0,230,118,.2);}
+.chip-err{background:rgba(255,82,82,.1);color:var(--clr-err);border:1px solid rgba(255,82,82,.2);}
+.chip-warn{background:rgba(255,215,64,.09);color:var(--clr-warn);border:1px solid rgba(255,215,64,.2);}
+.chip-info{background:rgba(64,196,255,.09);color:var(--clr-info);border:1px solid rgba(64,196,255,.2);}
+.chip-primary{background:rgba(229,57,53,.1);color:var(--clr-secondary);border:1px solid rgba(229,57,53,.2);}
+.chip-dim{background:var(--srf-3);color:var(--txt-sec);border:1px solid var(--out-var);}
+
+/* Btn tonal */
+.btn-tonal{
+  border:none;border-radius:var(--r-sm);height:42px;padding:0 18px;
+  font-family:'Google Sans';font-size:13px;font-weight:600;
+  cursor:pointer;display:inline-flex;align-items:center;gap:6px;
+  transition:.15s;position:relative;overflow:hidden;
+}
+
+/* Input */
+.inp{
+  width:100%;background:var(--srf-2);border:1.5px solid var(--out-var);
+  border-radius:var(--r-sm);padding:11px 14px;color:var(--txt-pri);
+  font-family:'Google Sans Text',sans-serif;font-size:13px;
+  outline:none;appearance:none;transition:.2s;
+}
+.inp:focus{border-color:var(--clr-primary);background:var(--srf-3);}
+.inp-lbl{font-size:10px;font-weight:700;letter-spacing:1px;color:var(--txt-sec);text-transform:uppercase;margin-bottom:6px;display:block;}
+
+/* Search bar */
+.search-bar{
+  display:flex;align-items:center;gap:10px;
+  margin:8px 16px;padding:10px 16px;
+  background:var(--srf-2);border-radius:var(--r-full);
+  border:1px solid var(--out-var);
+}
+.search-bar input{flex:1;background:none;border:none;outline:none;color:var(--txt-pri);font-size:14px;font-family:'Google Sans Text',sans-serif;}
+.search-bar input::placeholder{color:var(--txt-dis);}
+
+/* Alert box */
+.alert{padding:10px 14px;border-radius:var(--r-sm);font-size:12px;font-weight:500;display:none;margin:0 16px 10px;}
+.alert.on{display:block;}
+.alert-ok{background:rgba(0,230,118,.07);color:var(--clr-ok);border:1px solid rgba(0,230,118,.18);}
+.alert-er{background:rgba(255,82,82,.07);color:var(--clr-err);border:1px solid rgba(255,82,82,.18);}
+.alert-in{background:rgba(64,196,255,.07);color:var(--clr-info);border:1px solid rgba(64,196,255,.18);}
+.alert-wn{background:rgba(255,215,64,.07);color:var(--clr-warn);border:1px solid rgba(255,215,64,.18);}
+
+/* Divider */
+.div{height:1px;background:var(--out-var);margin:0 16px;}
+
+/* ══ PAGE — ATTENDANCE ════════════════════════════════════ */
+.cam-box{
+  margin:0 16px;border-radius:var(--r-lg);overflow:hidden;
+  background:#000;aspect-ratio:4/3;max-height:255px;
+  position:relative;border:1px solid var(--out-var);
+}
+.cam-box video,.cam-box img{width:100%;height:100%;object-fit:cover;}
+.cam-face-guide{
+  position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  pointer-events:none;
+}
+.cam-face-guide div{
+  width:100px;height:130px;border-radius:50%;
+  border:2px dashed rgba(229,57,53,.55);
+  box-shadow:0 0 0 9999px rgba(0,0,0,.22);
+}
+.cam-actions{display:flex;gap:8px;padding:10px 16px;}
+.cam-actions .btn-tonal{flex:1;justify-content:center;height:46px;border-radius:var(--r-sm);font-size:12px;}
+.cam-btn-inactive{background:var(--srf-2);color:var(--txt-sec);}
+.cam-btn-active{background:var(--clr-primary);color:#fff;box-shadow:0 3px 12px rgba(229,57,53,.35);}
+.type-row{display:flex;gap:10px;padding:0 16px 10px;}
+.type-card{
+  flex:1;padding:12px 10px;border-radius:var(--r-md);text-align:center;
+  background:var(--srf-2);border:2px solid var(--out-var);cursor:pointer;
+  transition:.18s;
+}
+.type-card.on{border-color:var(--clr-primary);background:rgba(229,57,53,.1);}
+.type-ic{font-size:22px;margin-bottom:4px;}
+.type-lbl{font-size:12px;font-weight:600;color:var(--txt-sec);}
+.type-card.on .type-lbl{color:var(--clr-primary);}
+.gps-box{
+  margin:0 16px 10px;padding:12px 16px;border-radius:var(--r-md);
+  display:flex;align-items:center;gap:10px;font-size:13px;font-weight:600;
+}
+.gps-ok{background:rgba(0,230,118,.07);border:1px solid rgba(0,230,118,.18);color:var(--clr-ok);}
+.gps-no{background:rgba(255,82,82,.07);border:1px solid rgba(255,82,82,.18);color:var(--clr-err);}
+.gps-load{background:rgba(255,215,64,.07);border:1px solid rgba(255,215,64,.18);color:var(--clr-warn);}
+.gps-adm{background:rgba(64,196,255,.07);border:1px solid rgba(64,196,255,.18);color:var(--clr-info);}
+.gps-grid{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;padding:0 16px 10px;}
+.gps-cell{background:var(--srf-2);border-radius:var(--r-sm);padding:9px 10px;}
+.gps-cell-lbl{font-size:9px;font-weight:700;color:var(--txt-dis);text-transform:uppercase;letter-spacing:.8px;}
+.gps-cell-val{font-family:'Google Sans Mono',monospace;font-size:11px;font-weight:500;margin-top:3px;color:var(--txt-sec);}
+
+/* ══ PAGE — JADWAL ═══════════════════════════════════════ */
+.week-nav{display:flex;align-items:center;gap:8px;padding:8px 16px;}
+.week-nav-btn{
+  width:38px;height:38px;border-radius:50%;border:1px solid var(--out);
+  background:var(--srf-2);color:var(--txt-sec);font-size:16px;
+  display:flex;align-items:center;justify-content:center;cursor:pointer;
+  flex-shrink:0;transition:.15s;
+}
+.week-nav-btn:active{background:var(--srf-3);}
+.week-lbl{flex:1;text-align:center;font-size:13px;font-weight:600;}
+.shift-leg{display:flex;gap:6px;padding:0 16px 8px;flex-wrap:wrap;align-items:center;}
+.s-pill{padding:3px 9px;border-radius:6px;font-size:10px;font-weight:700;cursor:pointer;}
+.sp{background:rgba(0,230,118,.1);color:#00E676;border:1px solid rgba(0,230,118,.2);}
+.ss{background:rgba(255,215,64,.1);color:#FFD740;border:1px solid rgba(255,215,64,.2);}
+.sl{background:rgba(90,87,112,.15);color:var(--txt-dis);border:1px solid var(--out-var);}
+.att-dots{display:flex;gap:3px;margin-top:4px;}
+.att-d{width:13px;height:13px;border-radius:4px;background:var(--srf-4);border:1px solid var(--out-var);cursor:pointer;transition:.15s;}
+.att-d:hover{transform:scale(1.18);}
+.att-d.H{background:#10b981;border-color:#059669;}
+.att-d.T{background:#f59e0b;border-color:#d97706;}
+.att-d.A{background:#ef4444;border-color:#b91c1c;}
+.jd-tbl-wrap{overflow-x:auto;}
+.jd-tbl{width:100%;border-collapse:collapse;min-width:480px;}
+.jd-tbl th{padding:8px 5px;font-size:9px;font-weight:700;color:var(--txt-sec);text-transform:uppercase;letter-spacing:.8px;background:var(--srf-2);text-align:center;}
+.jd-tbl th:first-child{text-align:left;padding-left:12px;}
+.jd-tbl td{padding:5px 4px;border-bottom:1px solid var(--out-var);text-align:center;vertical-align:middle;}
+.jd-tbl td:first-child{text-align:left;padding-left:12px;}
+.ktr-tbl{width:100%;border-collapse:collapse;}
+.ktr-inp{background:transparent;border:none;outline:none;color:var(--txt-pri);font-family:'Google Sans Text',sans-serif;font-size:12px;width:100%;padding:2px 0;}
+.ktr-inp::placeholder{color:var(--txt-dis);}
+
+/* ══ SUCCESS OVERLAY ══════════════════════════════════════ */
+#sucOv{
+  display:none;position:fixed;inset:0;z-index:300;
+  background:rgba(9,9,16,.92);
+  backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+  align-items:center;justify-content:center;flex-direction:column;gap:16px;
+}
+#sucOv.on{display:flex;animation:pg-in .3s ease;}
+.suc-circle{
+  width:90px;height:90px;border-radius:50%;
+  background:rgba(0,230,118,.1);border:2px solid rgba(0,230,118,.3);
+  display:flex;align-items:center;justify-content:center;font-size:40px;
+  animation:suc-pop .5s cubic-bezier(.34,1.56,.64,1);
+}
+@keyframes suc-pop{from{transform:scale(0)}to{transform:scale(1)}}
+.suc-ttl{font-family:'Google Sans';font-size:22px;font-weight:700;color:var(--clr-ok);}
+.suc-card{
+  background:var(--srf-1);border:1px solid var(--out-var);
+  border-radius:var(--r-xl);padding:22px 24px;width:290px;text-align:center;
+}
+.suc-nm{font-family:'Google Sans';font-size:19px;font-weight:700;margin-bottom:3px;}
+.suc-inf{font-size:11px;color:var(--txt-sec);margin-bottom:12px;}
+.suc-time{font-family:'Google Sans Mono','Google Sans',monospace;font-size:38px;font-weight:700;color:var(--clr-primary);}
+.suc-meta{font-size:11px;color:var(--txt-sec);margin-top:4px;}
+
+/* ══ RESPONSIVE ══════════════════════════════════════════ */
+@media(min-width:600px){
+  .bnav,.topbar,.sft-bar,#content{max-width:560px;margin-left:auto;margin-right:auto;}
+  .bnav{left:50%;transform:translateX(-50%);border-radius:28px 28px 0 0;}
+  #fab{right:calc(50% - 280px + 18px);}
+}
 @keyframes lp{0%,100%{opacity:1}50%{opacity:.3}}
-
-/* READONLY BANNER */
-.ro-banner{background:rgba(255,215,64,.08);border:1px solid rgba(255,215,64,.2);border-radius:12px;padding:10px 16px;color:#ffd740;font-size:12px;font-weight:600;margin-bottom:16px;display:none;align-items:center;gap:8px;}
-.ro-banner.on{display:flex;}
-
-/* PAGES */
-.page{display:none;padding:20px 24px;animation:fi .28s ease;}
-.page.on{display:block;}
-@keyframes fi{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
-
-/* STAT GRID */
-.sg{display:grid;grid-template-columns:repeat(auto-fit,minmax(165px,1fr));gap:12px;margin-bottom:20px;}
-.sc{background:var(--sur);border:1px solid var(--bdr);border-radius:15px;padding:16px;display:flex;align-items:center;gap:13px;transition:.2s;}
-.sc:hover{border-color:var(--bdr2);transform:translateY(-1px);}
-.sc-ic{width:42px;height:42px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:19px;flex-shrink:0;}
-.sc-v{font-family:'Syne',sans-serif;font-size:24px;font-weight:800;line-height:1;}
-.sc-l{font-size:10px;color:var(--txt3);font-weight:600;margin-top:3px;text-transform:uppercase;letter-spacing:.4px;}
-
-/* TABLE */
-.tw{background:var(--sur);border:1px solid var(--bdr);border-radius:15px;overflow:hidden;overflow-x:auto;}
-.tw table{width:100%;border-collapse:collapse;min-width:480px;}
-.tw thead{background:var(--sur2);}
-.tw th{padding:10px 13px;font-size:9px;font-weight:700;color:var(--txt3);text-transform:uppercase;letter-spacing:1px;text-align:left;white-space:nowrap;}
-.tw td{padding:10px 13px;font-size:12px;color:var(--txt2);border-bottom:1px solid var(--bdr);vertical-align:middle;}
-.tw tr:last-child td{border-bottom:none;}
-.tw tr:hover td{background:var(--glh);}
-
-/* BADGE */
-.bdg{display:inline-flex;align-items:center;font-size:10px;font-weight:700;padding:2px 8px;border-radius:99px;}
-.ok{background:rgba(0,230,118,.1);color:#00e676;border:1px solid rgba(0,230,118,.2);}
-.er{background:rgba(255,82,82,.1);color:#ff5252;border:1px solid rgba(255,82,82,.2);}
-.wn{background:rgba(255,215,64,.1);color:#ffd740;border:1px solid rgba(255,215,64,.2);}
-.bl{background:rgba(64,196,255,.1);color:#40c4ff;border:1px solid rgba(64,196,255,.2);}
-.pu{background:rgba(206,147,216,.1);color:#ce93d8;border:1px solid rgba(206,147,216,.2);}
-
-/* BTN */
-.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 15px;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer;transition:.18s;font-family:'DM Sans',sans-serif;border:none;white-space:nowrap;}
-.btn-r{background:linear-gradient(135deg,var(--red),var(--red2));color:#fff;box-shadow:0 4px 14px var(--rg);}
-.btn-r:hover{transform:translateY(-1px);box-shadow:0 6px 20px var(--rg);}
-.btn-r:disabled{opacity:.5;transform:none;cursor:not-allowed;}
-.btn-g{background:var(--sur2);color:var(--txt2);border:1px solid var(--bdr);}
-.btn-g:hover{background:var(--sur3);color:var(--txt);}
-.btn-grn{background:linear-gradient(135deg,#00c853,#00e676);color:#000;font-weight:800;}
-.btn-bl{background:linear-gradient(135deg,#0288d1,#40c4ff);color:#fff;}
-.btn-pu{background:linear-gradient(135deg,#7b1fa2,#ce93d8);color:#fff;}
-
-/* SECTION TITLE */
-.sec-t{font-family:'Syne',sans-serif;font-size:13px;font-weight:800;margin-bottom:12px;display:flex;align-items:center;gap:7px;flex-wrap:wrap;}
-
-/* STATUS BOX */
-.stbox{padding:9px 13px;border-radius:9px;font-weight:600;font-size:12px;margin-top:7px;display:none;}
-.st-ok{background:rgba(0,230,118,.08);color:#00e676;border:1px solid rgba(0,230,118,.18);}
-.st-er{background:rgba(239,68,68,.08);color:#ff5252;border:1px solid rgba(239,68,68,.18);}
-.st-in{background:rgba(64,196,255,.08);color:#40c4ff;border:1px solid rgba(64,196,255,.18);}
-.st-wn{background:rgba(255,215,64,.08);color:#ffd740;border:1px solid rgba(255,215,64,.18);}
-
-/* ABSENSI */
-.abs-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
-.abs-card{background:var(--sur);border:1px solid var(--bdr);border-radius:16px;padding:20px;}
-.abs-card h3{font-family:'Syne',sans-serif;font-size:13px;font-weight:800;margin-bottom:14px;display:flex;align-items:center;gap:6px;}
-.si-card{background:var(--sur2);border:1px solid var(--bdr);border-radius:12px;padding:13px;display:flex;align-items:center;gap:12px;margin-bottom:13px;}
-.si-av{width:44px;height:44px;border-radius:12px;background:linear-gradient(135deg,var(--red),#ff5252);display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:800;color:#fff;flex-shrink:0;}
-.si-nm{font-size:13px;font-weight:700;}
-.si-rl{font-size:10px;color:var(--txt3);margin-top:2px;}
-#camWrap{width:100%;aspect-ratio:4/3;max-height:260px;border-radius:13px;overflow:hidden;background:#000;position:relative;border:2px solid var(--bdr);margin-bottom:11px;}
-#camVid{width:100%;height:100%;object-fit:cover;}
-#camPrev{display:none;width:100%;height:100%;object-fit:cover;}
-.cam-ov{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none;}
-.face-c{width:100px;height:130px;border:2px dashed rgba(229,57,53,.6);border-radius:50%;opacity:.7;}
-.gps-data{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:11px;}
-.gps-box{background:var(--sur2);border:1px solid var(--bdr);border-radius:10px;padding:10px 12px;}
-.gps-box label{font-size:8px;font-weight:700;color:var(--txt3);text-transform:uppercase;letter-spacing:1px;display:block;margin-bottom:3px;}
-.gps-box span{font-size:12px;font-weight:600;color:var(--txt);font-family:'Syne',sans-serif;}
-.gps-sb{padding:12px 14px;border-radius:12px;font-weight:700;font-size:12px;margin-bottom:11px;display:flex;align-items:center;gap:8px;}
-.gps-v{background:rgba(0,230,118,.08);color:#00e676;border:1px solid rgba(0,230,118,.18);}
-.gps-i{background:rgba(239,68,68,.08);color:#ff5252;border:1px solid rgba(239,68,68,.18);}
-.gps-l{background:rgba(255,215,64,.07);color:#ffd740;border:1px solid rgba(255,215,64,.18);}
-.type-btns{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:13px;}
-.type-btn{padding:10px;border-radius:10px;border:2px solid var(--bdr);background:var(--sur2);color:var(--txt2);cursor:pointer;font-size:11px;font-weight:700;transition:.18s;text-align:center;font-family:'DM Sans',sans-serif;}
-.type-btn.on{border-color:var(--red);background:rgba(229,57,53,.1);color:var(--red3);}
-
-/* SUCCESS */
-#sucOv{display:none;position:fixed;inset:0;z-index:200;background:rgba(10,10,15,.96);align-items:center;justify-content:center;flex-direction:column;gap:16px;}
-#sucOv.on{display:flex;}
-.suc-ic{width:80px;height:80px;border-radius:50%;background:rgba(0,230,118,.1);border:2px solid rgba(0,230,118,.28);display:flex;align-items:center;justify-content:center;font-size:36px;animation:sp .5s cubic-bezier(.34,1.56,.64,1);}
-@keyframes sp{from{transform:scale(0)}to{transform:scale(1)}}
-.suc-t{font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:var(--grn);}
-.suc-card{background:var(--sur);border:1px solid var(--bdr);border-radius:16px;padding:20px;width:300px;text-align:center;}
-.suc-nm{font-size:16px;font-weight:700;margin-bottom:4px;}
-.suc-sub{font-size:10px;color:var(--txt3);margin-bottom:12px;}
-.suc-time{font-family:'Syne',sans-serif;font-size:28px;font-weight:900;color:var(--red3);}
-.suc-info{font-size:10px;color:var(--txt2);margin-top:3px;}
-
-/* JADWAL */
-.jdw-ctrl{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;align-items:center;}
-.week-nav{display:flex;align-items:center;gap:10px;margin-bottom:13px;flex-wrap:wrap;}
-.week-lbl{font-family:'Syne',sans-serif;font-size:14px;font-weight:800;}
-.shift-badge{display:inline-block;padding:4px 7px;border-radius:7px;font-size:10px;font-weight:700;min-width:56px;text-align:center;}
-.sp{background:rgba(0,230,118,.12);color:#00e676;border:1px solid rgba(0,230,118,.25);}
-.ss{background:rgba(255,215,64,.12);color:#ffd740;border:1px solid rgba(255,215,64,.25);}
-.sl{background:rgba(100,116,139,.12);color:#94a3b8;border:1px solid rgba(100,116,139,.25);}
-.shift-btn-cell{cursor:pointer;}
-.shift-btn-cell:hover .shift-badge{filter:brightness(1.3);}
-.chk-row{display:flex;justify-content:center;gap:4px;margin-top:3px;}
-.chk-box{width:13px;height:13px;border-radius:3px;cursor:pointer;border:1px solid var(--bdr2);background:var(--sur2);transition:.12s;}
-.chk-box:hover{transform:scale(1.2);}
-.chk-box.H{background:#10b981;border-color:#059669;}
-.chk-box.T{background:#f59e0b;border-color:#d97706;}
-.chk-box.A{background:#ef4444;border-color:#b91c1c;}
-.ktr-inp{background:transparent;border:none;color:var(--txt);font-family:'DM Sans',sans-serif;font-size:11px;width:100%;outline:none;}
-
-/* REKAP FILTER */
-.rek-f{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;align-items:center;}
-
-/* CHART */
-.chart-w{background:var(--sur);border:1px solid var(--bdr);border-radius:15px;padding:16px;margin-bottom:16px;}
-.chart-t{font-family:'Syne',sans-serif;font-size:13px;font-weight:800;margin-bottom:12px;}
-.bar-r{display:flex;align-items:center;gap:10px;margin-bottom:7px;}
-.bar-l{font-size:10px;color:var(--txt3);width:50px;text-align:right;}
-.bar-bg{flex:1;height:8px;background:var(--sur2);border-radius:99px;overflow:hidden;}
-.bar-f{height:100%;background:var(--red);border-radius:99px;transition:width .8s ease;}
-.bar-f.g{background:var(--grn);}
-.bar-v{font-size:10px;font-weight:700;color:var(--txt2);width:22px;}
-
-/* PASSWORD SETTINGS */
-.pw-card{background:var(--sur);border:1px solid var(--bdr);border-radius:15px;padding:18px;margin-bottom:14px;}
-.pw-card h3{font-family:'Syne',sans-serif;font-size:13px;font-weight:800;margin-bottom:14px;display:flex;align-items:center;gap:7px;}
-.pw-row{display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:9px;align-items:end;margin-bottom:9px;}
-
-/* MOBILE */
-.sb-ov{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:98;}
-
-::-webkit-scrollbar{width:4px;height:4px;}
-::-webkit-scrollbar-thumb{background:var(--bdr2);border-radius:99px;}
-
-@media(max-width:860px){
-  .abs-grid{grid-template-columns:1fr;}
-  .mob-btn{display:block;}
-  .sb{position:fixed;left:-254px;top:0;bottom:0;z-index:99;transition:.3s;width:252px;}
-  .sb.open{left:0;}
-  .sb-ov.on{display:block;}
-  #app.on{flex-direction:column;}
-  .main{width:100%;}
-  .topbar,.page{padding-left:14px;padding-right:14px;}
-  .sg{grid-template-columns:1fr 1fr;gap:9px;}
-}
-@media(max-width:480px){
-  .sg{grid-template-columns:1fr 1fr;}
-  .sc{padding:12px;gap:9px;}
-  .sc-ic{width:36px;height:36px;font-size:16px;}
-  .sc-v{font-size:20px;}
-  .pw-row{grid-template-columns:1fr 1fr;}
-}
 </style>
 </head>
 <body>
 
-<!-- SPLASH -->
+<!-- ══ SPLASH ════════════════════════════════════════════ -->
 <div id="splash">
-  <div class="spl-logo"><img src="assets/logo.png" alt="RI" onerror="this.style.display='none';this.parentNode.innerHTML='<span style=\'font-family:Syne;font-size:24px;font-weight:900;color:#fff\'>RI</span>'"/></div>
-  <div class="spl-t">RIFIM ERP</div>
-  <div class="spl-s">AIRPORT OPERATIONS SYSTEM</div>
-  <div class="spl-bar"><div class="spl-fill"></div></div>
+  <div class="spl-ring">
+    <div class="spl-icon">
+      <img src="assets/logo.png" alt="RI" id="splImg" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"/>
+      <div style="display:none;width:100%;height:100%;align-items:center;justify-content:center;font-family:'Google Sans';font-size:28px;font-weight:700;color:#fff;">RI</div>
+    </div>
+  </div>
+  <div class="spl-title">RIFIM ERP</div>
+  <div class="spl-sub">AIRPORT OPERATIONS SYSTEM</div>
+  <div class="spl-bar-wrap"><div class="spl-bar"></div></div>
 </div>
 
-<!-- LOGIN -->
-<div id="login">
-  <div class="lgn-w">
-    <div class="lgn-logo"><img src="assets/logo.png" alt="RI" onerror="this.parentNode.innerHTML='<span>RI</span>'"/></div>
+<!-- ══ LOGIN ════════════════════════════════════════════ -->
+<div id="loginScr">
+  <div class="lgn-wrap">
     <div class="lgn-brand">
-      <h1>RIFIM ERP</h1>
-      <p>PT. RIFIM INTERNATIONAL GEMILANG</p>
-      <p style="margin-top:1px;">Airport Operations & Administration</p>
+      <img src="assets/logo.png" alt="RI" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"/>
+      <div class="lgn-brand-fb" style="display:none;">RI</div>
     </div>
+    <div class="lgn-h">RIFIM ERP</div>
+    <div class="lgn-p">PT. RIFIM INTERNATIONAL GEMILANG</div>
     <div class="lgn-card">
-      <div id="lgn-err"></div>
-      <div class="fld">
-        <label>Login Sebagai</label>
-        <select id="selUser" class="inp"><option value="">Pilih Staff...</option></select>
+      <div class="lgn-err" id="lgnErr"></div>
+      <div style="margin-bottom:14px;">
+        <label class="field-lbl">Login Sebagai</label>
+        <select id="selUser" class="md-sel"></select>
       </div>
-      <div class="fld">
-        <label>Password Akses</label>
-        <div class="pw-w"><input type="password" id="pwIn" class="inp" placeholder="Password..."/><button class="pw-eye" onclick="togglePw()">👁</button></div>
+      <div style="margin-bottom:14px;">
+        <label class="field-lbl">Password</label>
+        <div class="inp-wrap">
+          <input type="password" id="pwIn" class="md-inp" placeholder="Masukkan password..."/>
+          <button class="inp-eye" onclick="togglePw()">👁</button>
+        </div>
       </div>
-      <button class="lgn-btn" id="lgnBtn" onclick="doLogin()">🔐 Masuk ke Sistem</button>
-      <div class="lgn-foot">INTEGRITAS • INOVASI • KUALITAS • KEBERLANJUTAN</div>
+      <button class="btn-filled ripple-host" id="lgnBtn" onclick="doLogin()">🔐 &nbsp;Masuk ke Sistem</button>
+      <div class="lgn-foot" style="margin-top:16px;">INTEGRITAS · INOVASI · KUALITAS · KEBERLANJUTAN</div>
     </div>
   </div>
 </div>
 
-<!-- SUCCESS -->
+<!-- ══ SUCCESS OVERLAY ════════════════════════════════════ -->
 <div id="sucOv">
-  <div class="suc-ic">✅</div>
-  <div class="suc-t">ABSENSI BERHASIL</div>
+  <div class="suc-circle">✅</div>
+  <div class="suc-ttl">ABSENSI BERHASIL</div>
   <div class="suc-card">
     <div class="suc-nm" id="scNm">—</div>
-    <div class="suc-sub" id="scCb">—</div>
+    <div class="suc-inf" id="scCb">—</div>
     <div class="suc-time" id="scTm">—</div>
-    <div class="suc-info">Foto & GPS tersimpan ke sistem</div>
-    <div style="margin-top:7px;"><span class="bdg ok" id="scSt">Absen Masuk</span></div>
+    <div class="suc-meta">Tersimpan ke Firebase + Google Sheets</div>
+    <div style="margin-top:10px;"><span id="scSt" class="chip chip-ok">Absen Masuk</span></div>
   </div>
-  <button class="btn btn-g" style="margin-top:5px;" onclick="hideSuc()">← Kembali ke Dashboard</button>
+  <button class="btn-filled ripple-host" style="width:260px;height:46px;border-radius:var(--r-sm);font-size:13px;" onclick="hideSuc()">← Kembali ke Dashboard</button>
 </div>
 
-<!-- APP -->
+<!-- ══ APP SHELL ══════════════════════════════════════════ -->
 <div id="app">
-  <div class="sb-ov" id="sbOv" onclick="closeSb()"></div>
+  <div class="sft-bar"></div>
 
-  <!-- SIDEBAR -->
-  <aside class="sb" id="sb">
-    <div class="sb-top">
-      <div class="sb-brand">
-        <div class="sb-lg"><img src="assets/logo.png" alt="RI" onerror="this.parentNode.innerHTML='<span>RI</span>'"/></div>
-        <div><div class="sb-title">RIFIM</div><div class="sb-sub">ERP ABSENSI</div></div>
-      </div>
+  <!-- Top Bar -->
+  <div class="topbar">
+    <div class="tb-title-wrap">
+      <div class="tb-title" id="pgTitle">Dashboard</div>
+      <div class="tb-sub" id="pgSub">Selamat datang</div>
     </div>
-    <nav class="sb-nav" id="sbNav">
-      <!-- Built dynamically based on role -->
-    </nav>
-    <div class="sb-user">
-      <div class="u-av" id="uAv">?</div>
-      <div><div class="u-nm" id="uNm">—</div><div class="u-rl" id="uRl">—</div></div>
-      <button class="lo-btn" onclick="doLogout()" title="Logout">🚪</button>
+    <div class="tb-right">
+      <div class="clock-pill" id="clk">--:--:--</div>
+      <button class="icon-btn ripple-host" onclick="doLogout()" title="Logout">🚪</button>
     </div>
-  </aside>
+  </div>
 
-  <!-- MAIN -->
-  <div class="main">
-    <div class="topbar">
-      <div style="display:flex;align-items:center;gap:10px;">
-        <button class="mob-btn" onclick="toggleSb()">☰</button>
-        <div class="tb-l"><h2 id="pgTitle">Dashboard</h2><p id="pgSub">Statistik kehadiran realtime</p></div>
-      </div>
-      <div class="tb-r">
-        <div class="live-dot">LIVE</div>
-        <div class="tb-clk" id="clk">--:--</div>
-      </div>
-    </div>
+  <!-- Content -->
+  <div id="content">
 
-    <!-- READ-ONLY BANNER -->
-    <div style="padding:0 24px;padding-top:12px;" id="roBannerWrap" style="display:none;">
-      <div class="ro-banner" id="roBanner">👁 Mode Lihat Saja — Anda tidak memiliki akses edit halaman ini</div>
-    </div>
-
-    <!-- ══ DASHBOARD ══ -->
-    <div class="page on" id="pgDashboard">
-      <div class="sg">
-        <div class="sc"><div class="sc-ic" style="background:rgba(229,57,53,.1);">👥</div><div><div class="sc-v" id="dTS">—</div><div class="sc-l">Total Staff</div></div></div>
-        <div class="sc"><div class="sc-ic" style="background:rgba(0,230,118,.08);">✅</div><div><div class="sc-v" id="dH" style="color:var(--grn)">—</div><div class="sc-l">Hadir Hari Ini</div></div></div>
-        <div class="sc"><div class="sc-ic" style="background:rgba(255,215,64,.08);">⏳</div><div><div class="sc-v" id="dB" style="color:var(--yel)">—</div><div class="sc-l">Belum Absen</div></div></div>
-        <div class="sc"><div class="sc-ic" style="background:rgba(255,82,82,.1);">⚠️</div><div><div class="sc-v" id="dTL" style="color:var(--red3)">—</div><div class="sc-l">Terlambat</div></div></div>
-      </div>
-      <div class="chart-w">
-        <div class="chart-t">📈 Grafik Kehadiran Minggu Ini</div>
-        <div id="weekChart"></div>
-      </div>
-      <div class="sec-t">📋 Kehadiran Realtime
-        <div class="live-dot" style="margin-left:5px;">Auto Update</div>
-        <button class="btn btn-g" style="margin-left:auto;font-size:11px;padding:6px 11px;" onclick="loadDash()">🔄</button>
-      </div>
-      <div class="tw"><table>
-        <thead><tr><th>#</th><th>Nama SPG</th><th>Bandara</th><th>Jabatan</th><th>Tipe</th><th>Status</th><th>Jam</th><th>GPS</th></tr></thead>
-        <tbody id="rtTable"><tr><td colspan="8" style="text-align:center;padding:24px;color:var(--txt3);">⏳ Memuat...</td></tr></tbody>
-      </table></div>
-    </div>
-
-    <!-- ══ ABSENSI ══ -->
-    <div class="page" id="pgAbsensi">
-      <div class="si-card">
-        <div class="si-av" id="abAv">?</div>
-        <div><div class="si-nm" id="abNm">—</div><div class="si-rl" id="abRl">—</div></div>
-        <span class="bdg bl" id="abSh" style="margin-left:auto;">—</span>
-      </div>
-      <div class="abs-grid">
-        <div>
-          <div class="abs-card">
-            <h3>📸 Selfie Verification</h3>
-            <div class="fld" style="margin-bottom:11px;">
-              <label>Lokasi / Cabang</label>
-              <select id="selCab" class="inp" onchange="valGPS();updateShift()" style="font-size:12px;"></select>
-            </div>
-            <div class="type-btns">
-              <button class="type-btn on" id="btnM" onclick="setType('masuk')">🌅 Absen Masuk</button>
-              <button class="type-btn" id="btnP" onclick="setType('pulang')">🌆 Absen Pulang</button>
-            </div>
-            <div id="camWrap">
-              <video id="camVid" autoplay playsinline></video>
-              <img id="camPrev"/>
-              <div class="cam-ov" id="camOv"><div class="face-c"></div></div>
-            </div>
-            <div style="display:flex;gap:8px;margin-bottom:8px;">
-              <button class="btn btn-g" style="flex:1" id="btnSC" onclick="startCam()">📷 Aktifkan Kamera</button>
-              <button class="btn btn-r" style="flex:1" id="btnTP" onclick="takePic()" disabled>📸 Ambil Foto</button>
-            </div>
-            <button class="btn btn-g" style="width:100%;margin-bottom:7px;background:rgba(0,200,83,.08);color:#00e676;border-color:rgba(0,200,83,.18);" onclick="doUpload()" id="btnUpl" disabled>☁️ Upload Selfie ke Drive</button>
-            <div id="uplSt" class="stbox"></div>
+    <!-- ▌PAGE: HOME ▌ -->
+    <div class="pg on" id="pgHome">
+      <!-- User hero card -->
+      <div class="card" style="margin:12px 16px 8px;">
+        <div style="padding:16px 16px 14px;display:flex;align-items:center;gap:14px;">
+          <div class="l-av" style="width:52px;height:52px;border-radius:18px;font-size:20px;" id="dashAv">?</div>
+          <div>
+            <div style="font-family:'Google Sans';font-size:17px;font-weight:700;" id="dashNm">—</div>
+            <div style="font-size:12px;color:var(--txt-sec);margin-top:2px;" id="dashRl">—</div>
           </div>
-        </div>
-        <div>
-          <div class="abs-card">
-            <h3>📍 GPS Validation</h3>
-            <div class="gps-data">
-              <div class="gps-box"><label>Latitude</label><span id="gLat">⏳</span></div>
-              <div class="gps-box"><label>Longitude</label><span id="gLng">⏳</span></div>
-              <div class="gps-box"><label>Akurasi</label><span id="gAcc">-</span></div>
-              <div class="gps-box"><label>Jarak</label><span id="gDst">-</span></div>
+          <div style="margin-left:auto;display:flex;flex-direction:column;align-items:flex-end;gap:5px;">
+            <div style="display:flex;align-items:center;gap:4px;font-size:10px;font-weight:700;color:var(--clr-ok);">
+              <div style="width:6px;height:6px;border-radius:50%;background:var(--clr-ok);box-shadow:0 0 6px var(--clr-ok);animation:lp 1.5s infinite;"></div>LIVE
             </div>
-            <div class="gps-sb gps-l" id="gpsSB">⏳ Memuat GPS...</div>
-            <button class="btn btn-g" style="width:100%;margin-bottom:11px;" onclick="refreshGPS()">🔄 Refresh GPS</button>
-            <div style="background:var(--sur2);border:1px solid var(--bdr);border-radius:10px;padding:12px;margin-bottom:11px;">
-              <div style="font-size:9px;font-weight:700;color:var(--txt3);text-transform:uppercase;letter-spacing:1px;margin-bottom:5px;">Jadwal Hari Ini</div>
-              <div style="font-size:12px;font-weight:600;" id="shiftInfo">Memuat...</div>
-            </div>
-            <button class="btn btn-r" style="width:100%;padding:14px;font-size:14px;justify-content:center;" id="btnKrm" onclick="submitAbs()">🚀 Kirim Absensi</button>
-            <div id="subSt" class="stbox"></div>
+            <div class="chip chip-dim" id="dashDate" style="font-size:10px;"></div>
           </div>
         </div>
       </div>
+      <!-- Stats -->
+      <div class="stats-row">
+        <div class="stat-chip"><div class="stat-val" id="dTS" style="color:var(--clr-primary)">—</div><div class="stat-lbl">Total Staff</div></div>
+        <div class="stat-chip"><div class="stat-val" id="dH" style="color:var(--clr-ok)">—</div><div class="stat-lbl">Hadir</div></div>
+        <div class="stat-chip"><div class="stat-val" id="dB" style="color:var(--clr-warn)">—</div><div class="stat-lbl">Belum</div></div>
+        <div class="stat-chip"><div class="stat-val" id="dTL" style="color:var(--clr-err)">—</div><div class="stat-lbl">Terlambat</div></div>
+        <div class="stat-chip"><div class="stat-val" id="dPot" style="color:#FF6F00;font-size:18px;">Rp 0</div><div class="stat-lbl">Potongan</div></div>
+      </div>
+      <!-- Cabang mini filter -->
+      <div class="sec-hdr">
+        <div class="sec-lbl">Kehadiran Hari Ini</div>
+        <button class="btn-tonal cam-btn-inactive ripple-host" onclick="loadDash()" style="height:32px;border-radius:var(--r-full);font-size:11px;padding:0 14px;">🔄 Refresh</button>
+      </div>
+      <div class="card" id="dashList">
+        <div style="padding:24px;text-align:center;color:var(--txt-sec);font-size:13px;">⏳ Memuat data...</div>
+      </div>
     </div>
 
-    <!-- ══ JADWAL ══ -->
-    <div class="page" id="pgJadwal">
-      <div class="ro-banner" id="roBannerJadwal"></div>
-      <div class="jdw-ctrl">
-        <select class="inp" style="width:auto;min-width:170px;" id="jCab"><option value="">Semua Cabang</option></select>
-        <input type="date" class="inp" style="width:auto;" id="jDate"/>
-        <button class="btn btn-g" onclick="loadJadwal()">🔄 Muat</button>
-        <button class="btn btn-r" onclick="syncJadwal()" id="btnSyncJ">📥 Sync DB Staff</button>
-        <button class="btn btn-g" onclick="genJadwal()" id="btnGenJ">✨ Generate</button>
-        <button class="btn btn-bl" onclick="exportJadwalPDF()" id="btnPdfJ">📄 PDF ke Drive</button>
+    <!-- ▌PAGE: ATTENDANCE ▌ -->
+    <div class="pg" id="pgAtt">
+      <!-- Staff info strip -->
+      <div class="card" style="margin:10px 16px 8px;">
+        <div style="padding:12px 16px;display:flex;align-items:center;gap:12px;">
+          <div class="l-av" style="width:44px;height:44px;border-radius:14px;font-size:16px;" id="absAv">?</div>
+          <div><div style="font-size:14px;font-weight:600;" id="absNm">—</div><div style="font-size:11px;color:var(--txt-sec);margin-top:1px;" id="absJab">—</div></div>
+          <span class="chip chip-info" id="absSh" style="margin-left:auto;">—</span>
+        </div>
+      </div>
+      <!-- Cabang select -->
+      <div style="padding:0 16px 8px;">
+        <label class="inp-lbl">Lokasi / Cabang</label>
+        <select id="selCab" class="inp" style="font-size:13px;" onchange="onCabChange()"></select>
+      </div>
+      <!-- Tipe absen -->
+      <div class="type-row">
+        <div class="type-card on ripple-host" id="btnM" onclick="setType('masuk')">
+          <div class="type-ic">🌅</div>
+          <div class="type-lbl">Absen Masuk</div>
+        </div>
+        <div class="type-card ripple-host" id="btnP" onclick="setType('pulang')">
+          <div class="type-ic">🌆</div>
+          <div class="type-lbl">Absen Pulang</div>
+        </div>
+      </div>
+      <!-- Camera -->
+      <div class="cam-box">
+        <video id="camVid" autoplay playsinline style="display:none;"></video>
+        <img id="camPrev" style="display:none;"/>
+        <div class="cam-face-guide" id="camGuide">
+          <div></div>
+        </div>
+        <div id="camPlaceholder" style="width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;background:var(--srf-2);">
+          <div style="font-size:40px;">📷</div>
+          <div style="font-size:12px;color:var(--txt-sec);">Klik "Buka Kamera" untuk mulai</div>
+        </div>
+      </div>
+      <div class="cam-actions">
+        <button class="btn-tonal cam-btn-inactive ripple-host" id="btnSC" onclick="startCam()" style="font-size:12px;">📷 Buka Kamera</button>
+        <button class="btn-tonal ripple-host" id="btnTP" onclick="takePic()" disabled style="background:var(--srf-3);color:var(--txt-dis);font-size:12px;">📸 Foto Selfie</button>
+      </div>
+      <div style="padding:0 16px 8px;">
+        <button class="btn-tonal ripple-host" id="btnUpl" onclick="doUpload()" disabled style="width:100%;height:44px;justify-content:center;background:rgba(64,196,255,.08);color:var(--clr-info);border:1px solid rgba(64,196,255,.18);font-size:12px;border-radius:var(--r-sm);">☁️ Upload Selfie ke Google Drive</button>
+      </div>
+      <div id="alUpl" class="alert"></div>
+      <!-- GPS section -->
+      <div class="sec-hdr" style="padding-top:4px;">
+        <div class="sec-lbl">Validasi GPS</div>
+        <button class="btn-tonal cam-btn-inactive" onclick="getGPS()" style="height:30px;border-radius:var(--r-full);font-size:10px;padding:0 12px;">🔄 Refresh</button>
+      </div>
+      <div class="gps-grid">
+        <div class="gps-cell"><div class="gps-cell-lbl">Lat</div><div class="gps-cell-val" id="gLat">⏳</div></div>
+        <div class="gps-cell"><div class="gps-cell-lbl">Lng</div><div class="gps-cell-val" id="gLng">⏳</div></div>
+        <div class="gps-cell"><div class="gps-cell-lbl">Akurasi</div><div class="gps-cell-val" id="gAcc">-</div></div>
+        <div class="gps-cell"><div class="gps-cell-lbl">Jarak</div><div class="gps-cell-val" id="gDst">-</div></div>
+      </div>
+      <div class="gps-box gps-load" id="gpsBox">⏳ Menunggu sinyal GPS...</div>
+      <!-- Shift info -->
+      <div class="card fill" style="margin:0 16px 16px;padding:12px 14px;">
+        <div style="font-size:9px;font-weight:700;color:var(--txt-dis);letter-spacing:1px;margin-bottom:3px;">JADWAL SHIFT HARI INI</div>
+        <div style="font-size:13px;font-weight:600;" id="shiftTxt">Pilih cabang untuk melihat shift</div>
+      </div>
+      <div id="alSub" class="alert"></div>
+    </div>
+
+    <!-- ▌PAGE: JADWAL ▌ -->
+    <div class="pg" id="pgJd">
+      <div style="padding:8px 16px;display:flex;gap:8px;flex-wrap:wrap;">
+        <select class="inp" style="flex:1;min-width:140px;font-size:12px;" id="jCab"><option value="">Semua Cabang</option></select>
+        <input type="date" class="inp" style="flex:1;min-width:130px;font-size:12px;" id="jDate"/>
       </div>
       <div class="week-nav">
-        <button class="btn btn-g" onclick="prevWeek()">← Lalu</button>
+        <button class="week-nav-btn" onclick="prevWeek()">‹</button>
         <div class="week-lbl" id="weekLbl">—</div>
-        <button class="btn btn-g" onclick="nextWeek()">Depan →</button>
-        <div style="margin-left:auto;font-size:11px;color:var(--txt3);">
-          <span style="color:#10b981;margin-right:6px;">■</span>H
-          <span style="color:#f59e0b;margin:0 6px;">■</span>T
-          <span style="color:#ef4444;margin-right:6px;">■</span>A
+        <button class="week-nav-btn" onclick="nextWeek()">›</button>
+      </div>
+      <div class="shift-leg">
+        <span style="font-size:10px;color:var(--txt-sec);font-weight:700;margin-right:2px;">SHIFT:</span>
+        <span class="s-pill sp">PAGI 07:05</span>
+        <span class="s-pill ss">SIANG 15:05</span>
+        <span class="s-pill sl">LIBUR</span>
+        <span style="background:rgba(91,124,247,.1);color:#a5b4fc;border:1px solid rgba(91,124,247,.2);padding:3px 8px;border-radius:6px;font-size:9px;font-weight:700;">⚡ Batam 14:05</span>
+      </div>
+      <!-- Table -->
+      <div class="card">
+        <div class="jd-tbl-wrap">
+          <table class="jd-tbl">
+            <thead id="jHead"></thead>
+            <tbody id="jBody">
+              <tr><td colspan="8" style="padding:24px;text-align:center;color:var(--txt-sec);font-size:13px;">Klik ✨ Generate Jadwal</td></tr>
+            </tbody>
+          </table>
         </div>
       </div>
-      <!-- Shift Info Bar -->
-      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;padding:10px 14px;background:var(--sur);border:1px solid var(--bdr);border-radius:12px;font-size:11px;">
-        <span style="color:var(--txt3);font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-right:4px;">SHIFT:</span>
-        <span class="shift-badge sp">PAGI 07:05</span>
-        <span class="shift-badge ss">SIANG 15:05</span>
-        <span class="shift-badge sl">LIBUR —</span>
-        <span style="background:rgba(91,124,247,.12);color:#818cf8;border:1px solid rgba(91,124,247,.25);padding:3px 9px;border-radius:99px;font-size:10px;font-weight:700;">⚡ Batam SIANG = 14:05</span>
-      </div>
-      <!-- Rules Bar -->
-      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:13px;padding:9px 13px;background:#0a0e1c;border:1px solid var(--bdr);border-radius:12px;font-size:10px;">
-        <span style="color:var(--txt3);font-weight:700;margin-right:4px;">ATURAN:</span>
-        <span style="background:rgba(139,92,246,.1);color:#c084fc;border:1px solid rgba(139,92,246,.2);padding:2px 8px;border-radius:99px;font-weight:700;">🔄 Jambi: Audra ≠ Dwi</span>
-        <span style="background:rgba(139,92,246,.1);color:#c084fc;border:1px solid rgba(139,92,246,.2);padding:2px 8px;border-radius:99px;font-weight:700;">🔄 Pekanbaru: Noor ≠ Aisyah</span>
-        <span style="background:rgba(139,92,246,.1);color:#c084fc;border:1px solid rgba(139,92,246,.2);padding:2px 8px;border-radius:99px;font-weight:700;">🔄 Balikpapan: Marissa ≠ Tiara</span>
-        <span style="background:rgba(139,92,246,.1);color:#c084fc;border:1px solid rgba(139,92,246,.2);padding:2px 8px;border-radius:99px;font-weight:700;">🔄 Batam: Regita ≠ Desti</span>
-        <span style="background:rgba(139,92,246,.1);color:#c084fc;border:1px solid rgba(139,92,246,.2);padding:2px 8px;border-radius:99px;font-weight:700;">🔄 Manado: Jessica ≠ Jusni</span>
-        <span style="background:rgba(251,146,60,.1);color:#fb923c;border:1px solid rgba(251,146,60,.2);padding:2px 8px;border-radius:99px;font-weight:700;">⏰ Libur → partner Lembur</span>
-      </div>
-      <div id="jadwalWrap" class="tw" style="overflow-x:auto;margin-bottom:16px;">
-        <table><thead id="jHead"></thead><tbody id="jBody"><tr><td colspan="9" style="text-align:center;padding:24px;color:var(--txt3);">Klik Sync DB Staff → Generate Jadwal</td></tr></tbody></table>
-      </div>
-      <!-- Bottom Grid -->
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
-        <div class="tw">
-          <div style="padding:11px 14px;background:var(--sur2);border-bottom:1px solid var(--bdr);font-family:'Syne',sans-serif;font-size:12px;font-weight:800;">📝 Keterangan Berhalangan</div>
-          <table><thead><tr><th>Nama Staff</th><th>Keterangan</th></tr></thead>
-          <tbody id="ktrBody">
-            <tr><td><input class="ktr-inp" placeholder="Nama..."/></td><td><input class="ktr-inp" placeholder="Sakit / Izin / Alfa..."/></td></tr>
-            <tr><td><input class="ktr-inp" placeholder="Nama..."/></td><td><input class="ktr-inp" placeholder="Sakit / Izin / Alfa..."/></td></tr>
-            <tr><td><input class="ktr-inp" placeholder="Nama..."/></td><td><input class="ktr-inp" placeholder="Sakit / Izin / Alfa..."/></td></tr>
-            <tr><td><input class="ktr-inp" placeholder="Nama..."/></td><td><input class="ktr-inp" placeholder="Sakit / Izin / Alfa..."/></td></tr>
-            <tr><td><input class="ktr-inp" placeholder="Nama..."/></td><td><input class="ktr-inp" placeholder="Sakit / Izin / Alfa..."/></td></tr>
-          </tbody></table>
+      <!-- Keterangan + Weekly status -->
+      <div style="display:grid;gap:10px;padding:10px 0 0;">
+        <div class="card">
+          <div style="padding:10px 14px;border-bottom:1px solid var(--out-var);font-size:12px;font-weight:700;">📝 Keterangan Berhalangan</div>
+          <table class="ktr-tbl">
+            <thead><tr>
+              <th style="padding:7px 12px;font-size:9px;font-weight:700;color:var(--txt-sec);text-align:left;background:var(--srf-2);">Nama Staff</th>
+              <th style="padding:7px 12px;font-size:9px;font-weight:700;color:var(--txt-sec);text-align:left;background:var(--srf-2);">Keterangan</th>
+            </tr></thead>
+            <tbody id="ktrBody"></tbody>
+          </table>
         </div>
-        <div class="tw">
-          <div style="padding:11px 14px;background:var(--sur2);border-bottom:1px solid var(--bdr);display:flex;justify-content:space-between;align-items:center;">
-            <span style="font-family:'Syne',sans-serif;font-size:12px;font-weight:800;">📊 Status Absensi Mingguan</span>
-            <button class="btn btn-bl" style="font-size:10px;padding:5px 9px;" onclick="saveAbsMgg()">💾 Simpan ke Drive</button>
+        <div class="card">
+          <div style="padding:10px 14px;border-bottom:1px solid var(--out-var);display:flex;justify-content:space-between;align-items:center;">
+            <span style="font-size:12px;font-weight:700;">📊 Status Absensi Mingguan</span>
+            <button class="btn-tonal" onclick="exportJadwalPDF()" style="height:28px;padding:0 10px;background:rgba(64,196,255,.08);color:var(--clr-info);border:1px solid rgba(64,196,255,.18);font-size:10px;border-radius:var(--r-xs);">📄 PDF</button>
           </div>
-          <table><thead><tr><th>Nama</th><th style="text-align:center">H</th><th style="text-align:center">T</th><th style="text-align:center">A</th><th style="text-align:center">Total</th></tr></thead>
-          <tbody id="absMggBody"><tr><td colspan="5" style="text-align:center;padding:16px;color:var(--txt3);">Generate jadwal dulu</td></tr></tbody></table>
+          <table style="width:100%;border-collapse:collapse;">
+            <thead><tr>
+              <th style="padding:7px 12px;font-size:9px;font-weight:700;color:var(--txt-sec);text-align:left;background:var(--srf-2);">Nama</th>
+              <th style="padding:7px;font-size:9px;text-align:center;background:var(--srf-2);color:var(--clr-ok);">H</th>
+              <th style="padding:7px;font-size:9px;text-align:center;background:var(--srf-2);color:var(--clr-warn);">T</th>
+              <th style="padding:7px;font-size:9px;text-align:center;background:var(--srf-2);color:var(--clr-err);">A</th>
+              <th style="padding:7px;font-size:9px;text-align:center;background:var(--srf-2);color:var(--txt-sec);">Total</th>
+            </tr></thead>
+            <tbody id="mggBody"><tr><td colspan="5" style="padding:14px;text-align:center;color:var(--txt-sec);font-size:12px;">Generate jadwal dulu</td></tr></tbody>
+          </table>
         </div>
       </div>
     </div>
 
-    <!-- ══ REKAP ══ -->
-    <div class="page" id="pgRekap">
-      <div class="rek-f">
-        <select class="inp" style="width:auto;" id="rkPer"><option value="harian">Harian</option><option value="mingguan">Mingguan</option><option value="bulanan" selected>Bulanan</option></select>
-        <select class="inp" style="width:auto;" id="rkCab"><option value="">Semua Cabang</option></select>
-        <select class="inp" style="width:auto;" id="rkStaff"><option value="">Semua Staff</option></select>
-        <input type="month" class="inp" style="width:auto;" id="rkBln"/>
-        <button class="btn btn-g" onclick="loadRekap()">🔄 Filter</button>
-        <button class="btn btn-grn" onclick="exportRekapPDF()">📄 Export PDF</button>
+    <!-- ▌PAGE: REKAP ▌ -->
+    <div class="pg" id="pgRk">
+      <div style="padding:8px 16px;display:flex;gap:8px;flex-wrap:wrap;">
+        <select class="inp" style="flex:1;min-width:110px;font-size:12px;" id="rkPer"><option value="bulanan" selected>Bulanan</option><option value="mingguan">Mingguan</option><option value="harian">Harian</option></select>
+        <select class="inp" style="flex:1;min-width:130px;font-size:12px;" id="rkCab"><option value="">Semua Cabang</option></select>
+        <input type="month" class="inp" style="flex:1;min-width:120px;font-size:12px;" id="rkBln"/>
       </div>
-      <div class="sg" style="margin-bottom:16px;">
-        <div class="sc"><div class="sc-ic" style="background:rgba(0,230,118,.08);">✅</div><div><div class="sc-v" id="rH" style="color:var(--grn)">0</div><div class="sc-l">Total Hadir</div></div></div>
-        <div class="sc"><div class="sc-ic" style="background:rgba(255,215,64,.08);">⏰</div><div><div class="sc-v" id="rT" style="color:var(--yel)">0</div><div class="sc-l">Terlambat</div></div></div>
-        <div class="sc"><div class="sc-ic" style="background:rgba(255,82,82,.08);">❌</div><div><div class="sc-v" id="rA" style="color:var(--red3)">0</div><div class="sc-l">Alfa</div></div></div>
-        <div class="sc"><div class="sc-ic" style="background:rgba(64,196,255,.08);">📊</div><div><div class="sc-v" id="rP" style="color:var(--blu)">0%</div><div class="sc-l">Kehadiran</div></div></div>
+      <div style="padding:0 16px 8px;display:flex;gap:8px;flex-wrap:wrap;">
+        <select class="inp" style="flex:1;min-width:120px;font-size:12px;" id="rkStaff"><option value="">Semua Staff</option></select>
+        <button class="btn-filled ripple-host" id="rkFilterBtn" onclick="doFilterRekap()" style="height:44px;padding:0 16px;border-radius:var(--r-sm);font-size:13px;width:auto;flex-shrink:0;">🔍 Filter</button>
       </div>
-      <div class="tw" style="overflow-x:auto;">
-        <table><thead><tr><th>#</th><th>Nama SPG</th><th>Bandara</th><th>Hadir</th><th>Terlambat</th><th>Alfa</th><th>%</th></tr></thead>
-        <tbody id="rkTable"><tr><td colspan="7" style="text-align:center;padding:24px;color:var(--txt3);">Pilih periode → Filter</td></tr></tbody></table>
+      <!-- Tombol export muncul setelah filter -->
+      <div id="rkExportRow" style="display:none;padding:0 16px 8px;display:none;gap:8px;flex-wrap:wrap;">
+        <button class="btn-tonal ripple-host" onclick="exportRekapSheet()" style="flex:1;height:42px;background:rgba(0,230,118,.08);color:var(--clr-ok);border:1px solid rgba(0,230,118,.18);font-size:12px;border-radius:var(--r-sm);">📊 Export ke Sheet ABSENSI</button>
+        <button class="btn-tonal ripple-host" onclick="exportRekapPDF()" style="flex:1;height:42px;background:rgba(64,196,255,.08);color:var(--clr-info);border:1px solid rgba(64,196,255,.18);font-size:12px;border-radius:var(--r-sm);">📄 Export PDF</button>
       </div>
+      <div class="stats-row">
+        <div class="stat-chip"><div class="stat-val" id="rH" style="color:var(--clr-ok)">0</div><div class="stat-lbl">Hadir</div></div>
+        <div class="stat-chip"><div class="stat-val" id="rT" style="color:var(--clr-warn)">0</div><div class="stat-lbl">Terlambat</div></div>
+        <div class="stat-chip"><div class="stat-val" id="rA" style="color:var(--clr-err)">0</div><div class="stat-lbl">Alfa</div></div>
+        <div class="stat-chip"><div class="stat-val" id="rP" style="color:var(--clr-info)">0%</div><div class="stat-lbl">Rate</div></div>
+        <div class="stat-chip"><div class="stat-val" id="rPot" style="color:#FF6F00;font-size:16px;">Rp 0</div><div class="stat-lbl">Potongan</div></div>
+      </div>
+      <!-- Tabel rekap per staff (poin 8) -->
+      <div class="card" style="margin:4px 16px 4px;overflow-x:auto;">
+        <table style="width:100%;border-collapse:collapse;min-width:420px;" id="rkTbl">
+          <thead><tr style="background:var(--srf-2);">
+            <th style="padding:8px 10px;font-size:9px;font-weight:700;color:var(--txt-sec);text-align:left;letter-spacing:.8px;">NAMA STAFF</th>
+            <th style="padding:8px 6px;font-size:9px;font-weight:700;color:var(--txt-sec);text-align:center;min-width:40px;">CABANG</th>
+            <th style="padding:8px 6px;font-size:9px;font-weight:700;color:var(--clr-ok);text-align:center;">H</th>
+            <th style="padding:8px 6px;font-size:9px;font-weight:700;color:var(--clr-warn);text-align:center;">T</th>
+            <th style="padding:8px 6px;font-size:9px;font-weight:700;color:var(--clr-err);text-align:center;">A</th>
+            <th style="padding:8px 6px;font-size:9px;font-weight:700;color:var(--clr-info);text-align:center;">RATE</th>
+            <th style="padding:8px 6px;font-size:9px;font-weight:700;color:#FF6F00;text-align:center;">POTONGAN</th>
+          </tr></thead>
+          <tbody id="rkTblBody">
+            <tr><td colspan="7" style="padding:24px;text-align:center;color:var(--txt-sec);font-size:13px;">Klik 🔍 Filter untuk tampilkan data</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div id="alRk" class="alert" style="margin:8px 16px;"></div>
     </div>
 
-    <!-- ══ STAFF ══ -->
-    <div class="page" id="pgStaff">
-      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;align-items:center;">
-        <input type="text" class="inp" style="max-width:260px;" placeholder="Cari nama..." id="sfSrch" oninput="filterStaff()"/>
-        <select class="inp" style="width:auto;" id="sfCab"><option value="">Semua Cabang</option></select>
-        <button class="btn btn-g" onclick="loadStaff()">🔄 Refresh</button>
-        <button class="btn btn-r" onclick="syncStaff()" id="btnSyncS">📥 Sync DB Staff</button>
-        <button class="btn btn-grn" onclick="showAddStaff()" id="btnAddS">➕ Tambah Staff</button>
-      </div>
-      <div id="addStaffForm" style="display:none;background:var(--sur);border:1px solid var(--bdr);border-radius:13px;padding:16px;margin-bottom:12px;">
-        <div style="font-family:'Syne',sans-serif;font-size:12px;font-weight:800;margin-bottom:10px;">➕ Tambah Staff Baru</div>
-        <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:9px;margin-bottom:9px;">
-          <input class="inp" id="sfNmIn" placeholder="Nama..."/>
-          <select class="inp" id="sfJabIn"><option>STAFF KONTER</option><option>KOORDINATOR</option><option>PICKUP POINT</option><option>ADMIN</option></select>
-          <select class="inp" id="sfCabIn"></select>
-          <input class="inp" id="sfPwIn" placeholder="Password (default: rifim2024)" value="rifim2024"/>
-        </div>
-        <div style="display:flex;gap:8px;">
-          <button class="btn btn-r" onclick="addStaff()">Simpan</button>
-          <button class="btn btn-g" onclick="document.getElementById('addStaffForm').style.display='none'">Batal</button>
-        </div>
-      </div>
-      <div class="tw" style="overflow-x:auto;">
-        <table><thead><tr><th>#</th><th>Nama</th><th>ID Staff</th><th>Jabatan</th><th>Cabang</th><th>Akses</th><th>Status</th><th id="sfActHead">Aksi</th></tr></thead>
-        <tbody id="sfTable"><tr><td colspan="8" style="text-align:center;padding:24px;color:var(--txt3);">Klik Sync dari DB Staff</td></tr></tbody></table>
-      </div>
-    </div>
-
-    <!-- ══ CABANG ══ -->
-    <div class="page" id="pgCabang">
-      <div id="cbCards" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:13px;"></div>
-    </div>
-
-    <!-- ══ PASSWORD SETTINGS ══ -->
-    <div class="page" id="pgPassword">
-      <div class="pw-card">
-        <h3>🔑 Pengaturan Password Staff</h3>
-        <p style="font-size:12px;color:var(--txt3);margin-bottom:14px;">Hanya Owner dan Nabilla yang dapat mengubah password.</p>
-        <div id="pwList" style="display:flex;flex-direction:column;gap:9px;"></div>
-        <div style="margin-top:16px;padding-top:14px;border-top:1px solid var(--bdr);">
-          <div style="font-family:'Syne',sans-serif;font-size:12px;font-weight:800;margin-bottom:10px;">Ubah Password Staff</div>
-          <div style="display:grid;grid-template-columns:1fr 1fr auto;gap:9px;">
-            <select class="inp" id="pwStaffSel" style="font-size:12px;"></select>
-            <div class="pw-w"><input type="password" class="inp" id="pwNew" placeholder="Password baru..." style="font-size:12px;"/><button class="pw-eye" onclick="togglePwNew()">👁</button></div>
-            <button class="btn btn-r" onclick="savePassword()">💾 Simpan</button>
+    <!-- ▌PAGE: MORE ▌ -->
+    <div class="pg" id="pgMore">
+      <div class="card" style="margin:12px 16px 8px;">
+        <div style="padding:18px;display:flex;align-items:center;gap:14px;">
+          <div class="l-av" style="width:56px;height:56px;border-radius:18px;font-size:22px;" id="moreAv">?</div>
+          <div>
+            <div style="font-family:'Google Sans';font-size:18px;font-weight:700;" id="moreNm">—</div>
+            <div style="font-size:12px;color:var(--txt-sec);margin-top:2px;" id="moreRl">—</div>
           </div>
-          <div id="pwSt" class="stbox" style="margin-top:8px;"></div>
         </div>
       </div>
-
-      <!-- System Config -->
-      <div class="pw-card">
-        <h3>⚙️ Konfigurasi Sistem</h3>
-        <div class="fld" style="margin-bottom:10px;"><label>Apps Script URL</label><input class="inp" id="cfGAS" value="https://script.google.com/macros/s/AKfycbyrUp1IVAOrHpXpDrpOvK4W6J0w6Ky9aI0T5TDTwHbCn7sUBu1U-8laJ5LfPU5Gy-Rd/exec"/></div>
-        <div class="fld" style="margin-bottom:10px;"><label>Folder Drive ID</label><input class="inp" id="cfFld" value="1Ejaz210g3TeM46W6up5BtgHNzEWwOnRQ"/></div>
-        <div class="fld" style="margin-bottom:10px;"><label>Sheet ID RIFIM ERP ABSENSI</label><input class="inp" id="cfSht" value="1FU5hKMpYn1qhsl4-xZYUZrXDhTOV6aRRewYEs6gIkxA"/></div>
-        <div class="fld" style="margin-bottom:12px;"><label>Sheet ID DATABASE STAFF</label><input class="inp" id="cfStf" value="1fcraq3QHqIaD-13Ebzt6stT9aA6j_loTXeAtpNX12kw"/></div>
-        <button class="btn btn-r" onclick="saveSettings()">💾 Simpan Pengaturan</button>
-      </div>
+      <div class="card" id="moreMenuEl"></div>
     </div>
 
-  </div><!-- /main -->
+    <!-- ▌PAGE: STAFF ▌ -->
+    <div class="pg" id="pgStaff">
+      <div class="search-bar">
+        <span style="color:var(--txt-sec);">🔍</span>
+        <input placeholder="Cari nama staff..." id="sfQ" oninput="filterStaff(this.value)"/>
+      </div>
+      <div style="padding:0 16px 8px;display:flex;gap:8px;flex-wrap:wrap;">
+        <select class="inp" style="flex:1;font-size:12px;" id="sfCab" onchange="filterStaff(document.getElementById('sfQ').value)"><option value="">Semua Cabang</option></select>
+        <button class="btn-filled ripple-host" onclick="syncStaff()" style="height:44px;padding:0 14px;border-radius:var(--r-sm);font-size:12px;width:auto;">📥 Sync DB</button>
+      </div>
+      <div class="card" id="sfList"><div style="padding:24px;text-align:center;color:var(--txt-sec);">Klik Sync DB Staff</div></div>
+    </div>
+
+    <!-- ▌PAGE: CABANG ▌ -->
+    <div class="pg" id="pgCbng"><div id="cbList"></div></div>
+
+    <!-- ▌PAGE: PASSWORD ▌ -->
+    <div class="pg" id="pgPw">
+      <div class="card" style="margin:12px 16px 8px;">
+        <div style="padding:13px 16px;border-bottom:1px solid var(--out-var);font-size:14px;font-weight:700;">🔑 Ubah Password Staff</div>
+        <div style="padding:14px 16px;">
+          <div style="margin-bottom:12px;"><label class="inp-lbl">Staff</label><select class="inp" id="pwSel" style="font-size:13px;"></select></div>
+          <div style="margin-bottom:14px;">
+            <label class="inp-lbl">Password Baru</label>
+            <div class="inp-wrap"><input type="password" class="inp" id="pwNew" placeholder="Min 6 karakter..."/><button class="inp-eye" onclick="togglePwNew()">👁</button></div>
+          </div>
+          <button class="btn-filled ripple-host" onclick="savePassword()" style="height:46px;border-radius:var(--r-sm);font-size:13px;">💾 Simpan Password</button>
+          <div id="alPw" class="alert" style="margin:10px 0 0;"></div>
+        </div>
+      </div>
+      <div class="card" id="pwList" style="margin:0 16px;"></div>
+    </div>
+
+  </div><!-- /content -->
+
+  <!-- Bottom Nav -->
+  <nav class="bnav">
+    <button class="bn-btn on ripple-host" id="bn0" onclick="goPage('home',0)"><div class="bn-pill">🏠</div><div class="bn-lbl">Home</div></button>
+    <button class="bn-btn ripple-host" id="bn1" onclick="goPage('att',1)"><div class="bn-pill">📍</div><div class="bn-lbl">Absensi</div><div class="bn-badge" id="bnB1"></div></button>
+    <button class="bn-btn ripple-host" id="bn2" onclick="goPage('jd',2)"><div class="bn-pill">📅</div><div class="bn-lbl">Jadwal</div></button>
+    <button class="bn-btn ripple-host" id="bn3" onclick="goPage('rk',3)"><div class="bn-pill">📊</div><div class="bn-lbl">Rekap</div></button>
+    <button class="bn-btn ripple-host" id="bn4" onclick="goPage('more',4)"><div class="bn-pill">⋯</div><div class="bn-lbl">Lainnya</div></button>
+  </nav>
+
+  <!-- FAB -->
+  <button id="fab" class="ripple-host hide" onclick="fabAct()" title="Aksi">🚀</button>
+
 </div><!-- /app -->
 
+<!-- ══ Scripts ══════════════════════════════════════════ -->
 <script src="google-drive.js"></script>
 <script>
-// ═══════════════════════════════════════════════════
-// RIFIM ERP ABSENSI v4 — Full System with Role Access
-// ═══════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════
+//  RIFIM ERP — Core Logic v4 (Android PWA)
+// ═══════════════════════════════════════════════════════════
 
-// ── FIREBASE ─────────────────────────────────────
-if (!firebase.apps.length) {
-  firebase.initializeApp({
-    apiKey:"AIzaSyCROrmmx9cxlAeMEobuT9DAWmVuF1oZrG4",
-    authDomain:"gen-lang-client-0837778946.firebaseapp.com",
-    projectId:"gen-lang-client-0837778946",
-    storageBucket:"gen-lang-client-0837778946.firebasestorage.app",
-    messagingSenderId:"984064974556",
-    appId:"1:984064974556:web:42e4771e687590b2595e19"
-  });
+// ─── Firebase init (safe — SDK loaded synchronously above) ──
+const FIREBASE_CFG = {
+  apiKey:"AIzaSyCROrmmx9cxlAeMEobuT9DAWmVuF1oZrG4",
+  authDomain:"gen-lang-client-0837778946.firebaseapp.com",
+  projectId:"gen-lang-client-0837778946",
+  storageBucket:"gen-lang-client-0837778946.firebasestorage.app",
+  messagingSenderId:"984064974556",
+  appId:"1:984064974556:web:42e4771e687590b2595e19"
+};
+let auth, db;
+function initFirebase() {
+  try {
+    if (typeof firebase === 'undefined') throw new Error('Firebase SDK not loaded');
+    if (!firebase.apps.length) firebase.initializeApp(FIREBASE_CFG);
+    auth = firebase.auth();
+    db   = firebase.firestore();
+    return true;
+  } catch(e) {
+    console.error('Firebase init failed:', e.message);
+    return false;
+  }
 }
-const auth = firebase.auth();
-const db   = firebase.firestore();
 
-// ── ROLE DEFINITIONS ─────────────────────────────
-// owner  : full access semua
-// admin  : full access (Nabilla saja yg bisa edit)
-// editor : bisa edit (Nabilla saja)
-// staff  : hanya attendance + lihat saja
-const ROLES = {
-  owner:  { label:"👑 Owner",     css:"owner",  canEdit:true,  onlyAttendance:false },
-  admin:  { label:"🟢 Admin",     css:"admin",  canEdit:false, onlyAttendance:false },
-  editor: { label:"✏️ Editor",    css:"editor", canEdit:true,  onlyAttendance:false },
-  staff:  { label:"👤 Staff",     css:"staff",  canEdit:false, onlyAttendance:true  }
+// ─── Constants ────────────────────────────────────────────
+const MO=["Jan","Feb","Mar","Apr","Mei","Jun","Jul","Agu","Sep","Okt","Nov","Des"];
+const HR=["MIN","SEN","SEL","RAB","KAM","JUM","SAB"];
+const AIRPORTS={
+  "ID Rifim Airport Batam":      {lat:1.1210, lng:104.1186,r:500,  admin:false},
+  "ID Rifim Airport Jambi":      {lat:-1.6381,lng:103.6441,r:500,  admin:false},
+  "ID Rifim Airport Balikpapan": {lat:1.2675, lng:116.8946,r:500,  admin:false},
+  "ID Rifim Airport Manado":     {lat:1.5493, lng:124.9260,r:500,  admin:false},
+  "ID Rifim Airport Pekanbaru":  {lat:0.4609, lng:101.4454,r:500,  admin:false},
+  "ID Rifim Batam":              {lat:1.1211, lng:104.0402,r:2000, admin:false},
+  "ID Rifim Jambi Luar":         {lat:-1.6500,lng:103.6300,r:2000, admin:false},
+  "Admin":                       {lat:0,     lng:0,        r:999999,admin:true}
 };
-
-// ── AIRPORT DATA ──────────────────────────────────
-const AIRPORTS = {
-  "ID Rifim Airport Batam":      {lat:1.1210, lng:104.1186, r:500,  kota:"Batam",       admin:false},
-  "ID Rifim Airport Jambi":      {lat:-1.6381,lng:103.6441, r:500,  kota:"Jambi",       admin:false},
-  "ID Rifim Airport Balikpapan": {lat:1.2675, lng:116.8946, r:500,  kota:"Balikpapan",  admin:false},
-  "ID Rifim Airport Manado":     {lat:1.5493, lng:124.9260, r:500,  kota:"Manado",      admin:false},
-  "ID Rifim Airport Pekanbaru":  {lat:0.4609, lng:101.4454, r:500,  kota:"Pekanbaru",   admin:false},
-  "ID Rifim Batam":              {lat:1.1211, lng:104.0402, r:2000, kota:"Batam Kota",  admin:false},
-  "ID Rifim Jambi Luar":         {lat:-1.6500,lng:103.6300, r:2000, kota:"Jambi Luar",  admin:false},
-  "Admin":                       {lat:0, lng:0, r:999999, kota:"Kantor Pusat", admin:true}
-};
-
-const CABANG = Object.keys(AIRPORTS).filter(k => k !== "Admin");
-const ALL_CABANG = Object.keys(AIRPORTS);
-
-const JADWAL_RULES = {
-  differentShift:[
-    {cabang:"ID Rifim Airport Jambi",      a:"Audra Agung pratama", b:"Dwi Fitrianti"},
-    {cabang:"ID Rifim Airport Pekanbaru",  a:"Noor Halimah",        b:"Aisyah Sari"},
-    {cabang:"ID Rifim Airport Balikpapan", a:"Marissa",             b:"Tiara"},
-    {cabang:"ID Rifim Airport Batam",      a:"Siti Regita Cahyani", b:"Destiaulia"},
-    {cabang:"ID Rifim Airport Manado",     a:"Jessica Item",        b:"Jusni Kourow"}
-  ]
-};
-
-// ── MASTER STAFF (default — overridden by DB) ─────
-let STAFF_LIST = [
-  {nama:"Nabilla",           pw:"rifim2024",jabatan:"ADMIN",        cabang:"Admin",                      idStaff:"RIF0139",role:"editor", email:"nabilaseptiola4@gmail.com"},
-  {nama:"govin 2",           pw:"rifim2024",jabatan:"ADMIN",        cabang:"Admin",                      idStaff:"RIF0143",role:"admin",  email:"pipin@adminrifim.org"},
-  {nama:"febriany sandra",   pw:"rifim2024",jabatan:"PICKUP POINT", cabang:"Admin",                      idStaff:"RIF0147",role:"staff",  email:"febrianysandra822@gmail.com"},
-  {nama:"Audra Agung pratama",pw:"rifim2024",jabatan:"STAFF KONTER",cabang:"ID Rifim Airport Jambi",     idStaff:"RIF0125",role:"staff",  email:"audraagung17@gmail.com"},
-  {nama:"Putri Amalia",      pw:"rifim2024",jabatan:"KOORDINATOR",  cabang:"ID Rifim Airport Jambi",     idStaff:"RIF0126",role:"staff",  email:"putriaml0812@gmail.com"},
-  {nama:"Dwi Fitrianti",     pw:"rifim2024",jabatan:"STAFF KONTER", cabang:"ID Rifim Airport Jambi",     idStaff:"RIF0126",role:"staff",  email:"dfitrianti163@gmail.com"},
-  {nama:"Aisyah Sari",       pw:"rifim2024",jabatan:"STAFF KONTER", cabang:"ID Rifim Airport Pekanbaru", idStaff:"RIF0127",role:"staff",  email:"aisyahsariii05@gmail.com"},
-  {nama:"Noor Halimah",      pw:"rifim2024",jabatan:"STAFF KONTER", cabang:"ID Rifim Airport Pekanbaru", idStaff:"RIF0124",role:"staff",  email:"imayyn03@gmail.com"},
-  {nama:"Choki Ardiansyah",  pw:"rifim2024",jabatan:"PICKUP POINT", cabang:"ID Rifim Airport Pekanbaru", idStaff:"RIF0128",role:"staff",  email:"chokiardiansyah693@gmail.com"},
-  {nama:"Ilham Maulana 2",   pw:"rifim2024",jabatan:"KOORDINATOR",  cabang:"ID Rifim Airport Pekanbaru", idStaff:"RIF0129",role:"staff",  email:"habibyoman11@gmail.com"},
-  {nama:"Aditya Al Fauzan",  pw:"rifim2024",jabatan:"PICKUP POINT", cabang:"ID Rifim Airport Pekanbaru", idStaff:"RIF0140",role:"staff",  email:"adityaalfauzan10@gmail.com"},
-  {nama:"Marissa",           pw:"rifim2024",jabatan:"STAFF KONTER", cabang:"ID Rifim Airport Balikpapan",idStaff:"RIF0130",role:"staff",  email:"marisa.aditya1@gmail.com"},
-  {nama:"Henry",             pw:"rifim2024",jabatan:"KOORDINATOR",  cabang:"ID Rifim Airport Balikpapan",idStaff:"RIF0131",role:"staff",  email:"henrybudimans1@gmail.com"},
-  {nama:"Tiara",             pw:"rifim2024",jabatan:"STAFF KONTER", cabang:"ID Rifim Airport Balikpapan",idStaff:"RIF0142",role:"staff",  email:"tanitatiara@gmail.com"},
-  {nama:"Siti Regita Cahyani",pw:"rifim2024",jabatan:"STAFF KONTER",cabang:"ID Rifim Airport Batam",    idStaff:"RIF0133",role:"staff",  email:"cahyanir624@gmail.com"},
-  {nama:"Farhan",            pw:"rifim2024",jabatan:"PICKUP POINT", cabang:"ID Rifim Airport Batam",     idStaff:"RIF0134",role:"staff",  email:"akunmintnotfake@gmail.com"},
-  {nama:"Robert Marino",     pw:"rifim2024",jabatan:"PICKUP POINT", cabang:"ID Rifim Airport Batam",     idStaff:"RIF0141",role:"staff",  email:"robertomarino722@gmail.com"},
-  {nama:"yudi ultra",        pw:"rifim2024",jabatan:"PICKUP POINT", cabang:"ID Rifim Airport Batam",     idStaff:"RIF0144",role:"staff",  email:"yudiultra02@gmail.com"},
-  {nama:"Muhammad Haikal",   pw:"rifim2024",jabatan:"PICKUP POINT", cabang:"ID Rifim Airport Batam",     idStaff:"RIF0144",role:"staff",  email:"ismail20210207@gmail.com"},
-  {nama:"Hafiz setiawan",    pw:"rifim2024",jabatan:"PICKUP POINT", cabang:"ID Rifim Airport Batam",     idStaff:"RIF0145",role:"staff",  email:"setiawanhafis038@gmail.com"},
-  {nama:"Destiaulia",        pw:"rifim2024",jabatan:"STAFF KONTER", cabang:"ID Rifim Airport Batam",     idStaff:"RIF0146",role:"staff",  email:"dsaull099@gmail.com"},
-  {nama:"Jessica Item",      pw:"rifim2024",jabatan:"STAFF KONTER", cabang:"ID Rifim Airport Manado",    idStaff:"RIF0135",role:"staff",  email:"Jsc170194@gmail.com"},
-  {nama:"Ivana Madalena Pongoh",pw:"rifim2024",jabatan:"PICKUP POINT",cabang:"ID Rifim Airport Manado", idStaff:"RIF0136",role:"staff",  email:"Ivanapongoh1881@gmail.com"},
-  {nama:"Jusni Kourow",      pw:"rifim2024",jabatan:"STAFF KONTER", cabang:"ID Rifim Airport Manado",    idStaff:"RIF0137",role:"staff",  email:"yunikourow80@gmail.com"},
-  {nama:"Jeien Johana Rambi",pw:"rifim2024",jabatan:"PICKUP POINT", cabang:"ID Rifim Airport Manado",    idStaff:"RIF0138",role:"staff",  email:"jeinrambi1979@gmail.com"},
-  {nama:"Owner / Bobby",     pw:"owner2024",jabatan:"Direktur Utama",cabang:"Pusat",                    idStaff:"OWN001", role:"owner",  email:""},
+const JD_RULES=[
+  {cabang:"ID Rifim Airport Jambi",a:"Audra Agung pratama",b:"Dwi Fitrianti"},
+  {cabang:"ID Rifim Airport Pekanbaru",a:"Noor Halimah",b:"Aisyah Sari"},
+  {cabang:"ID Rifim Airport Balikpapan",a:"Marissa",b:"Tiara"},
+  {cabang:"ID Rifim Airport Batam",a:"Siti Regita Cahyani",b:"Destiaulia"},
+  {cabang:"ID Rifim Airport Manado",a:"Jessica Item",b:"Jusni Kourow"}
 ];
 
-// Load saved passwords from localStorage
-function loadSavedPW() {
-  try {
-    const saved = JSON.parse(localStorage.getItem("rifim_pw")||"{}");
-    STAFF_LIST.forEach(s => { if(saved[s.nama]) s.pw = saved[s.nama]; });
-  } catch {}
+// ─── Staff list ───────────────────────────────────────────
+let STAFF=[
+  {nama:"Nabilla",              pw:"rifim2024",jabatan:"Admin Editor",  cabang:"Admin",                       id:"RIF0139",role:"editor"},
+  {nama:"govin 2",              pw:"rifim2024",jabatan:"Admin",         cabang:"Admin",                       id:"RIF0143",role:"admin"},
+  {nama:"febriany sandra",      pw:"rifim2024",jabatan:"Pickup Point",  cabang:"Admin",                       id:"RIF0147",role:"staff"},
+  {nama:"Audra Agung pratama",  pw:"rifim2024",jabatan:"Staff Konter",  cabang:"ID Rifim Airport Jambi",      id:"RIF0125",role:"staff"},
+  {nama:"Putri Amalia",         pw:"rifim2024",jabatan:"Koordinator",   cabang:"ID Rifim Airport Jambi",      id:"RIF0126",role:"staff"},
+  {nama:"Dwi Fitrianti",        pw:"rifim2024",jabatan:"Staff Konter",  cabang:"ID Rifim Airport Jambi",      id:"RIF0126",role:"staff"},
+  {nama:"Aisyah Sari",          pw:"rifim2024",jabatan:"Staff Konter",  cabang:"ID Rifim Airport Pekanbaru",  id:"RIF0127",role:"staff"},
+  {nama:"Noor Halimah",         pw:"rifim2024",jabatan:"Staff Konter",  cabang:"ID Rifim Airport Pekanbaru",  id:"RIF0124",role:"staff"},
+  {nama:"Choki Ardiansyah",     pw:"rifim2024",jabatan:"Pickup Point",  cabang:"ID Rifim Airport Pekanbaru",  id:"RIF0128",role:"staff"},
+  {nama:"Ilham Maulana 2",      pw:"rifim2024",jabatan:"Koordinator",   cabang:"ID Rifim Airport Pekanbaru",  id:"RIF0129",role:"staff"},
+  {nama:"Aditya Al Fauzan",     pw:"rifim2024",jabatan:"Pickup Point",  cabang:"ID Rifim Airport Pekanbaru",  id:"RIF0140",role:"staff"},
+  {nama:"Marissa",              pw:"rifim2024",jabatan:"Staff Konter",  cabang:"ID Rifim Airport Balikpapan", id:"RIF0130",role:"staff"},
+  {nama:"Henry",                pw:"rifim2024",jabatan:"Koordinator",   cabang:"ID Rifim Airport Balikpapan", id:"RIF0131",role:"staff"},
+  {nama:"Tiara",                pw:"rifim2024",jabatan:"Staff Konter",  cabang:"ID Rifim Airport Balikpapan", id:"RIF0142",role:"staff"},
+  {nama:"Siti Regita Cahyani",  pw:"rifim2024",jabatan:"Staff Konter",  cabang:"ID Rifim Airport Batam",      id:"RIF0133",role:"staff"},
+  {nama:"Farhan",               pw:"rifim2024",jabatan:"Pickup Point",  cabang:"ID Rifim Airport Batam",      id:"RIF0134",role:"staff"},
+  {nama:"Robert Marino",        pw:"rifim2024",jabatan:"Pickup Point",  cabang:"ID Rifim Airport Batam",      id:"RIF0141",role:"staff"},
+  {nama:"yudi ultra",           pw:"rifim2024",jabatan:"Pickup Point",  cabang:"ID Rifim Airport Batam",      id:"RIF0144",role:"staff"},
+  {nama:"Muhammad Haikal",      pw:"rifim2024",jabatan:"Pickup Point",  cabang:"ID Rifim Airport Batam",      id:"RIF0144",role:"staff"},
+  {nama:"Hafiz setiawan",       pw:"rifim2024",jabatan:"Pickup Point",  cabang:"ID Rifim Airport Batam",      id:"RIF0145",role:"staff"},
+  {nama:"Destiaulia",           pw:"rifim2024",jabatan:"Staff Konter",  cabang:"ID Rifim Airport Batam",      id:"RIF0146",role:"staff"},
+  {nama:"Jessica Item",         pw:"rifim2024",jabatan:"Staff Konter",  cabang:"ID Rifim Airport Manado",     id:"RIF0135",role:"staff"},
+  {nama:"Ivana Madalena Pongoh",pw:"rifim2024",jabatan:"Pickup Point",  cabang:"ID Rifim Airport Manado",     id:"RIF0136",role:"staff"},
+  {nama:"Jusni Kourow",         pw:"rifim2024",jabatan:"Staff Konter",  cabang:"ID Rifim Airport Manado",     id:"RIF0137",role:"staff"},
+  {nama:"Jeien Johana Rambi",   pw:"rifim2024",jabatan:"Pickup Point",  cabang:"ID Rifim Airport Manado",     id:"RIF0138",role:"staff"},
+  {nama:"Owner / Bobby",        pw:"owner2024",jabatan:"Direktur Utama",cabang:"Pusat",                      id:"OWN001", role:"owner"},
+];
+
+// ─── Shift rules (poin 5,6) ──────────────────────────────
+const SHIFT_JAM={PAGI:{h:7,m:5},MIDDLE:{h:11,m:0},SIANG:{h:15,m:5},SIANG_BATAM:{h:14,m:5}};
+const LATE_EXEMPT=["ID Rifim Airport Jambi","ID Rifim Airport Manado"];
+function isLate(cabang,jsDate){
+  if(LATE_EXEMPT.includes(cabang))return false;
+  if(!jsDate)return false;
+  const menit=jsDate.getHours()*60+jsDate.getMinutes();
+  const isBatam=cabang==="ID Rifim Airport Batam";
+  let batas;
+  if(menit<11*60)batas=SHIFT_JAM.PAGI;
+  else if(menit<14*60)batas=SHIFT_JAM.MIDDLE;
+  else batas=isBatam?SHIFT_JAM.SIANG_BATAM:SHIFT_JAM.SIANG;
+  return menit>batas.h*60+batas.m;
 }
-function savePWStore() {
-  const store={};
-  STAFF_LIST.forEach(s => store[s.nama]=s.pw);
-  localStorage.setItem("rifim_pw", JSON.stringify(store));
+function getShiftLabel(cabang){
+  const isBatam=cabang==="ID Rifim Airport Batam";
+  return ["PAGI 07:05","MIDDLE 11:00","SIANG "+(isBatam?"14:05":"15:05")];
 }
 
-const HARI=["MIN","SEN","SEL","RAB","KAM","JUM","SAB"];
-const M=["Jan","Feb","Mar","Apr","Mei","Jun","Jul","Agu","Sep","Okt","Nov","Des"];
-
-// ── STATE ─────────────────────────────────────────
-let CU=null;
+// ─── App state ────────────────────────────────────────────
+let CU=null,curPg="home";
 let gLat=null,gLng=null,gAcc=null;
 let sBlob=null,sFile=null;
-let absTipe="masuk";
-let camStream=null;
-let weekStart=getMon(new Date());
-let jadwalData={};
-let attData={};
+let absTipe="masuk",camStream=null;
+let wkStart=getMon(new Date());
+let jadwal={},att={};
+let lastRekapData=[];
 
-// ── INIT ──────────────────────────────────────────
-window.addEventListener("DOMContentLoaded", () => {
-  loadSavedPW();
-  populateSel();
-  startClock();
-  startGPS();
-  buildCabangPage();
+const canEdit=()=>CU&&(CU.role==="owner"||CU.role==="editor");
+const isAdmin=()=>CU&&(CU.role==="owner"||CU.role==="editor"||CU.role==="admin");
 
-  auth.onAuthStateChanged(user => {
-    setTimeout(() => {
-      document.getElementById("splash").classList.add("hide");
-      setTimeout(() => {
-        // Restore session
-        const saved = localStorage.getItem("rifim_sess");
-        if (saved) {
-          try {
-            const s = JSON.parse(saved);
-            const found = STAFF_LIST.find(u => u.nama === s.nama);
-            if (found) { CU=found; showApp(); return; }
-          } catch {}
-        }
-        if (user) {
-          const found = STAFF_LIST.find(u => u.nama === user.displayName);
-          if (found) { CU=found; showApp(); return; }
-        }
-        showLogin();
-      }, 500);
-    }, 2700);
-  });
+// ─── Ripple engine ────────────────────────────────────────
+document.addEventListener("pointerdown",e=>{
+  const h=e.target.closest(".ripple-host");if(!h)return;
+  const r=h.getBoundingClientRect(),el=document.createElement("div");
+  el.className="md-ripple-el";
+  const sz=Math.max(r.width,r.height)*2;
+  el.style.cssText=`width:${sz}px;height:${sz}px;left:${e.clientX-r.left-sz/2}px;top:${e.clientY-r.top-sz/2}px;`;
+  h.appendChild(el);setTimeout(()=>el.remove(),600);
 });
 
-function populateSel() {
-  const sel=document.getElementById("selUser");
-  STAFF_LIST.forEach(u=>{const o=document.createElement("option");o.value=u.nama;o.textContent=`${u.nama} — ${u.jabatan}`;sel.appendChild(o);});
-  ["selCab","jCab","rkCab","sfCab","sfCabIn"].forEach(id=>{
-    const el=document.getElementById(id); if(!el) return;
-    const hasAdmin = ["selCab"].includes(id);
-    const list = hasAdmin ? ALL_CABANG : CABANG;
-    list.forEach(c=>{const o=document.createElement("option");o.value=c;o.textContent=c;el.appendChild(o);});
-  });
-  ["rkStaff","pwStaffSel"].forEach(id=>{
-    const el=document.getElementById(id); if(!el) return;
-    STAFF_LIST.filter(u=>u.role!=="owner").forEach(u=>{const o=document.createElement("option");o.value=u.nama;o.textContent=u.nama;el.appendChild(o);});
-  });
-  const jd=document.getElementById("jDate"); if(jd) jd.value=getMon(new Date()).toISOString().slice(0,10);
-  const rb=document.getElementById("rkBln"); if(rb) rb.value=new Date().toISOString().slice(0,7);
+// ─── Boot ─────────────────────────────────────────────────
+window.addEventListener("DOMContentLoaded",()=>{
+  // Init Firebase (must be first)
+  initFirebase();
+  loadPW();populateDropdowns();startClock();startGPS();
+  // Restore wkStart dari storage
+  const savedWk=lsGet("rifim_wkstart");
+  if(savedWk)wkStart=getMon(new Date(savedWk));
+  else lsSet("rifim_wkstart",wkStart.toISOString());
+  const jd=document.getElementById("jDate");if(jd)jd.value=wkStart.toISOString().slice(0,10);
   updateWeekLabel();
+  buildKtrRows();
+  autoGenIfExpired(); // poin 2: auto-generate bila periode berakhir
+  loadJadwalFromStorage(); // poin 1: load jadwal dari storage
+  // onAuthStateChanged - safe guard if firebase not ready
+  const proceedAfterSplash = () => {
+    document.getElementById("splash").classList.add("exit");
+    setTimeout(()=>{
+      const s=lsGet("rifim_sess");
+      if(s){const f=STAFF.find(u=>u.nama===s.nama);if(f){CU=f;showApp();return;}}
+      showLogin();
+    },400);
+  };
+  if(auth) {
+    auth.onAuthStateChanged(()=>{
+      setTimeout(proceedAfterSplash, 2800);
+    });
+  } else {
+    // Firebase tidak tersedia — tetap lanjut ke login tanpa auth
+    setTimeout(proceedAfterSplash, 2800);
+  }
+});
+
+function loadPW(){try{const s=lsGet("rifim_pw");if(s)STAFF.forEach(u=>{if(s[u.nama])u.pw=s[u.nama];});}catch{}}
+function savePW(){const s={};STAFF.forEach(u=>s[u.nama]=u.pw);lsSet("rifim_pw",s);}
+function lsGet(k){try{return JSON.parse(localStorage.getItem(k));}catch{return null;}}
+function lsSet(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch{}}
+
+// ── Jadwal persistence (poin 1) ──────────────────────────
+function saveJadwal(){
+  const key="rifim_jadwal_"+wkStart.toISOString().slice(0,10);
+  lsSet(key,{jadwal,att,savedAt:new Date().toISOString()});
+}
+function loadJadwalFromStorage(){
+  const key="rifim_jadwal_"+wkStart.toISOString().slice(0,10);
+  const s=lsGet(key);
+  if(s){jadwal=s.jadwal||{};att=s.att||{};}
+  else{jadwal={};att={};}
+}
+function isCurrentWeekExpired(){
+  const now=new Date();
+  const end=new Date(wkStart);end.setDate(end.getDate()+6);
+  end.setHours(23,59,59,999);
+  return now>end;
+}
+// Auto-generate bila periode berakhir (poin 2)
+function autoGenIfExpired(){
+  if(isCurrentWeekExpired()){
+    wkStart=getMon(new Date());
+    lsSet("rifim_wkstart",wkStart.toISOString());
+    syncWkDate();
+    const list=STAFF.filter(u=>u.role!=="owner");
+    runGenJadwal(list);
+    console.log("Auto-generated jadwal for new week");
+  }
 }
 
-// ── LOGIN / LOGOUT ────────────────────────────────
-function showLogin() {
-  document.getElementById("login").classList.add("on");
-  document.getElementById("app").classList.remove("on");
+function populateDropdowns(){
+  // User login selector
+  const su=document.getElementById("selUser");
+  if(su)STAFF.forEach(u=>{const o=document.createElement("option");o.value=u.nama;o.textContent=u.nama+" — "+u.jabatan;su.appendChild(o);});
+  // Cabang selects
+  const cabs=Object.keys(AIRPORTS);
+  ["selCab","jCab","rkCab","sfCab"].forEach(id=>{
+    const el=document.getElementById(id);if(!el)return;
+    const hasAll=el.id!=="selCab";
+    cabs.forEach(c=>{
+      const o=document.createElement("option");o.value=c;
+      o.textContent=c.replace("ID Rifim Airport ","✈ ").replace("ID Rifim ","🏢 ");
+      el.appendChild(o);
+    });
+  });
+  // Staff selects
+  ["rkStaff","pwSel"].forEach(id=>{
+    const el=document.getElementById(id);if(!el)return;
+    STAFF.filter(u=>u.role!=="owner").forEach(u=>{const o=document.createElement("option");o.value=u.nama;o.textContent=u.nama;el.appendChild(o);});
+  });
+  // Date defaults
+  const rb=document.getElementById("rkBln");if(rb)rb.value=new Date().toISOString().slice(0,7);
 }
-function showApp() {
-  loadSavedPW();
-  document.getElementById("login").classList.remove("on");
+
+// ─── Login ────────────────────────────────────────────────
+function showLogin(){document.getElementById("loginScr").classList.add("on");document.getElementById("app").classList.remove("on");}
+function showApp(){
+  loadPW();
+  document.getElementById("loginScr").classList.remove("on");
   document.getElementById("app").classList.add("on");
-  buildSidebar();
-  updateUserUI();
-  loadDash();
-  buildCabangPage();
-  buildPwList();
+  refreshUserUI();loadDash();buildMoreMenu();buildCabang();buildPwList();
 }
-async function doLogin() {
-  const nama=document.getElementById("selUser").value;
+async function doLogin(){
+  const nm=document.getElementById("selUser").value;
   const pw=document.getElementById("pwIn").value.trim();
-  if (!nama||!pw) { showErr("Pilih nama dan masukkan password!"); return; }
-  loadSavedPW();
-  const user=STAFF_LIST.find(u=>u.nama===nama&&u.pw===pw);
-  if (!user) { showErr("Password salah!"); return; }
-  const btn=document.getElementById("lgnBtn");
-  btn.disabled=true; btn.textContent="⏳ Masuk...";
-  try {
-    const em=nama.toLowerCase().replace(/[\s\/]+/g,".").replace(/[^a-z0-9.]/g,"")+"@rifim.local";
-    try { await auth.signInWithEmailAndPassword(em,pw+"_rifim"); }
-    catch(e) { if(e.code==="auth/user-not-found"||e.code==="auth/invalid-credential") {
-      const c=await auth.createUserWithEmailAndPassword(em,pw+"_rifim");
-      await c.user.updateProfile({displayName:nama});
-    }}
-  } catch {}
-  CU=user;
-  localStorage.setItem("rifim_sess",JSON.stringify({nama:user.nama}));
-  btn.disabled=false; btn.textContent="🔐 Masuk ke Sistem";
-  showApp();
+  if(!nm||!pw){lgnErr("Pilih nama dan masukkan password");return;}
+  loadPW();
+  const u=STAFF.find(s=>s.nama===nm&&s.pw===pw);
+  if(!u){lgnErr("Password salah!");return;}
+  const btn=document.getElementById("lgnBtn");btn.disabled=true;
+  try{
+    if(auth){
+      const em=nm.toLowerCase().replace(/[\s\/]+/g,".").replace(/[^a-z0-9.]/g,"")+"@rifim.local";
+      try{await auth.signInWithEmailAndPassword(em,pw+"_r");}
+      catch(er){if(er.code==="auth/user-not-found"||er.code==="auth/invalid-credential"||er.code==="auth/invalid-email"){try{const c=await auth.createUserWithEmailAndPassword(em,pw+"_r");await c.user.updateProfile({displayName:nm});}catch{}}
+      }
+    }
+  }catch{}
+  CU=u;lsSet("rifim_sess",{nama:u.nama});btn.disabled=false;showApp();
 }
-function doLogout() {
-  if(!confirm("Yakin logout?")) return;
-  auth.signOut(); CU=null; localStorage.removeItem("rifim_sess");
+function doLogout(){
+  if(!confirm("Yakin logout?"))return;
+  if(auth)auth.signOut();CU=null;localStorage.removeItem("rifim_sess");
   if(camStream){camStream.getTracks().forEach(t=>t.stop());camStream=null;}
   showLogin();
 }
-function showErr(m) {
-  const e=document.getElementById("lgn-err");
-  e.textContent="❌ "+m; e.style.display="block";
-  setTimeout(()=>e.style.display="none",3000);
-}
-function togglePw() { const e=document.getElementById("pwIn");e.type=e.type==="password"?"text":"password"; }
-function togglePwNew() { const e=document.getElementById("pwNew");e.type=e.type==="password"?"text":"password"; }
+function lgnErr(m){const e=document.getElementById("lgnErr");e.textContent="❌ "+m;e.style.display="block";setTimeout(()=>e.style.display="none",3000);}
+function togglePw(){const e=document.getElementById("pwIn");e.type=e.type==="password"?"text":"password";}
+function togglePwNew(){const e=document.getElementById("pwNew");e.type=e.type==="password"?"text":"password";}
 
-// ── SIDEBAR BUILDER ───────────────────────────────
-const NAV_ITEMS = [
-  {id:"dashboard",ic:"📊",lbl:"Dashboard",group:"Utama",   minRole:"staff"},
-  {id:"absensi",  ic:"📍",lbl:"Attendance",group:"Utama",  minRole:"staff"},
-  {id:"jadwal",   ic:"📅",lbl:"Jadwal Shift",group:"Info", minRole:"staff"},
-  {id:"rekap",    ic:"📊",lbl:"Rekap",      group:"Info",  minRole:"staff"},
-  {id:"staff",    ic:"👥",lbl:"Staff",      group:"Master",minRole:"staff"},
-  {id:"cabang",   ic:"🏢",lbl:"Cabang",     group:"Master",minRole:"staff"},
-  {id:"password", ic:"🔑",lbl:"Password & Settings",group:"Sistem",minRole:"editor"},
-];
-function canEdit() { return CU && (CU.role==="owner"||CU.role==="editor"); }
-function isAdminOrOwner() { return CU && (CU.role==="owner"||CU.role==="editor"||CU.role==="admin"); }
-
-function buildSidebar() {
-  if (!CU) return;
-  const nav=document.getElementById("sbNav");
-  nav.innerHTML="";
-  let lastGroup="";
-  NAV_ITEMS.forEach(item=>{
-    if (item.minRole==="editor" && !canEdit()) return;
-    if (item.group!==lastGroup) {
-      const sec=document.createElement("div");
-      sec.className="nav-sec"; sec.textContent=item.group;
-      nav.appendChild(sec); lastGroup=item.group;
-    }
-    const btn=document.createElement("button");
-    btn.className="nav-btn"+(item.id==="dashboard"?" on":"");
-    const ro = CU.role==="staff" && item.id!=="absensi" && item.id!=="dashboard";
-    if(ro) btn.className+=" readonly";
-    btn.onclick=()=>goPage(item.id,btn);
-    btn.innerHTML=`<span class="ic">${item.ic}</span>${item.lbl}${ro?'<span class="nav-lock">👁</span>':''}`;
-    nav.appendChild(btn);
-  });
-}
-
-function updateUserUI() {
-  if(!CU) return;
+function refreshUserUI(){
+  if(!CU)return;
   const av=CU.nama[0].toUpperCase();
-  ["uAv","abAv"].forEach(id=>{const e=document.getElementById(id);if(e)e.textContent=av;});
-  setT("uNm",CU.nama);
-  const rl=document.getElementById("uRl");
-  if(rl){const rd=ROLES[CU.role]||ROLES.staff;rl.textContent=rd.label;rl.className="u-rl "+rd.css;}
-  setT("abNm",CU.nama); setT("abRl",`${CU.jabatan} • ${CU.cabang}`);
-  const sel=document.getElementById("selCab");
-  if(sel&&ALL_CABANG.includes(CU.cabang)){sel.value=CU.cabang;valGPS();updateShift();}
-  // Show/hide edit buttons based on role
-  ["btnSyncJ","btnGenJ","btnPdfJ","btnSyncS","btnAddS"].forEach(id=>{
-    const el=document.getElementById(id); if(!el) return;
-    el.style.display=canEdit()?"inline-flex":"none";
-  });
-  // Staff column
-  const sfAH=document.getElementById("sfActHead");
-  if(sfAH) sfAH.style.display=canEdit()?"":"none";
+  ["dashAv","absAv","moreAv"].forEach(id=>{const e=g(id);if(e)e.textContent=av;});
+  const rls={owner:"👑 Owner",editor:"✏️ Admin Editor",admin:"🟢 Admin",staff:"👤 Staff"};
+  st("dashNm",CU.nama);st("dashRl",CU.jabatan+" · "+CU.cabang);
+  st("moreNm",CU.nama);st("moreRl",(rls[CU.role]||"👤")+" · "+CU.jabatan);
+  st("absNm",CU.nama);st("absJab",CU.jabatan+" · "+CU.cabang);
+  const now=new Date();
+  st("dashDate",now.getDate()+" "+MO[now.getMonth()]+" "+now.getFullYear());
+  const sel=g("selCab");
+  if(sel&&Object.keys(AIRPORTS).includes(CU.cabang)){sel.value=CU.cabang;onCabChange();}
 }
 
-// ── NAV ───────────────────────────────────────────
-const PT={
-  dashboard:["Dashboard","Statistik kehadiran realtime"],
-  absensi:  ["Attendance","Selfie + GPS Verification"],
-  jadwal:   ["Jadwal Shift","Jadwal kerja mingguan"],
-  rekap:    ["Rekap Kehadiran","Laporan & Export PDF"],
-  staff:    ["Data Staff","Master staff"],
-  cabang:   ["Cabang","Info seluruh cabang"],
-  password: ["Password & Settings","Konfigurasi & keamanan"],
+// ─── Page navigation ──────────────────────────────────────
+const PG_META={
+  home:{pg:"pgHome",title:"Dashboard",sub:"Statistik kehadiran hari ini",fab:null,bn:0},
+  att: {pg:"pgAtt", title:"Attendance",sub:"Selfie + Validasi GPS",    fab:"🚀",bn:1},
+  jd:  {pg:"pgJd",  title:"Jadwal Shift",sub:"Jadwal kerja mingguan",  fab:"✨",bn:2},
+  rk:  {pg:"pgRk",  title:"Rekap",sub:"Laporan kehadiran",             fab:null,bn:3},
+  more:{pg:"pgMore",title:"Lainnya",sub:"Menu & pengaturan",           fab:null,bn:4},
+  staff:{pg:"pgStaff",title:"Data Staff",sub:"Master staff",            fab:null,bn:-1},
+  cbng: {pg:"pgCbng",title:"Cabang",sub:"Info 7 cabang",               fab:null,bn:-1},
+  pw:   {pg:"pgPw",  title:"Password",sub:"Keamanan akun",              fab:null,bn:-1},
 };
-function goPage(id,btn) {
-  document.querySelectorAll(".page").forEach(p=>p.classList.remove("on"));
-  document.querySelectorAll(".nav-btn").forEach(b=>b.classList.remove("on"));
-  const p=document.getElementById("pg"+id.charAt(0).toUpperCase()+id.slice(1));
-  if(p) p.classList.add("on");
-  if(btn) btn.classList.add("on");
-  const t=PT[id]||[id,""];
-  setT("pgTitle",t[0]); setT("pgSub",t[1]);
-  // Read-only banner
-  const rb=document.getElementById("roBanner");
-  const roBW=document.getElementById("roBannerWrap");
-  const ro=CU&&CU.role==="staff"&&id!=="absensi"&&id!=="dashboard";
-  if(rb){rb.className="ro-banner "+(ro?"on":"");}
-  if(roBW) roBW.style.display=ro?"block":"none";
-  closeSb();
-  if(id==="dashboard") loadDash();
-  if(id==="absensi")  {updateUserUI();updateShift();}
-  if(id==="rekap")     loadRekap();
-  if(id==="staff")     loadStaff();
-  if(id==="password")  buildPwList();
-  if(id==="jadwal")    loadJadwal();
+function goPage(key,bnIdx){
+  curPg=key;const m=PG_META[key];if(!m)return;
+  document.querySelectorAll(".pg").forEach(p=>p.classList.remove("on"));
+  const pg=g(m.pg);if(pg)pg.classList.add("on");
+  document.querySelectorAll(".bn-btn").forEach((b,i)=>b.classList.toggle("on",i===m.bn));
+  st("pgTitle",m.title);st("pgSub",m.sub);
+  const fab=g("fab");
+  if(fab){fab.classList.toggle("hide",!m.fab);if(m.fab)fab.textContent=m.fab;}
+  const ca=g("content");if(ca)ca.scrollTop=0;
+  if(key==="home")loadDash();
+  if(key==="att"){refreshUserUI();onCabChange();}
+  if(key==="rk")loadRekap();
+  if(key==="staff")renderStaff("","");
+  if(key==="jd")loadJadwal();
+  if(key==="pw")buildPwList();
+  if(key==="more")buildMoreMenu();
 }
-function toggleSb(){document.getElementById("sb").classList.toggle("open");document.getElementById("sbOv").classList.toggle("on");}
-function closeSb(){document.getElementById("sb").classList.remove("open");document.getElementById("sbOv").classList.remove("on");}
+function fabAct(){
+  if(curPg==="att")submitAbs();
+  else if(curPg==="jd")genJadwal();
+}
 
-// ── CLOCK ─────────────────────────────────────────
+// ─── Clock ────────────────────────────────────────────────
 function startClock(){
-  const u=()=>setT("clk",new Date().toLocaleString("id-ID",{day:"2-digit",month:"short",hour:"2-digit",minute:"2-digit",second:"2-digit"}));
+  const u=()=>st("clk",new Date().toLocaleTimeString("id-ID",{hour:"2-digit",minute:"2-digit",second:"2-digit"}));
   u();setInterval(u,1000);
 }
 
-// ── GPS ───────────────────────────────────────────
+// ─── GPS ──────────────────────────────────────────────────
 function startGPS(){
   if(!navigator.geolocation)return;
   navigator.geolocation.watchPosition(pos=>{
     gLat=pos.coords.latitude;gLng=pos.coords.longitude;gAcc=Math.round(pos.coords.accuracy);
-    setT("gLat",gLat.toFixed(6));setT("gLng",gLng.toFixed(6));setT("gAcc",gAcc+"m");
-    valGPS();
-  },()=>{const e=document.getElementById("gpsSB");if(e){e.className="gps-sb gps-i";e.textContent="❌ GPS gagal — izinkan akses lokasi";}},{enableHighAccuracy:true});
+    st("gLat",gLat.toFixed(5));st("gLng",gLng.toFixed(5));st("gAcc",gAcc+"m");
+    updateGPSStatus();
+  },()=>{gpsBox("❌ Akses GPS ditolak — izinkan di browser","gps-no");},{enableHighAccuracy:true,timeout:10000});
 }
-function refreshGPS(){navigator.geolocation.getCurrentPosition(pos=>{gLat=pos.coords.latitude;gLng=pos.coords.longitude;gAcc=Math.round(pos.coords.accuracy);setT("gLat",gLat.toFixed(6));setT("gLng",gLng.toFixed(6));setT("gAcc",gAcc+"m");valGPS();},()=>{},{enableHighAccuracy:true});}
-function valGPS(){
-  const cab=document.getElementById("selCab")?.value;
-  const ap=cab?AIRPORTS[cab]:null;
-  const el=document.getElementById("gpsSB");if(!el)return;
-  if(!gLat||!gLng){el.className="gps-sb gps-l";el.textContent="⏳ Memuat GPS...";return;}
-  if(!ap){el.className="gps-sb gps-l";el.textContent="⚠️ Pilih cabang dulu";setT("gDst","-");return;}
-  // Admin cabang: tidak perlu GPS validation
-  if(ap.admin){el.className="gps-sb gps-v";el.innerHTML="✅ Divisi Admin — Tidak perlu validasi GPS";setT("gDst","N/A");return;}
+function getGPS(){navigator.geolocation.getCurrentPosition(pos=>{gLat=pos.coords.latitude;gLng=pos.coords.longitude;gAcc=Math.round(pos.coords.accuracy);st("gLat",gLat.toFixed(5));st("gLng",gLng.toFixed(5));st("gAcc",gAcc+"m");updateGPSStatus();},()=>{},{enableHighAccuracy:true});}
+function updateGPSStatus(){
+  const cab=g("selCab")?.value;const ap=cab?AIRPORTS[cab]:null;
+  if(!gLat||!gLng){gpsBox("⏳ Menunggu sinyal GPS...","gps-load");return;}
+  if(!ap){gpsBox("⚠️ Pilih cabang untuk validasi GPS","gps-load");st("gDst","-");return;}
+  if(ap.admin){gpsBox("🏢 Divisi Admin — GPS Bandara tidak diperlukan","gps-adm");st("gDst","N/A");return;}
   const dist=haverM(gLat,gLng,ap.lat,ap.lng);
   const ds=dist<1000?dist.toFixed(0)+"m":(dist/1000).toFixed(2)+"km";
-  setT("gDst",ds);
-  if(dist<=ap.r){el.className="gps-sb gps-v";el.innerHTML=`✅ Dalam Radius Bandara — <strong>${ds}</strong>`;}
-  else{el.className="gps-sb gps-i";el.innerHTML=`❌ Di Luar Radius — <strong>${ds}</strong> dari bandara`;}
+  st("gDst",ds);
+  if(dist<=ap.r)gpsBox(`✅ Dalam Radius Bandara · ${ds}`,"gps-ok");
+  else gpsBox(`❌ Di Luar Radius · ${ds} dari bandara`,"gps-no");
 }
-function haverM(a,b,c,d){const R=6371000,r=x=>x*Math.PI/180,dL=r(c-a),dO=r(d-b),x=Math.sin(dL/2)**2+Math.cos(r(a))*Math.cos(r(c))*Math.sin(dO/2)**2;return R*2*Math.atan2(Math.sqrt(x),Math.sqrt(1-x));}
-function updateShift(){
-  const cab=document.getElementById("selCab")?.value;
-  const now=new Date();const h=now.getHours();
-  if(cab==="Admin"){setT("shiftInfo","Jam Kerja Admin — Tidak ada shift bandara");setT("abSh","🏢 Admin");valGPS();return;}
+function gpsBox(txt,cls){const e=g("gpsBox");if(!e)return;e.textContent=txt;e.className="gps-box "+cls;}
+function onCabChange(){updateGPSStatus();updateShiftTxt();}
+function updateShiftTxt(){
+  const cab=g("selCab")?.value;const now=new Date();const h=now.getHours();
+  if(!cab){st("shiftTxt","Pilih cabang untuk melihat shift");st("absSh","—");return;}
+  if(cab==="Admin"){st("shiftTxt","Jam Kerja Admin — Bebas shift bandara");st("absSh","🏢 Admin");return;}
   const isBatam=cab==="ID Rifim Airport Batam";
-  const sh=h<12?"PAGI (07:05)":(isBatam?"SIANG (14:05)":"SIANG (15:05)");
-  setT("shiftInfo","Shift "+sh);setT("abSh","⏰ Shift "+(h<12?"Pagi":"Siang"));valGPS();
+  const sh=h<12?"PAGI 07:05":(isBatam?"SIANG 14:05":"SIANG 15:05");
+  st("shiftTxt","Shift "+sh+(h>=7&&h<12?" · Pagi aktif":h>=12?" · Siang aktif":""));
+  st("absSh","⏰ "+sh.split(" ")[0]);
 }
+function haverM(a,b,c,d){const R=6371000,r=x=>x*Math.PI/180,dl=r(c-a),do_=r(d-b),x=Math.sin(dl/2)**2+Math.cos(r(a))*Math.cos(r(c))*Math.sin(do_/2)**2;return R*2*Math.atan2(Math.sqrt(x),Math.sqrt(1-x));}
 
-// ── CAMERA ────────────────────────────────────────
+// ─── Camera ───────────────────────────────────────────────
 async function startCam(){
-  try{camStream=await navigator.mediaDevices.getUserMedia({video:{facingMode:"user"}});
-    document.getElementById("camVid").srcObject=camStream;
-    document.getElementById("camVid").style.display="block";document.getElementById("camPrev").style.display="none";
-    document.getElementById("camOv").style.display="flex";document.getElementById("btnTP").disabled=false;
-    setT("btnSC","🔄 Aktif");
-  }catch{setSt("uplSt","❌ Kamera tidak dapat diakses","er");}
+  try{
+    camStream=await navigator.mediaDevices.getUserMedia({video:{facingMode:"user",width:{ideal:640},height:{ideal:480}}});
+    const v=g("camVid");v.srcObject=camStream;v.style.display="block";
+    g("camPrev").style.display="none";g("camPlaceholder").style.display="none";
+    g("camGuide").style.display="flex";g("btnTP").disabled=false;
+    g("btnTP").className="btn-tonal cam-btn-active ripple-host";
+    alert_(g("alUpl"),"","");
+  }catch{alert_(g("alUpl"),"❌ Kamera tidak bisa diakses — izinkan di browser","er");}
 }
 function takePic(){
-  const vid=document.getElementById("camVid");const cv=document.createElement("canvas");
-  cv.width=vid.videoWidth||640;cv.height=vid.videoHeight||480;
+  const vid=g("camVid");
+  const cv=document.createElement("canvas");cv.width=vid.videoWidth||640;cv.height=vid.videoHeight||480;
   cv.getContext("2d").drawImage(vid,0,0);
   cv.toBlob(blob=>{
-    sBlob=blob;const ts=new Date().toISOString().replace(/[:.]/g,"-");
+    sBlob=blob;
+    const ts=new Date().toISOString().replace(/[:.]/g,"-");
     const nm=(CU?.nama||"staff").replace(/\s+/g,"_");
     sFile=new File([blob],`selfie_${nm}_${ts}.jpg`,{type:"image/jpeg"});
-    const pr=document.getElementById("camPrev");pr.src=URL.createObjectURL(blob);
-    pr.style.display="block";document.getElementById("camVid").style.display="none";
-    document.getElementById("camOv").style.display="none";document.getElementById("btnUpl").disabled=false;
-    setSt("uplSt","✅ Foto berhasil diambil!","ok");
-  },"image/jpeg",0.88);
+    const pr=g("camPrev");pr.src=URL.createObjectURL(blob);pr.style.display="block";
+    g("camVid").style.display="none";g("camGuide").style.display="none";
+    g("btnUpl").disabled=false;
+    alert_(g("alUpl"),"✅ Foto berhasil diambil — siap upload","ok");
+  },"image/jpeg",.88);
 }
 async function doUpload(){
-  if(!sFile){setSt("uplSt","⚠️ Ambil foto dulu!","wn");return null;}
-  setSt("uplSt","⏳ Upload ke Drive...","in");
+  if(!sFile){alert_(g("alUpl"),"⚠️ Ambil foto dulu!","wn");return null;}
+  alert_(g("alUpl"),"⏳ Upload ke Google Drive...","in");
+  g("btnUpl").disabled=true;
   const fid=await uploadFileToDrive(sFile,RIFIM_FOLDER);
-  if(fid)setSt("uplSt","✅ Upload berhasil","ok");
-  else setSt("uplSt","⚠️ Upload gagal, absensi tetap lanjut","wn");
-  return fid;
+  if(fid){alert_(g("alUpl"),"✅ Upload berhasil!","ok");}
+  else{alert_(g("alUpl"),"⚠️ Upload gagal — absensi tetap lanjut","wn");}
+  g("btnUpl").disabled=false;return fid;
 }
 
-// ── ABSENSI ───────────────────────────────────────
-function setType(t){absTipe=t;document.getElementById("btnM").classList.toggle("on",t==="masuk");document.getElementById("btnP").classList.toggle("on",t==="pulang");}
+// ─── Attendance submit ────────────────────────────────────
+function setType(t){
+  absTipe=t;
+  g("btnM").classList.toggle("on",t==="masuk");
+  g("btnP").classList.toggle("on",t==="pulang");
+}
 async function submitAbs(){
-  if(!CU){alert("Sesi habis!");return;}
-  if(!gLat){alert("⚠️ Tunggu GPS");return;}
-  if(!sBlob){alert("⚠️ Ambil foto selfie dulu");return;}
-  const cab=document.getElementById("selCab").value;
-  if(!cab){alert("⚠️ Pilih cabang");return;}
+  if(!CU)return;if(!gLat){alert("⏳ Tunggu GPS");return;}
+  if(!sBlob){alert("📸 Ambil foto selfie dulu!");return;}
+  const cab=g("selCab")?.value;if(!cab){alert("⚠️ Pilih cabang!");return;}
   const ap=AIRPORTS[cab];
   const dist=ap&&!ap.admin?haverM(gLat,gLng,ap.lat,ap.lng):0;
   const validGPS=ap?.admin||!ap||dist<=ap.r;
-  const btn=document.getElementById("btnKrm");
-  btn.disabled=true;btn.textContent="⏳ Mengirim...";
-  setSt("subSt","⏳ Memproses...","in");
+  const fab=g("fab");fab.textContent="⏳";fab.disabled=true;
+  alert_(g("alSub"),"⏳ Menyimpan absensi...","in");
   try{
     const fid=await doUpload();
     const now=new Date();
     const wkt=now.toLocaleTimeString("id-ID",{hour:"2-digit",minute:"2-digit"});
-    const late=absTipe==="masuk"&&!ap?.admin&&(now.getHours()>7||(now.getHours()===7&&now.getMinutes()>30));
-    // Save to Firestore
+    const late=absTipe==="masuk"&&!ap?.admin&&isLate(cab,now); // poin 5+6
+    const potongan=late?10000:0; // poin 7
+    if(!db) throw new Error("Firebase tidak tersedia — cek koneksi internet");
     await db.collection("absensi").add({
       nama:CU.nama,jabatan:CU.jabatan,cabang:cab,tipe:absTipe,
       lat:gLat,lng:gLng,akurasi:gAcc,gpsValid:validGPS,jarak:Math.round(dist),
-      waktu:wkt,status:late?"terlambat":"hadir",fotoId:fid||"",
+      waktu:wkt,status:late?"terlambat":"hadir",potongan,fotoId:fid||"",
       timestamp:firebase.firestore.FieldValue.serverTimestamp(),
-      tanggal:now.toISOString().slice(0,10),
+      tanggal:now.toISOString().slice(0,10)
     });
-    // Save to Google Sheets (RIFIM ERP ABSENSI — sheet ABSENSI)
-    try{await fetch(RIFIM_GAS,{method:"POST",headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({action:"absensi",sheetId:RIFIM_SHEET_ABSENSI,sheetName:"ABSENSI",
-        timestamp:now.toLocaleString("id-ID"),nama:CU.nama,bandara:cab,
-        tipe:absTipe,koordinatGPS:`${gLat},${gLng}`,
-        statusJarak:validGPS?"Dalam Radius":"Di Luar Radius",buktiFoto:fid||""})});}catch{}
-    showSuc(CU.nama,cab,wkt,absTipe,late);
+    // Kirim ke Google Sheets
+    try{await appendToSheet(RIFIM_SHEET_ABSENSI,"ABSENSI",[
+      now.toLocaleString("id-ID"),CU.nama,cab,absTipe,`${gLat},${gLng}`,
+      validGPS?"Dalam Radius":"Di Luar Radius",fid||""
+    ]);}catch{}
     sBlob=null;sFile=null;
-    document.getElementById("camPrev").style.display="none";
-    document.getElementById("camVid").style.display="block";
-    document.getElementById("btnUpl").disabled=true;document.getElementById("btnTP").disabled=true;
-    setSt("subSt","","");
-  }catch(e){setSt("subSt","❌ Gagal: "+e.message,"er");}
-  btn.disabled=false;btn.textContent="🚀 Kirim Absensi";
+    g("camPrev").style.display="none";g("camPlaceholder").style.display="flex";
+    g("btnUpl").disabled=true;g("btnTP").disabled=true;
+    g("btnTP").className="btn-tonal ripple-host";
+    alert_(g("alSub"),"","");
+    showSuc(CU.nama,cab,wkt,absTipe,late);
+  }catch(e){alert_(g("alSub"),"❌ Gagal: "+e.message,"er");}
+  fab.textContent="🚀";fab.disabled=false;
 }
-function showSuc(nama,cab,wkt,tipe,late){
-  setT("scNm",nama);setT("scCb",cab);setT("scTm",wkt);
-  const st=document.getElementById("scSt");
-  st.textContent=tipe==="masuk"?"Absen Masuk":"Absen Pulang";
-  st.className="bdg "+(late?"wn":"ok");
-  document.getElementById("sucOv").classList.add("on");
+function showSuc(nm,cb,tm,tp,late){
+  st("scNm",nm);st("scCb",cb);st("scTm",tm);
+  const el=g("scSt");el.textContent=tp==="masuk"?"Absen Masuk":"Absen Pulang";
+  el.className="chip "+(late?"chip-warn":"chip-ok");
+  g("sucOv").classList.add("on");
 }
-function hideSuc(){document.getElementById("sucOv").classList.remove("on");goPage("dashboard",document.querySelector(".nav-btn"));}
+function hideSuc(){g("sucOv").classList.remove("on");goPage("home",0);}
 
-// ── DASHBOARD ─────────────────────────────────────
+// ─── Dashboard ────────────────────────────────────────────
 async function loadDash(){
   const today=new Date().toISOString().slice(0,10);
   try{
+    if(!db){g("dashList").innerHTML='<div style="padding:16px;color:#FF5252;text-align:center;">Firebase tidak tersedia — cek koneksi</div>';return;}
     const snap=await db.collection("absensi").where("tanggal","==",today).get();
     const rows=snap.docs.map(d=>d.data());
     const hadir=rows.filter(r=>r.status!=="terlambat").length;
     const late=rows.filter(r=>r.status==="terlambat").length;
-    const total=STAFF_LIST.filter(u=>u.role!=="owner").length;
-    setT("dTS",total);setT("dH",hadir);setT("dB",Math.max(0,total-rows.length));setT("dTL",late);
-    const tb=document.getElementById("rtTable");
-    if(!rows.length){tb.innerHTML=`<tr><td colspan="8" style="text-align:center;padding:24px;color:var(--txt3);">Belum ada kehadiran hari ini</td></tr>`;}
-    else tb.innerHTML=rows.slice(0,30).map((r,i)=>`<tr>
-      <td style="color:var(--txt3)">${i+1}</td>
-      <td style="font-weight:700">${r.nama}</td>
-      <td style="font-size:11px;">${r.cabang}</td>
-      <td style="font-size:10px;color:var(--txt3);">${r.jabatan||"-"}</td>
-      <td><span class="bdg bl">${r.tipe==="masuk"?"🌅 Masuk":"🌆 Pulang"}</span></td>
-      <td><span class="bdg ${r.status==="hadir"?"ok":r.status==="terlambat"?"wn":"er"}">${r.status}</span></td>
-      <td style="font-family:'Syne',sans-serif;font-size:11px;">${r.waktu||"-"}</td>
-      <td><span class="bdg ${r.gpsValid?"ok":"er"}">${r.gpsValid?"✅":"❌"}</span></td>
-    </tr>`).join("");
-    buildWeekChart(rows);
-  }catch(e){console.log("Dash:",e.message);}
-}
-function buildWeekChart(todayRows){
-  const days=["Sen","Sel","Rab","Kam","Jum","Sab","Min"];
-  const counts=[todayRows.length,0,0,0,0,0,0];
-  const max=Math.max(...counts,1);
-  document.getElementById("weekChart").innerHTML=days.map((d,i)=>`<div class="bar-r"><div class="bar-l">${d}</div><div class="bar-bg"><div class="bar-f ${i===0?"":"g"}" style="width:${Math.round((counts[i]/max)*100)}%"></div></div><div class="bar-v">${counts[i]}</div></div>`).join("");
+    const total=STAFF.filter(u=>u.role!=="owner").length;
+    const totalPot=rows.reduce((s,r)=>s+(r.potongan||0),0); // poin 7
+    st("dTS",total);st("dH",hadir);st("dB",Math.max(0,total-rows.length));st("dTL",late);
+    st("dPot","Rp "+totalPot.toLocaleString("id-ID")); // poin 7
+    const list=g("dashList");
+    if(!rows.length){list.innerHTML='<div style="padding:24px;text-align:center;color:var(--txt-sec);font-size:13px;">Belum ada kehadiran hari ini</div>';return;}
+    list.innerHTML=rows.slice(0,25).map(r=>`
+      <div class="list-item">
+        <div class="l-av">${r.nama[0]}</div>
+        <div class="l-main">
+          <div class="l-title">${r.nama}</div>
+          <div class="l-sub">${r.cabang} · ${r.tipe||"masuk"}</div>
+        </div>
+        <div class="l-trail">
+          <div class="chip ${r.status==="hadir"?"chip-ok":r.status==="terlambat"?"chip-warn":"chip-err"}" style="margin-bottom:3px;">${r.status}</div>
+          <div style="font-size:11px;font-family:'Google Sans Mono',monospace;color:var(--txt-sec);">${r.waktu||"—"}${r.potongan?"<b style='color:#FF6F00'> -Rp10k</b>":""}</div>
+        </div>
+      </div>`).join("");
+  }catch(e){console.log("dash:",e.message);}
 }
 
-// ── JADWAL ────────────────────────────────────────
+// ─── Jadwal ───────────────────────────────────────────────
 function getMon(d){const c=new Date(d),day=c.getDay(),diff=c.getDate()-day+(day===0?-6:1);return new Date(c.setDate(diff));}
-function prevWeek(){weekStart=new Date(weekStart);weekStart.setDate(weekStart.getDate()-7);syncWkDate();loadJadwal();}
-function nextWeek(){weekStart=new Date(weekStart);weekStart.setDate(weekStart.getDate()+7);syncWkDate();loadJadwal();}
-function syncWkDate(){const jd=document.getElementById("jDate");if(jd)jd.value=weekStart.toISOString().slice(0,10);updateWeekLabel();}
+function prevWeek(){wkStart=new Date(wkStart);wkStart.setDate(wkStart.getDate()-7);syncWkDate();loadJadwal();}
+function nextWeek(){wkStart=new Date(wkStart);wkStart.setDate(wkStart.getDate()+7);syncWkDate();loadJadwal();}
+function syncWkDate(){const jd=g("jDate");if(jd)jd.value=wkStart.toISOString().slice(0,10);updateWeekLabel();}
 function updateWeekLabel(){
-  const end=new Date(weekStart);end.setDate(end.getDate()+6);
-  setT("weekLbl",`${weekStart.getDate()} ${M[weekStart.getMonth()]} — ${end.getDate()} ${M[end.getMonth()]} ${end.getFullYear()}`);
+  const end=new Date(wkStart);end.setDate(end.getDate()+6);
+  const s=`${wkStart.getDate()} ${MO[wkStart.getMonth()]} — ${end.getDate()} ${MO[end.getMonth()]} ${end.getFullYear()}`;
+  st("weekLbl",s);
 }
-
-async function syncJadwal(){
-  if(!canEdit()){alert("Hanya Nabilla dan Owner yang bisa mengubah jadwal!");return;}
-  try{
-    const url=`https://opensheet.elk.sh/${RIFIM_SHEET_STAFF}/MASTER%20DATA%20STAFF`;
-    const res=await fetch(url);const data=await res.json();
-    if(Array.isArray(data)&&data.length){
-      const keep=STAFF_LIST.filter(u=>u.role==="editor"||u.role==="owner");
-      data.forEach(r=>{
-        const nm=(r["Nama"]||"").trim();
-        if(!nm||keep.find(k=>k.nama===nm))return;
-        const existing=STAFF_LIST.find(s=>s.nama===nm);
-        keep.push({
-          nama:nm,jabatan:(r["Jabatan"]||"").trim(),
-          cabang:(r["ID CABANG"]||"").trim(),
-          idStaff:(r["ID Staff"]||"").trim(),
-          pw:existing?.pw||"rifim2024",role:"staff",email:(r["Email"]||"")
-        });
-      });
-      STAFF_LIST=keep;
-      const sel=document.getElementById("selUser");sel.innerHTML='<option value="">Pilih Staff...</option>';
-      STAFF_LIST.forEach(u=>{const o=document.createElement("option");o.value=u.nama;o.textContent=`${u.nama} — ${u.jabatan}`;sel.appendChild(o);});
-      alert(`✅ ${data.length} staff berhasil disinkronisasi dari DATABASE STAFF!`);
-      loadJadwal();
-    }
-  }catch(e){alert("Gagal sync: "+e.message);}
-}
-
 function loadJadwal(){
-  const jd=document.getElementById("jDate");if(jd&&jd.value)weekStart=getMon(new Date(jd.value));
+  const jd=g("jDate");if(jd&&jd.value)wkStart=getMon(new Date(jd.value));
+  lsSet("rifim_wkstart",wkStart.toISOString()); // poin 1
   syncWkDate();
-  const cabF=document.getElementById("jCab").value;
-  let list=STAFF_LIST.filter(u=>u.role!=="owner");
+  loadJadwalFromStorage(); // poin 1: load dari localStorage
+  autoGenIfExpired(); // poin 2: auto-gen bila expired
+  const cabF=g("jCab")?.value;
+  let list=STAFF.filter(u=>u.role!=="owner");
   if(cabF)list=list.filter(u=>u.cabang===cabF);
   renderJadwal(list);
 }
-
 function renderJadwal(list){
-  const days=[];for(let i=0;i<7;i++){const d=new Date(weekStart);d.setDate(d.getDate()+i);days.push(d);}
-  document.getElementById("jHead").innerHTML=`<tr>
-    <th style="min-width:150px;">STAFF</th>
-    ${days.map(d=>`<th style="text-align:center;min-width:105px;">${HARI[d.getDay()]}<br><span style="font-size:9px;color:var(--txt3);font-weight:500;">${d.getDate()} ${M[d.getMonth()]}</span></th>`).join("")}
+  const days=[];for(let i=0;i<7;i++){const d=new Date(wkStart);d.setDate(d.getDate()+i);days.push(d);}
+  const isE=canEdit();
+  g("jHead").innerHTML=`<tr>
+    <th style="text-align:left;padding-left:12px;">STAFF</th>
+    ${days.map(d=>`<th style="min-width:68px;">${HR[d.getDay()]}<br/><span style="font-size:8px;font-weight:400;">${d.getDate()}/${d.getMonth()+1}</span></th>`).join("")}
   </tr>`;
-  const isEdit=canEdit();
-  document.getElementById("jBody").innerHTML=list.map(s=>{
-    if(!jadwalData[s.nama])jadwalData[s.nama]={};
-    if(!attData[s.nama])attData[s.nama]={};
-    const sn=s.cabang.replace("ID Rifim Airport ","✈ ").replace("ID Rifim ","🏢 ").replace("Admin","🏢 Admin");
+  g("jBody").innerHTML=list.map(s=>{
+    if(!jadwal[s.nama])jadwal[s.nama]={};
+    if(!att[s.nama])att[s.nama]={};
+    const sn=s.cabang.replace("ID Rifim Airport ","").replace("ID Rifim ","").replace("Admin","Admin");
     const cells=days.map((_,di)=>{
-      const sh=jadwalData[s.nama][di]||"PAGI";
-      const att=attData[s.nama][di]||"";
+      const sh=jadwal[s.nama][di]||"PAGI";
+      const at=att[s.nama][di]||"";
       const cls=sh==="PAGI"?"sp":sh==="SIANG"?"ss":"sl";
-      const shCell=isEdit
-        ?`<div class="shift-badge ${cls} shift-btn-cell" onclick="cycleShift('${s.nama.replace(/'/g,"\\'")}',${di})" title="Klik ganti shift">${sh}</div>`
-        :`<div class="shift-badge ${cls}">${sh}</div>`;
-      const chks=isEdit
-        ?`<div class="chk-row">
-            <div class="chk-box ${att==="H"?"H":""}" title="Hadir" onclick="setAtt('${s.nama.replace(/'/g,"\\'")}',${di},'H')"></div>
-            <div class="chk-box ${att==="T"?"T":""}" title="Terlambat" onclick="setAtt('${s.nama.replace(/'/g,"\\'")}',${di},'T')"></div>
-            <div class="chk-box ${att==="A"?"A":""}" title="Alpha" onclick="setAtt('${s.nama.replace(/'/g,"\\'")}',${di},'A')"></div>
-          </div>`
-        :`<div class="chk-row">
-            <div class="chk-box ${att==="H"?"H":""}" style="cursor:default;"></div>
-            <div class="chk-box ${att==="T"?"T":""}" style="cursor:default;"></div>
-            <div class="chk-box ${att==="A"?"A":""}" style="cursor:default;"></div>
-          </div>`;
-      return `<td style="padding:5px 3px;text-align:center;">${shCell}${chks}</td>`;
+      const pill=isE?`<div class="s-pill ${cls}" onclick="cycleShift('${esc(s.nama)}',${di})" style="cursor:pointer;">${sh}</div>`:
+        `<div class="s-pill ${cls}" style="cursor:default;">${sh}</div>`;
+      const dots=isE?`<div class="att-dots">
+        <div class="att-d ${at==="H"?"H":""}" onclick="setAtt('${esc(s.nama)}',${di},'H')" title="Hadir"></div>
+        <div class="att-d ${at==="T"?"T":""}" onclick="setAtt('${esc(s.nama)}',${di},'T')" title="Terlambat"></div>
+        <div class="att-d ${at==="A"?"A":""}" onclick="setAtt('${esc(s.nama)}',${di},'A')" title="Alfa"></div>
+      </div>`:`<div class="att-dots">
+        <div class="att-d ${at==="H"?"H":""}" style="cursor:default;"></div>
+        <div class="att-d ${at==="T"?"T":""}" style="cursor:default;"></div>
+        <div class="att-d ${at==="A"?"A":""}" style="cursor:default;"></div>
+      </div>`;
+      return `<td><div style="display:flex;flex-direction:column;align-items:center;gap:4px;">${pill}${dots}</div></td>`;
     }).join("");
     return `<tr>
-      <td style="min-width:150px;padding:8px 11px;">
-        <div style="font-weight:700;font-size:11px;">${s.nama}</div>
-        <div style="font-size:9px;color:var(--txt3);">${s.jabatan}</div>
-        <div style="font-size:9px;color:var(--txt3);margin-top:1px;">${sn}</div>
-      </td>${cells}</tr>`;
-  }).join("")||`<tr><td colspan="8" style="text-align:center;padding:24px;color:var(--txt3);">Tidak ada staff — sync DB Staff dulu</td></tr>`;
-  buildAbsMgg(list,days);
+      <td><div style="font-size:11px;font-weight:600;">${s.nama}</div><div style="font-size:9px;color:var(--txt-sec);">${sn}</div></td>
+      ${cells}
+    </tr>`;
+  }).join("");
+  renderMgg(list,days);
 }
-
 function cycleShift(nama,day){
-  if(!canEdit()){alert("Hanya Nabilla dan Owner yang bisa mengubah jadwal!");return;}
-  if(!jadwalData[nama])jadwalData[nama]={};
-  const cur=jadwalData[nama][day]||"PAGI";
-  const opts=["PAGI","SIANG","LIBUR"];
+  if(!canEdit()){alert("Hanya Nabilla dan Owner!");return;}
+  if(!jadwal[nama])jadwal[nama]={};
+  const opts=["PAGI","SIANG","LIBUR"];const cur=jadwal[nama][day]||"PAGI";
   const next=opts[(opts.indexOf(cur)+1)%opts.length];
-  const rule=JADWAL_RULES.differentShift.find(r=>r.a===nama||r.b===nama);
+  const rule=JD_RULES.find(r=>r.a===nama||r.b===nama);
   if(rule&&next!=="LIBUR"){
     const partner=rule.a===nama?rule.b:rule.a;
-    const psh=jadwalData[partner]?.[day];
-    if(psh===next&&psh!=="LIBUR"){alert(`⚠️ ${nama} & ${partner} harus beda shift!`);return;}
+    if(jadwal[partner]?.[day]===next){alert(`⚠️ ${nama} & ${partner} harus beda shift!`);return;}
   }
-  jadwalData[nama][day]=next;
-  const cabF=document.getElementById("jCab").value;
-  let list=STAFF_LIST.filter(u=>u.role!=="owner");
-  if(cabF)list=list.filter(u=>u.cabang===cabF);
+  jadwal[nama][day]=next;
+  saveJadwal(); // poin 1
+  const cabF=g("jCab")?.value;let list=STAFF.filter(u=>u.role!=="owner");if(cabF)list=list.filter(u=>u.cabang===cabF);
   renderJadwal(list);
 }
-
 function setAtt(nama,day,val){
-  if(!canEdit()){return;}
-  if(!attData[nama])attData[nama]={};
-  attData[nama][day]=attData[nama][day]===val?"":val;
-  const cabF=document.getElementById("jCab").value;
-  let list=STAFF_LIST.filter(u=>u.role!=="owner");
-  if(cabF)list=list.filter(u=>u.cabang===cabF);
+  if(!canEdit())return;
+  if(!att[nama])att[nama]={};
+  att[nama][day]=att[nama][day]===val?"":val;
+  saveJadwal(); // poin 1
+  const cabF=g("jCab")?.value;let list=STAFF.filter(u=>u.role!=="owner");if(cabF)list=list.filter(u=>u.cabang===cabF);
   renderJadwal(list);
 }
-
-function buildAbsMgg(list,days){
-  document.getElementById("absMggBody").innerHTML=list.map(s=>{
-    let H=0,T=0,A=0;
-    days.forEach((_,di)=>{const a=attData[s.nama]?.[di]||"";if(a==="H")H++;if(a==="T")T++;if(a==="A")A++;});
+function renderMgg(list,days){
+  g("mggBody").innerHTML=list.map(s=>{
+    let H=0,T=0,A=0;days.forEach((_,di)=>{const a=att[s.nama]?.[di]||"";if(a==="H")H++;if(a==="T")T++;if(a==="A")A++;});
     return `<tr>
-      <td style="font-weight:700;font-size:11px;">${s.nama}</td>
-      <td style="text-align:center;color:#10b981;font-weight:700;">${H}</td>
-      <td style="text-align:center;color:#f59e0b;font-weight:700;">${T}</td>
-      <td style="text-align:center;color:#ef4444;font-weight:700;">${A}</td>
-      <td style="text-align:center;font-weight:700;">${H+T}</td>
+      <td style="padding:7px 12px;font-size:11px;font-weight:600;border-bottom:1px solid var(--out-var);">${s.nama}</td>
+      <td style="text-align:center;font-weight:700;color:var(--clr-ok);border-bottom:1px solid var(--out-var);">${H}</td>
+      <td style="text-align:center;font-weight:700;color:var(--clr-warn);border-bottom:1px solid var(--out-var);">${T}</td>
+      <td style="text-align:center;font-weight:700;color:var(--clr-err);border-bottom:1px solid var(--out-var);">${A}</td>
+      <td style="text-align:center;font-weight:700;border-bottom:1px solid var(--out-var);">${H+T}</td>
     </tr>`;
-  }).join("")||`<tr><td colspan="5" style="text-align:center;padding:16px;color:var(--txt3);">Generate jadwal dulu</td></tr>`;
+  }).join("")||`<tr><td colspan="5" style="padding:14px;text-align:center;color:var(--txt-sec);font-size:12px;">Generate jadwal dulu</td></tr>`;
+}
+function buildKtrRows(){
+  const tb=g("ktrBody");if(!tb)return;
+  let html="";for(let i=0;i<5;i++){
+    html+=`<tr>
+      <td style="padding:7px 12px;border-bottom:1px solid var(--out-var);"><input class="ktr-inp" placeholder="Nama..."/></td>
+      <td style="padding:7px 12px;border-bottom:1px solid var(--out-var);"><input class="ktr-inp" placeholder="Sakit / Izin / Alfa..."/></td>
+    </tr>`;
+  }tb.innerHTML=html;
+}
+// Core generate logic (dipanggil dari manual & auto)
+function runGenJadwal(list){
+  list.forEach(s=>{
+    if(!jadwal[s.nama])jadwal[s.nama]={};
+    const code=s.nama.split("").reduce((a,c)=>a+c.charCodeAt(0),0);
+    const liburDay=(code+wkStart.getDate())%7;
+    for(let d=0;d<7;d++){
+      jadwal[s.nama][d]=d===liburDay?"LIBUR":d%2===0?"PAGI":"SIANG";
+    }
+  });
+  JD_RULES.forEach(rule=>{
+    for(let d=0;d<7;d++){
+      const sa=jadwal[rule.a]?.[d],sb=jadwal[rule.b]?.[d];
+      if(sa&&sb&&sa!=="LIBUR"&&sb!=="LIBUR"&&sa===sb&&jadwal[rule.b])jadwal[rule.b][d]=sa==="PAGI"?"SIANG":"PAGI";
+    }
+  });
+  saveJadwal(); // poin 1: simpan ke localStorage
 }
 
 function genJadwal(){
-  if(!canEdit()){alert("Hanya Nabilla dan Owner yang bisa generate jadwal!");return;}
-  const cabF=document.getElementById("jCab").value;
-  let list=STAFF_LIST.filter(u=>u.role!=="owner");
-  if(cabF)list=list.filter(u=>u.cabang===cabF);
-  list.forEach(s=>{
-    if(!jadwalData[s.nama])jadwalData[s.nama]={};
-    const code=s.nama.split("").reduce((a,c)=>a+c.charCodeAt(0),0);
-    const liburDay=(code+new Date(weekStart).getDate())%7;
-    for(let d=0;d<7;d++){
-      if(d===liburDay){jadwalData[s.nama][d]="LIBUR";continue;}
-      jadwalData[s.nama][d]=["SIANG","PAGI"][d%2];
-    }
-  });
-  JADWAL_RULES.differentShift.forEach(rule=>{
-    for(let d=0;d<7;d++){
-      const shA=jadwalData[rule.a]?.[d];const shB=jadwalData[rule.b]?.[d];
-      if(shA&&shB&&shA!=="LIBUR"&&shB!=="LIBUR"&&shA===shB){
-        if(jadwalData[rule.b])jadwalData[rule.b][d]=shA==="PAGI"?"SIANG":"PAGI";
-      }
-    }
-  });
-  renderJadwal(list);alert("✅ Jadwal berhasil di-generate!");
+  if(!canEdit()){alert("Hanya Nabilla dan Owner!");return;}
+  const cabF=g("jCab")?.value;let list=STAFF.filter(u=>u.role!=="owner");if(cabF)list=list.filter(u=>u.cabang===cabF);
+  runGenJadwal(list); // poin 2
+  renderJadwal(list);
+  alert("✅ Jadwal berhasil di-generate!\n\nKlik shift untuk ubah · Klik dot H/T/A untuk catat absensi");
 }
-
 function exportJadwalPDF(){
-  if(!canEdit()){alert("Hanya Nabilla dan Owner yang bisa export!");return;}
-  const end=new Date(weekStart);end.setDate(end.getDate()+6);
-  const wkLbl=document.getElementById("weekLbl").textContent;
-  const cabF=document.getElementById("jCab").value||"Semua Cabang";
-  const fn=`Jadwal_Shift_Rifim_${weekStart.getDate()}${M[weekStart.getMonth()]}-${end.getDate()}${M[end.getMonth()]}${end.getFullYear()}_${cabF.replace(/\s+/g,"_")}.pdf`;
+  const end=new Date(wkStart);end.setDate(end.getDate()+6);
+  const wl=g("weekLbl").textContent;
+  const cabF=g("jCab")?.value||"Semua";
   const pw=window.open("","_blank");
-  pw.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"/><title>${fn}</title><style>
-    body{font-family:Arial,sans-serif;padding:16px;font-size:11px;}h2{color:#C62828;margin-bottom:4px;}
-    .sub{color:#64748b;font-size:10px;margin-bottom:14px;}
-    table{width:100%;border-collapse:collapse;margin-bottom:12px;}
-    th{background:#1e293b;color:#fff;padding:6px 7px;text-align:center;font-size:9px;}
-    td{padding:5px 6px;border:1px solid #e2e8f0;text-align:center;font-size:9px;}
-    .sp{background:#dcfce7;color:#15803d;padding:2px 5px;border-radius:4px;font-weight:700;}
-    .ss{background:#fef9c3;color:#854d0e;padding:2px 5px;border-radius:4px;font-weight:700;}
-    .sl{background:#f1f5f9;color:#64748b;padding:2px 5px;border-radius:4px;font-weight:700;}
-    .chk-row{display:none;}
-    @media print{@page{size:A4 landscape;margin:8mm;}}
-  </style></head><body>
-    <h2>📋 JADWAL KERJA STAFF — RIFIM ERP</h2>
-    <div class="sub">PT. Rifim International Gemilang | Minggu: ${wkLbl} | Cabang: ${cabF} | Dicetak: ${new Date().toLocaleString("id-ID")}</div>
-    ${document.getElementById("jadwalWrap").innerHTML}
-    <h3 style="margin-top:12px;color:#C62828;font-size:11px;">Keterangan Berhalangan</h3>
-    ${document.getElementById("ktrBody").parentElement.parentElement.outerHTML}
-    <h3 style="margin-top:12px;color:#C62828;font-size:11px;">Status Absensi Mingguan</h3>
-    ${document.getElementById("absMggBody").parentElement.parentElement.outerHTML}
-    <div style="margin-top:12px;font-size:8px;color:#94a3b8;text-align:center;">RIFIM ERP v4 • INTEGRITAS • INOVASI • KUALITAS • KEBERLANJUTAN</div>
-    <script>window.onload=()=>{window.print();window.close();};<\/script>
-  </body></html>`);pw.document.close();
-  gasAction({action:"save_jadwal",folderId:RIFIM_FOLDER,fileName:fn}).then(r=>{if(r.success)console.log("Saved to Drive");});
+  const tbl=g("pgJd").querySelector("table");
+  const tblHTML=tbl?tbl.outerHTML:"<p>Kosong — generate jadwal dulu</p>";
+  const autoprint="window.onload=function(){window.print();window.close();}";
+  const html=
+    "<!DOCTYPE html><html><head><meta charset='UTF-8'/><title>Jadwal RIFIM</title>"
+    +"<style>body{font-family:Arial;padding:14px;font-size:10px;}h2{color:#C62828;}"
+    +"table{width:100%;border-collapse:collapse;}th{background:#1e293b;color:#fff;padding:6px;font-size:9px;}"
+    +"td{padding:5px 6px;border:1px solid #e2e8f0;font-size:9px;}"
+    +".sp{color:#15803d;font-weight:700;}.ss{color:#854d0e;font-weight:700;}.sl{color:#64748b;}"
+    +"@media print{@page{size:A4 landscape;margin:7mm;}}</style></head><body>"
+    +"<h2>JADWAL KERJA STAFF \u2014 RIFIM ERP</h2>"
+    +"<p style='color:#64748b;font-size:9px;'>Minggu: "+wl+" | Cabang: "+cabF+" | "+new Date().toLocaleString("id-ID")+"</p>"
+    +tblHTML
+    +"<scri"+"pt>"+autoprint+"</scri"+"pt>"
+    +"</body></html>";
+  pw.document.write(html);pw.document.close();
 }
 
-async function saveAbsMgg(){
-  if(!canEdit()){alert("Hanya Nabilla dan Owner yang bisa menyimpan!");return;}
-  const end=new Date(weekStart);end.setDate(end.getDate()+6);
-  const fn=`Absensi_Mingguan_${weekStart.getDate()}${M[weekStart.getMonth()]}-${end.getDate()}${M[end.getMonth()]}${end.getFullYear()}.pdf`;
-  const r=await gasAction({action:"save_absensi_mgg",folderId:RIFIM_FOLDER,fileName:fn});
-  alert(r.success?`✅ Tersimpan ke Drive!\n${fn}`:`⚠️ Gunakan Ctrl+P untuk print.\nSaran nama file: ${fn}`);
-}
-
-// ── REKAP ─────────────────────────────────────────
-async function loadRekap(){
-  const bln=document.getElementById("rkBln").value;
-  const cab=document.getElementById("rkCab").value;
-  const sfn=document.getElementById("rkStaff").value;
+// ─── Rekap ────────────────────────────────────────────────
+// ── REKAP (poin 3,4,7,8) ─────────────────────────────────
+async function doFilterRekap(){
+  const bln=g("rkBln")?.value;
+  const cab=g("rkCab")?.value;
+  const sfn=g("rkStaff")?.value;
+  const btn=g("rkFilterBtn");
+  if(btn){btn.disabled=true;btn.textContent="⏳ Memuat...";}
+  alert_(g("alRk"),"⏳ Mengambil data dari Firebase...","in");
   try{
+    // Build query - Firebase butuh index untuk multi-where
+    if(!db){alert_(g("alRk"),"❌ Firebase tidak tersedia — cek koneksi internet","er");if(btn){btn.disabled=false;btn.textContent="🔍 Filter";}return;}
     let q=db.collection("absensi");
-    if(bln)q=q.where("tanggal",">=",bln+"-01").where("tanggal","<=",bln+"-31");
+    let rows=[];
+    if(bln){
+      const [yr,mn]=bln.split("-");
+      const lastDay=new Date(+yr,+mn,0).getDate();
+      q=q.where("tanggal",">=",bln+"-01").where("tanggal","<=",bln+"-"+String(lastDay).padStart(2,"0"));
+    }
     const snap=await q.get();
-    let rows=snap.docs.map(d=>d.data());
+    rows=snap.docs.map(d=>({...d.data(),docId:d.id}));
+    // Filter client-side (lebih reliabel)
     if(cab)rows=rows.filter(r=>r.cabang===cab);
     if(sfn)rows=rows.filter(r=>r.nama===sfn);
+
+    // Aggregate per staff (poin 8)
     const agg={};
-    rows.forEach(r=>{
-      if(!agg[r.nama])agg[r.nama]={nama:r.nama,cabang:r.cabang,H:0,T:0,A:0};
-      if(r.status==="terlambat")agg[r.nama].T++;else agg[r.nama].H++;
+    STAFF.filter(u=>u.role!=="owner").filter(u=>!cab||u.cabang===cab).forEach(u=>{
+      agg[u.nama]={nama:u.nama,cabang:u.cabang,H:0,T:0,A:0,pot:0};
     });
-    STAFF_LIST.filter(u=>u.role!=="owner").forEach(u=>{if(!agg[u.nama])agg[u.nama]={nama:u.nama,cabang:u.cabang,H:0,T:0,A:0};});
-    const data=Object.values(agg);
-    const tH=data.reduce((s,x)=>s+x.H,0),tT=data.reduce((s,x)=>s+x.T,0),tA=data.reduce((s,x)=>s+x.A,0);
-    setT("rH",tH);setT("rT",tT);setT("rA",tA);
-    setT("rP",tH+tT>0?Math.min(100,Math.round((tH/(tH+tT+tA))*100))+"%":"0%");
-    document.getElementById("rkTable").innerHTML=data.map((r,i)=>{
-      const tot=r.H+r.T;const p=tot>0?Math.round((r.H/tot)*100):0;
-      return `<tr><td style="color:var(--txt3)">${i+1}</td><td style="font-weight:700">${r.nama}</td>
-        <td style="font-size:11px;">${r.cabang}</td>
-        <td style="color:var(--grn);font-weight:700">${r.H}</td>
-        <td style="color:var(--yel);font-weight:700">${r.T}</td>
-        <td style="color:var(--red3);font-weight:700">${r.A}</td>
-        <td><span class="bdg ${p>=80?"ok":p>=60?"wn":"er"}">${p}%</span></td></tr>`;
-    }).join("")||`<tr><td colspan="7" style="text-align:center;padding:24px;color:var(--txt3)">Tidak ada data</td></tr>`;
-  }catch(e){console.log("Rekap:",e.message);}
-}
-function exportRekapPDF(){
-  const bln=document.getElementById("rkBln").value||new Date().toISOString().slice(0,7);
-  const cab=document.getElementById("rkCab").value||"Semua Cabang";
-  const fn=`Rekap_Absensi_${bln}_${cab.replace(/\s+/g,"_")}.pdf`;
-  const pw=window.open("","_blank");
-  pw.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"/><title>${fn}</title>
-    <style>body{font-family:Arial;padding:16px;}h2{color:#C62828;}table{width:100%;border-collapse:collapse;font-size:11px;}
-    th{background:#1e293b;color:#fff;padding:7px;}td{padding:6px;border:1px solid #e2e8f0;}
-    @media print{@page{size:A4;margin:10mm;}}</style>
-  </head><body>
-    <h2>📊 REKAP KEHADIRAN — RIFIM ERP</h2>
-    <p style="font-size:10px;">Periode: ${bln} | Cabang: ${cab} | Dicetak: ${new Date().toLocaleString("id-ID")}</p>
-    ${document.getElementById("rkTable").parentElement.parentElement.outerHTML}
-    <script>window.onload=()=>{window.print();window.close();};<\/script>
-  </body></html>`);pw.document.close();
-  gasAction({action:"save_rekap",folderId:RIFIM_FOLDER,fileName:fn});
+    rows.forEach(r=>{
+      if(!agg[r.nama])agg[r.nama]={nama:r.nama,cabang:r.cabang,H:0,T:0,A:0,pot:0};
+      if(r.tipe==="masuk"||!r.tipe){
+        if(r.status==="terlambat"){agg[r.nama].T++;agg[r.nama].pot+=(r.potongan||10000);}
+        else agg[r.nama].H++;
+      }
+    });
+    const data=Object.values(agg).filter(r=>!sfn||r.nama===sfn);
+    lastRekapData=data; // poin 4: simpan untuk export
+
+    const tH=data.reduce((s,x)=>s+x.H,0);
+    const tT=data.reduce((s,x)=>s+x.T,0);
+    const tA=data.reduce((s,x)=>s+x.A,0);
+    const tPot=data.reduce((s,x)=>s+x.pot,0);
+    st("rH",tH);st("rT",tT);st("rA",tA);
+    const tot=tH+tT+tA;
+    st("rP",tot>0?Math.min(100,Math.round((tH/tot)*100))+"%":"0%");
+    st("rPot","Rp "+tPot.toLocaleString("id-ID"));
+
+    // Render tabel rekap per staff (poin 8)
+    const tbody=g("rkTblBody");
+    if(!data.length){
+      tbody.innerHTML='<tr><td colspan="7" style="padding:24px;text-align:center;color:var(--txt-sec);">Tidak ada data untuk periode ini</td></tr>';
+    } else {
+      tbody.innerHTML=data.map(r=>{
+        const t=r.H+r.T;
+        const p=t>0?Math.round((r.H/t)*100):0;
+        const sn=r.cabang.replace("ID Rifim Airport ","").replace("ID Rifim ","");
+        return `<tr style="border-bottom:1px solid var(--out-var);">
+          <td style="padding:9px 10px;font-size:12px;font-weight:500;">${r.nama}</td>
+          <td style="padding:9px 6px;font-size:10px;color:var(--txt-sec);text-align:center;">${sn}</td>
+          <td style="padding:9px 6px;text-align:center;font-weight:700;color:var(--clr-ok);">${r.H}</td>
+          <td style="padding:9px 6px;text-align:center;font-weight:700;color:var(--clr-warn);">${r.T}</td>
+          <td style="padding:9px 6px;text-align:center;font-weight:700;color:var(--clr-err);">${r.A}</td>
+          <td style="padding:9px 6px;text-align:center;">
+            <span style="font-size:11px;font-weight:700;color:${p>=80?"var(--clr-ok)":p>=50?"var(--clr-warn)":"var(--clr-err)"};">${p}%</span>
+          </td>
+          <td style="padding:9px 6px;text-align:center;font-size:11px;font-weight:600;color:${r.pot>0?"#FF6F00":"var(--txt-dis)"};">
+            ${r.pot>0?"Rp "+r.pot.toLocaleString("id-ID"):"—"}
+          </td>
+        </tr>`;
+      }).join("");
+    }
+
+    // Tampilkan tombol export (poin 4)
+    const expRow=g("rkExportRow");
+    if(expRow){expRow.style.display="flex";}
+    alert_(g("alRk"),`✅ ${rows.length} record ditemukan · ${data.length} staff`,"ok");
+  }catch(e){
+    alert_(g("alRk"),"❌ Error: "+e.message+". Cek koneksi internet.","er");
+    console.error("rekap:",e);
+    sendErrorEmail("loadRekap",e.message); // poin 9
+  }finally{
+    if(btn){btn.disabled=false;btn.textContent="🔍 Filter";}
+  }
 }
 
-// ── STAFF ──────────────────────────────────────────
-function loadStaff(){
-  const s=document.getElementById("sfSrch").value.toLowerCase();
-  const c=document.getElementById("sfCab").value;
-  const list=STAFF_LIST.filter(u=>u.role!=="owner").filter(u=>(!s||u.nama.toLowerCase().includes(s))&&(!c||u.cabang===c));
-  const isEdit=canEdit();
-  document.getElementById("sfTable").innerHTML=list.map((u,i)=>{
-    const rd=ROLES[u.role]||ROLES.staff;
-    const actCell=isEdit?`<td><button class="btn btn-g" style="font-size:10px;padding:4px 8px;color:#ef4444;" onclick="delStaff('${u.nama.replace(/'/g,"\\'")}')">🗑 Hapus</button></td>`:`<td></td>`;
-    return `<tr>
-      <td style="color:var(--txt3)">${i+1}</td>
-      <td style="font-weight:700">${u.nama}</td>
-      <td style="font-size:10px;color:var(--txt3);">${u.idStaff||"—"}</td>
-      <td>${u.jabatan}</td>
-      <td style="font-size:11px;">${u.cabang}</td>
-      <td><span class="bdg ${u.role==="owner"?"wn":u.role==="editor"?"bl":u.role==="admin"?"ok":"pu"}">${rd.label}</span></td>
-      <td><span class="bdg ok">AKTIF</span></td>
-      ${actCell}</tr>`;
-  }).join("")||`<tr><td colspan="8" style="text-align:center;padding:24px;color:var(--txt3)">Tidak ditemukan</td></tr>`;
+// Wrapper untuk kompatibilitas (dipanggil dari goPage)
+function loadRekap(){doFilterRekap();}
+
+// Export rekap ke Google Sheets (poin 4)
+async function exportRekapSheet(){
+  if(!lastRekapData.length){alert("Filter dulu!");return;}
+  const bln=g("rkBln")?.value||new Date().toISOString().slice(0,7);
+  alert_(g("alRk"),"⏳ Mengekspor ke Sheet ABSENSI...","in");
+  try{
+    const rows=lastRekapData.map(r=>[
+      bln,r.nama,r.cabang,r.H,r.T,r.A,
+      Math.round(r.H/(r.H+r.T||1)*100)+"%",
+      r.pot>0?"Rp "+r.pot.toLocaleString("id-ID"):"0"
+    ]);
+    // Header row
+    const headerRow=["Periode","Nama Staff","Cabang","Hadir","Terlambat","Alfa","Rate","Potongan"];
+    // Append ke sheet REKAP (buat sheet baru bila belum ada)
+    const res=await fetch(RIFIM_GAS,{
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({
+        action:"appendRows",
+        sheetId:RIFIM_SHEET_ABSENSI,
+        sheetName:"REKAP",
+        rows:[headerRow,...rows],
+        clearFirst:false
+      })
+    });
+    if(res.ok){alert_(g("alRk"),"✅ Berhasil diekspor ke Sheet ABSENSI → tab REKAP!","ok");}
+    else throw new Error("HTTP "+res.status);
+  }catch(e){
+    alert_(g("alRk"),"⚠️ Export gagal: "+e.message+". Coba PDF saja.","wn");
+    console.warn("exportRekapSheet:",e);
+  }
 }
-function filterStaff(){loadStaff();}
-function showAddStaff(){if(!canEdit()){alert("Hanya Nabilla dan Owner!");return;}document.getElementById("addStaffForm").style.display="block";}
-function addStaff(){
-  if(!canEdit())return;
-  const nm=document.getElementById("sfNmIn").value.trim();
-  const jb=document.getElementById("sfJabIn").value;
-  const cb=document.getElementById("sfCabIn").value;
-  const pw=document.getElementById("sfPwIn").value.trim()||"rifim2024";
-  if(!nm){alert("Isi nama staff!");return;}
-  if(STAFF_LIST.find(u=>u.nama===nm)){alert("Nama sudah ada!");return;}
-  STAFF_LIST.push({nama:nm,pw,jabatan:jb,cabang:cb,idStaff:"RIF-"+Date.now().toString(36).toUpperCase(),role:"staff"});
-  savePWStore();
-  document.getElementById("sfNmIn").value="";
-  document.getElementById("addStaffForm").style.display="none";
-  loadStaff();
-  alert(`✅ ${nm} berhasil ditambahkan!`);
+
+function exportRekapPDF(){
+  const bln=g("rkBln")?.value||"";
+  const cab=g("rkCab")?.value||"Semua";
+  const pw=window.open("","_blank");
+  const tbl=g("rkTbl");
+  if(!tbl){alert("Filter dulu!");return;}
+  const autoprint="window.onload=function(){window.print();window.close();}";
+  const html=
+    "<!DOCTYPE html><html><head><meta charset='UTF-8'/><title>Rekap RIFIM</title>"
+    +"<style>body{font-family:Arial;padding:14px;font-size:10px;}h2{color:#C62828;}"
+    +"table{width:100%;border-collapse:collapse;}"
+    +"th{background:#1e293b;color:#fff;padding:7px;font-size:9px;}"
+    +"td{padding:6px;border:1px solid #e2e8f0;font-size:9px;}"
+    +"@media print{@page{size:A4;margin:10mm;}}</style></head><body>"
+    +"<h2>REKAP KEHADIRAN \u2014 RIFIM ERP</h2>"
+    +"<p style='color:#64748b;font-size:9px;'>Periode: "+bln+" | Cabang: "+cab+" | Dicetak: "+new Date().toLocaleString("id-ID")+"</p>"
+    +tbl.outerHTML
+    +"<scri"+"pt>"+autoprint+"</scri"+"pt>"
+    +"</body></html>";
+  pw.document.write(html);pw.document.close();
 }
-function delStaff(nama){
+
+// ─── Staff ────────────────────────────────────────────────
+function filterStaff(q){
+  const c=g("sfCab")?.value;renderStaff(q||"",c||"");
+}
+function renderStaff(q,cab){
+  const list=STAFF.filter(u=>u.role!=="owner").filter(u=>
+    (!q||u.nama.toLowerCase().includes(q.toLowerCase()))&&(!cab||u.cabang===cab));
+  g("sfList").innerHTML=list.map(u=>`
+    <div class="list-item">
+      <div class="l-av" style="border-radius:14px;">${u.nama[0]}</div>
+      <div class="l-main">
+        <div class="l-title">${u.nama}</div>
+        <div class="l-sub">${u.jabatan} · ${u.id||"—"}</div>
+        <div class="l-sub" style="margin-top:1px;">${u.cabang}</div>
+      </div>
+      <div class="l-trail">
+        <div class="chip ${u.role==="editor"?"chip-info":u.role==="admin"?"chip-ok":"chip-primary"}" style="margin-bottom:4px;">${u.role}</div>
+        ${canEdit()?`<div onclick="delStaff('${esc(u.nama)}');event.stopPropagation();" style="font-size:11px;color:var(--clr-err);cursor:pointer;padding:2px 4px;">🗑 Hapus</div>`:""}
+      </div>
+    </div>`).join("")||'<div style="padding:24px;text-align:center;color:var(--txt-sec);">Tidak ditemukan</div>';
+}
+function delStaff(nm){
   if(!canEdit()){alert("Hanya Nabilla dan Owner!");return;}
-  if(!confirm(`Hapus ${nama}?`))return;
-  STAFF_LIST=STAFF_LIST.filter(u=>u.nama!==nama);
-  savePWStore();loadStaff();
+  if(!confirm(`Hapus ${nm}?`))return;
+  STAFF=STAFF.filter(u=>u.nama!==nm);savePW();
+  filterStaff(g("sfQ")?.value||"");
 }
 async function syncStaff(){
   if(!canEdit()){alert("Hanya Nabilla dan Owner!");return;}
-  await syncJadwal();loadStaff();
+  try{
+    const url=`https://opensheet.elk.sh/${RIFIM_SHEET_STAFF}/MASTER%20DATA%20STAFF`;
+    const res=await fetch(url);const data=await res.json();
+    if(!Array.isArray(data)||!data.length)throw new Error("Data kosong");
+    const keep=STAFF.filter(u=>u.role==="editor"||u.role==="owner");
+    data.forEach(r=>{const nm=(r["Nama"]||"").trim();if(!nm||keep.find(k=>k.nama===nm))return;
+      keep.push({nama:nm,jabatan:(r["Jabatan"]||"").trim(),cabang:(r["ID CABANG"]||r["Cabang"]||"").trim(),
+        id:(r["ID Staff"]||"").trim(),pw:STAFF.find(s=>s.nama===nm)?.pw||"rifim2024",role:"staff"});});
+    STAFF=keep;alert(`✅ ${data.length} baris sync dari Database Staff!`);
+    filterStaff("","");
+  }catch(e){alert("❌ Sync gagal: "+e.message);}
 }
 
-// ── CABANG ─────────────────────────────────────────
-function buildCabangPage(){
-  const c=document.getElementById("cbCards");if(!c)return;
-  c.innerHTML=Object.entries(AIRPORTS).filter(([k])=>k!=="Admin").map(([nm,d])=>{
-    const cnt=STAFF_LIST.filter(u=>u.cabang===nm).length;
-    const sn=nm.replace("ID Rifim Airport ","✈️ ").replace("ID Rifim ","🏢 ");
-    return `<div style="background:var(--sur);border:1px solid var(--bdr);border-radius:14px;padding:16px;transition:.18s;" onmouseover="this.style.borderColor='rgba(229,57,53,.3)'" onmouseout="this.style.borderColor='var(--bdr)'">
-      <div style="font-family:'Syne',sans-serif;font-size:14px;font-weight:800;margin-bottom:9px;">${sn}</div>
-      <div style="font-size:10px;color:var(--txt3);margin-bottom:9px;">${nm}</div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:9px;">
-        <div style="background:var(--sur2);border-radius:8px;padding:8px;text-align:center;"><div style="font-size:18px;font-weight:800">${cnt}</div><div style="font-size:8px;color:var(--txt3);text-transform:uppercase;">Staff</div></div>
-        <div style="background:var(--sur2);border-radius:8px;padding:8px;text-align:center;"><div style="font-size:14px;font-weight:800">${d.r>=1000?(d.r/1000).toFixed(1)+"km":d.r+"m"}</div><div style="font-size:8px;color:var(--txt3);text-transform:uppercase;">Radius GPS</div></div>
+// ─── Cabang page ──────────────────────────────────────────
+function buildCabang(){
+  const el=g("cbList");if(!el)return;
+  el.innerHTML=Object.entries(AIRPORTS).map(([nm,d])=>{
+    const cnt=STAFF.filter(u=>u.cabang===nm).length;
+    const sn=nm.replace("ID Rifim Airport ","").replace("ID Rifim ","");
+    const ic=nm.includes("Airport")?"✈️":nm==="Admin"?"🏢":"🏙️";
+    return `<div class="list-item">
+      <div class="l-av" style="border-radius:14px;font-size:20px;">${ic}</div>
+      <div class="l-main">
+        <div class="l-title">${sn}</div>
+        <div class="l-sub">${cnt} staff · Radius ${d.r>=1000?(d.r/1000)+"km":d.r+"m"}</div>
+        ${!d.admin?`<div class="l-sub" style="font-family:'Google Sans Mono',monospace;font-size:10px;margin-top:1px;">${d.lat.toFixed(4)}, ${d.lng.toFixed(4)}</div>`:""}
       </div>
-      <div style="font-size:10px;color:var(--txt3);">📍 ${d.lat.toFixed(4)}, ${d.lng.toFixed(4)}</div>
-      <div style="margin-top:8px;display:flex;align-items:center;gap:7px;"><span class="bdg ok">AKTIF</span><span style="font-size:10px;color:var(--txt3);">${d.kota}</span></div>
+      <span class="chip ${d.admin?"chip-warn":"chip-ok"}">${d.admin?"ADMIN":"AKTIF"}</span>
     </div>`;
-  }).join("")+
-  // Admin card
-  `<div style="background:var(--sur);border:1px solid rgba(255,215,64,.2);border-radius:14px;padding:16px;transition:.18s;">
-    <div style="font-family:'Syne',sans-serif;font-size:14px;font-weight:800;margin-bottom:9px;">🏢 Admin</div>
-    <div style="font-size:10px;color:var(--txt3);margin-bottom:9px;">Kantor Pusat — Tidak perlu GPS Bandara</div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:9px;">
-      <div style="background:var(--sur2);border-radius:8px;padding:8px;text-align:center;"><div style="font-size:18px;font-weight:800">${STAFF_LIST.filter(u=>u.cabang==="Admin").length}</div><div style="font-size:8px;color:var(--txt3);text-transform:uppercase;">Staff</div></div>
-      <div style="background:var(--sur2);border-radius:8px;padding:8px;text-align:center;"><div style="font-size:12px;font-weight:800">Bebas</div><div style="font-size:8px;color:var(--txt3);text-transform:uppercase;">Radius GPS</div></div>
-    </div>
-    <div style="margin-top:8px;"><span class="bdg wn">Divisi Admin</span></div>
-  </div>`;
+  }).join("");
 }
 
-// ── PASSWORD MANAGEMENT ────────────────────────────
-function buildPwList(){
-  if(!canEdit()){document.getElementById("pwList").innerHTML='<p style="color:var(--txt3);font-size:12px;">Hanya Owner dan Nabilla yang bisa melihat dan mengubah password.</p>';return;}
-  const list=STAFF_LIST.filter(u=>u.role!=="owner");
-  document.getElementById("pwList").innerHTML=list.map(u=>`
-    <div style="display:flex;align-items:center;gap:12px;padding:9px 13px;background:var(--sur2);border-radius:10px;border:1px solid var(--bdr);">
-      <div style="flex:1;font-size:12px;font-weight:700;">${u.nama}</div>
-      <div style="font-size:10px;color:var(--txt3);">${u.jabatan} • ${u.cabang}</div>
-      <div style="font-family:'Syne',sans-serif;font-size:11px;background:var(--sur3);padding:3px 8px;border-radius:6px;letter-spacing:1px;color:var(--txt2);">${"•".repeat(u.pw.length)}</div>
+// ─── More menu ────────────────────────────────────────────
+function buildMoreMenu(){
+  const items=[
+    {ic:"👥",lbl:"Data Staff",sub:"Kelola staff",fn:"goPage('staff')"},
+    {ic:"🏢",lbl:"Cabang",sub:"Info 7 cabang",fn:"goPage('cbng')"},
+  ];
+  if(canEdit())items.push({ic:"🔑",lbl:"Password & Settings",sub:"Kelola password staff",fn:"goPage('pw')"});
+  items.push({ic:"🚪",lbl:"Logout",sub:"Keluar dari sistem",fn:"doLogout()",danger:true});
+  g("moreMenuEl").innerHTML=items.map(it=>`
+    <div class="list-item ripple-host" onclick="${it.fn}">
+      <div class="l-av" style="border-radius:14px;${it.danger?"background:rgba(255,82,82,.1);":""}"><span style="font-size:18px;">${it.ic}</span></div>
+      <div class="l-main">
+        <div class="l-title" style="${it.danger?"color:var(--clr-err);":""}">${it.lbl}</div>
+        <div class="l-sub">${it.sub}</div>
+      </div>
+      <span style="color:var(--txt-dis);font-size:20px;">›</span>
     </div>`).join("");
-  // Refresh staff select
-  const sel=document.getElementById("pwStaffSel");
-  if(sel){sel.innerHTML="";list.forEach(u=>{const o=document.createElement("option");o.value=u.nama;o.textContent=u.nama;sel.appendChild(o);});}
+}
+
+// ─── Password ─────────────────────────────────────────────
+function buildPwList(){
+  const el=g("pwList");if(!el)return;
+  if(!canEdit()){el.innerHTML='<div style="padding:16px;color:var(--txt-sec);font-size:13px;">Hanya Owner dan Nabilla yang bisa mengelola password.</div>';return;}
+  el.innerHTML=STAFF.filter(u=>u.role!=="owner").map(u=>`
+    <div class="list-item">
+      <div class="l-av">${u.nama[0]}</div>
+      <div class="l-main"><div class="l-title">${u.nama}</div><div class="l-sub">${u.jabatan}</div></div>
+      <div style="font-family:'Google Sans Mono',monospace;font-size:11px;color:var(--txt-dis);">${"•".repeat(Math.min(u.pw.length,8))}</div>
+    </div>`).join("");
+  // Refresh sel
+  const sel=g("pwSel");if(sel){sel.innerHTML="";STAFF.filter(u=>u.role!=="owner").forEach(u=>{const o=document.createElement("option");o.value=u.nama;o.textContent=u.nama;sel.appendChild(o);});}
 }
 function savePassword(){
   if(!canEdit()){alert("Hanya Nabilla dan Owner!");return;}
-  const nama=document.getElementById("pwStaffSel").value;
-  const pw=document.getElementById("pwNew").value.trim();
-  if(!nama||!pw){setSt("pwSt","⚠️ Pilih staff dan isi password baru!","wn");return;}
-  if(pw.length<6){setSt("pwSt","⚠️ Password minimal 6 karakter!","wn");return;}
-  const u=STAFF_LIST.find(s=>s.nama===nama);
-  if(!u){setSt("pwSt","❌ Staff tidak ditemukan","er");return;}
-  u.pw=pw;savePWStore();
-  document.getElementById("pwNew").value="";
-  setSt("pwSt",`✅ Password ${nama} berhasil diubah!`,"ok");
-  buildPwList();
+  const nm=g("pwSel")?.value,pw=g("pwNew")?.value.trim();
+  if(!nm||!pw){alert_(g("alPw"),"⚠️ Pilih staff dan isi password!","wn");return;}
+  if(pw.length<6){alert_(g("alPw"),"⚠️ Minimal 6 karakter!","wn");return;}
+  const u=STAFF.find(s=>s.nama===nm);if(!u){alert_(g("alPw"),"❌ Staff tidak ditemukan","er");return;}
+  u.pw=pw;savePW();g("pwNew").value="";
+  alert_(g("alPw"),`✅ Password ${nm} berhasil diubah!`,"ok");buildPwList();
 }
 
-// ── SETTINGS ──────────────────────────────────────
-function saveSettings(){
-  if(!canEdit()){alert("Hanya Nabilla dan Owner!");return;}
-  localStorage.setItem("rifim_gas_url",document.getElementById("cfGAS").value.trim());
-  localStorage.setItem("rifim_folder_id",document.getElementById("cfFld").value.trim());
-  localStorage.setItem("rifim_sheet_absensi",document.getElementById("cfSht").value.trim());
-  localStorage.setItem("rifim_sheet_staff",document.getElementById("cfStf").value.trim());
-  alert("✅ Pengaturan disimpan!");
+// ─── Error reporting (poin 9) ────────────────────────────
+async function sendErrorEmail(ctx,msg){
+  try{
+    await fetch(RIFIM_GAS,{
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({
+        action:"sendErrorEmail",
+        to:"rifim01@adminrifim.org",
+        subject:"[RIFIM ERP] Error: "+ctx,
+        body:`Error terjadi di RIFIM ERP PWA\n\nKonteks: ${ctx}\nPesan: ${msg}\nWaktu: ${new Date().toLocaleString("id-ID")}\nUser: ${CU?.nama||"unknown"}\nURL: ${location.href}`
+      })
+    });
+  }catch(e2){console.warn("sendErrorEmail failed:",e2);}
 }
 
-// ── HELPERS ───────────────────────────────────────
-function setT(id,val){const e=document.getElementById(id);if(e)e.textContent=val;}
-function setSt(id,msg,type){
-  const e=document.getElementById(id);if(!e)return;
-  if(!msg){e.style.display="none";return;}
-  const m={ok:"st-ok",er:"st-er",in:"st-in",wn:"st-wn"};
-  e.className="stbox "+(m[type]||"st-in");e.textContent=msg;e.style.display="block";
-}
-async function gasAction(params){
-  try{const r=await fetch(RIFIM_GAS,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(params)});return await r.json();}
-  catch(e){return{success:false,error:e.message};}
+// Global error handler
+window.addEventListener("error",e=>{
+  sendErrorEmail("Global JS Error",e.message+" ("+e.filename+":"+e.lineno+")");
+});
+window.addEventListener("unhandledrejection",e=>{
+  sendErrorEmail("Unhandled Promise",e.reason?.message||String(e.reason));
+});
+
+// ─── Utils ────────────────────────────────────────────────
+function g(id){return document.getElementById(id);}
+function st(id,val){const e=g(id);if(e)e.textContent=val;}
+function esc(s){return s.replace(/'/g,"\\'").replace(/"/g,'\\"');}
+function alert_(el,msg,type){
+  if(!el)return;const m={ok:"alert-ok",er:"alert-er",in:"alert-in",wn:"alert-wn"};
+  if(!msg){el.classList.remove("on");return;}
+  el.className="alert "+(m[type]||"alert-in")+" on";el.textContent=msg;
 }
 
-// ── SERVICE WORKER ─────────────────────────────────
-if("serviceWorker"in navigator){navigator.serviceWorker.register("service-worker.js");}
+// ─── Push notification permission ────────────────────────
+async function reqPushPerm(){
+  if("Notification" in window&&Notification.permission==="default"){
+    const p=await Notification.requestPermission();
+    if(p==="granted")console.log("Push notifications enabled");
+  }
+}
+
+// ─── Service Worker ───────────────────────────────────────
+if("serviceWorker" in navigator){
+  navigator.serviceWorker.register("service-worker.js")
+    .then(reg=>{console.log("SW registered:",reg.scope);reqPushPerm();})
+    .catch(e=>console.warn("SW:",e));
+}
 </script>
 </body>
 </html>
