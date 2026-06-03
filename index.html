@@ -11,7 +11,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
 <meta http-equiv="Pragma" content="no-cache"/>
 <meta http-equiv="Expires" content="0"/>
-<title>RIFIM ERP</title><!-- v3.1 -->
+<title>RIFIM ERP</title><!-- v4.0-20260604 -->
 <link rel="manifest" href="manifest.json"/>
 <link rel="apple-touch-icon" href="assets/icons/icon-192.png"/>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
@@ -509,6 +509,7 @@ body{
 .shift-leg{display:flex;gap:6px;padding:0 16px 8px;flex-wrap:wrap;align-items:center;}
 .s-pill{padding:3px 9px;border-radius:6px;font-size:10px;font-weight:700;cursor:pointer;}
 .sp{background:rgba(0,230,118,.1);color:#00E676;border:1px solid rgba(0,230,118,.2);}
+.sm{background:rgba(64,196,255,.1);color:#40C4FF;border:1px solid rgba(64,196,255,.2);}
 .ss{background:rgba(255,215,64,.1);color:#FFD740;border:1px solid rgba(255,215,64,.2);}
 .sl{background:rgba(90,87,112,.15);color:var(--txt-dis);border:1px solid var(--out-var);}
 .att-dots{display:flex;gap:3px;margin-top:4px;}
@@ -669,7 +670,10 @@ body{
       <!-- Cabang mini filter -->
       <div class="sec-hdr">
         <div class="sec-lbl">Kehadiran Hari Ini</div>
-        <button class="btn-tonal cam-btn-inactive ripple-host" onclick="loadDash()" style="height:32px;border-radius:var(--r-full);font-size:11px;padding:0 14px;">🔄 Refresh</button>
+        <div style="display:flex;gap:6px;">
+          <button class="btn-tonal cam-btn-inactive ripple-host" onclick="loadDash()" style="height:32px;border-radius:var(--r-full);font-size:11px;padding:0 12px;">🔄 Refresh</button>
+          <button class="btn-tonal ripple-host" onclick="resetAbsensi()" style="height:32px;border-radius:var(--r-full);font-size:11px;padding:0 12px;background:rgba(255,82,82,.1);color:var(--clr-err);border:1px solid rgba(255,82,82,.2);">🗑 Reset</button>
+        </div>
       </div>
       <div class="card" id="dashList">
         <div style="padding:24px;text-align:center;color:var(--txt-sec);font-size:13px;">⏳ Memuat data...</div>
@@ -753,12 +757,19 @@ body{
         <div class="week-lbl" id="weekLbl">—</div>
         <button class="week-nav-btn" onclick="nextWeek()">›</button>
       </div>
+      <div id="jdBtnRow" style="display:flex;gap:6px;padding:0 16px 8px;flex-wrap:wrap;">
+        <button class="btn-filled ripple-host" onclick="genJadwal()" style="height:36px;flex:1;border-radius:var(--r-sm);font-size:11px;">✨ Generate</button>
+        <button class="btn-tonal ripple-host" onclick="doSaveJadwal()" style="height:36px;flex:1;border-radius:var(--r-sm);font-size:11px;background:rgba(0,230,118,.1);color:var(--clr-ok);border:1px solid rgba(0,230,118,.2);">💾 Simpan</button>
+        <button class="btn-tonal ripple-host" onclick="buatPDFJadwal()" style="height:36px;flex:1;border-radius:var(--r-sm);font-size:11px;background:rgba(64,196,255,.1);color:var(--clr-info);border:1px solid rgba(64,196,255,.2);">📄 PDF</button>
+        <button class="btn-tonal ripple-host" onclick="resetJadwal()" style="height:36px;flex:1;border-radius:var(--r-sm);font-size:11px;background:rgba(255,82,82,.1);color:var(--clr-err);border:1px solid rgba(255,82,82,.2);">🗑 Reset</button>
+      </div>
       <div class="shift-leg">
         <span style="font-size:10px;color:var(--txt-sec);font-weight:700;margin-right:2px;">SHIFT:</span>
-        <span class="s-pill sp">PAGI 07:05</span>
-        <span class="s-pill ss">SIANG 15:05</span>
+        <span class="s-pill sp">PAGI 06-07:05</span>
+        <span class="s-pill sm">MIDDLE 10-11:05</span>
+        <span class="s-pill ss">SIANG 14-15:05</span>
         <span class="s-pill sl">LIBUR</span>
-        <span style="background:rgba(91,124,247,.1);color:#a5b4fc;border:1px solid rgba(91,124,247,.2);padding:3px 8px;border-radius:6px;font-size:9px;font-weight:700;">⚡ Batam 14:05</span>
+        <span style="background:rgba(91,124,247,.1);color:#a5b4fc;border:1px solid rgba(91,124,247,.2);padding:3px 8px;border-radius:6px;font-size:9px;font-weight:700;">⚡ Batam 13-14:05</span>
       </div>
       <!-- Table -->
       <div class="card">
@@ -813,6 +824,7 @@ body{
       <div style="padding:0 16px 8px;display:flex;gap:8px;flex-wrap:wrap;">
         <select class="inp" style="flex:1;min-width:120px;font-size:12px;" id="rkStaff"><option value="">Semua Staff</option></select>
         <button class="btn-filled ripple-host" id="rkFilterBtn" onclick="doFilterRekap()" style="height:44px;padding:0 16px;border-radius:var(--r-sm);font-size:13px;width:auto;flex-shrink:0;">🔍 Filter</button>
+        <button class="btn-tonal ripple-host" onclick="resetRekap()" style="height:44px;padding:0 14px;border-radius:var(--r-sm);font-size:13px;background:rgba(255,82,82,.1);color:var(--clr-err);border:1px solid rgba(255,82,82,.2);flex-shrink:0;">🗑 Reset</button>
       </div>
       <!-- Tombol export muncul setelah filter -->
       <div id="rkExportRow" style="display:none;padding:0 16px 8px;display:none;gap:8px;flex-wrap:wrap;">
@@ -997,11 +1009,17 @@ const WITA_CABANG=["ID Rifim Airport Balikpapan","ID Rifim Airport Manado"];
 const LATE_EXEMPT=["ID Rifim Airport Jambi","ID Rifim Airport Manado"];
 
 // Jam masuk shift (WIB basis) — Batam SIANG = 14:05
+// SHIFT WINDOW (WIB basis):
+// PAGI:        06:00 - 07:05  (1j 5m window)
+// MIDDLE:      10:00 - 11:05  (1j 5m window)
+// SIANG:       14:00 - 15:05  (1j 5m window)
+// SIANG BATAM: 13:00 - 14:05  (1j 5m window)
+// WITA (Balikpapan & Manado): jam dikurangi 1 untuk samakan ke WIB
 const SHIFTS={
-  PAGI:       {mulai:{h:7,m:5},  tutup:{h:8,m:0}},
-  MIDDLE:     {mulai:{h:11,m:0}, tutup:{h:12,m:0}},
-  SIANG:      {mulai:{h:15,m:5}, tutup:{h:16,m:0}},
-  SIANG_BATAM:{mulai:{h:14,m:5}, tutup:{h:15,m:0}},
+  PAGI:       {mulai:{h:6,  m:0}, tutup:{h:7,  m:5}},
+  MIDDLE:     {mulai:{h:10, m:0}, tutup:{h:11, m:5}},
+  SIANG:      {mulai:{h:14, m:0}, tutup:{h:15, m:5}},
+  SIANG_BATAM:{mulai:{h:13, m:0}, tutup:{h:14, m:5}},
 };
 
 // Konversi waktu lokal ke WIB-equivalent
@@ -1012,46 +1030,47 @@ function getWIBMenit(cabang, jsDate){
   return h*60 + m;
 }
 
-// Tentukan tipe absen berdasarkan jam
+// Tentukan tipe absen berdasarkan jam (WIB basis)
 function getTipeAbsen(cabang, jsDate){
   const menit = getWIBMenit(cabang, jsDate);
   const isBatam = cabang==="ID Rifim Airport Batam";
   
-  // Window PAGI: 07:05 - 08:00
-  if(menit >= 7*60+5 && menit <= 8*60) return "masuk";
-  // Window MIDDLE: 11:00 - 12:00
-  if(menit >= 11*60 && menit <= 12*60) return "masuk";
-  // Window SIANG Batam: 14:05 - 15:00
-  if(isBatam && menit >= 14*60+5 && menit <= 15*60) return "masuk";
-  // Window SIANG: 15:05 - 16:00
-  if(!isBatam && menit >= 15*60+5 && menit <= 16*60) return "masuk";
-  // Di luar jam kerja = Absen Pulang
-  return "pulang";
+  if(menit >= 6*60    && menit <= 7*60+5)  return "masuk"; // PAGI  06:00-07:05
+  if(menit >= 10*60   && menit <= 11*60+5) return "masuk"; // MIDDLE 10:00-11:05
+  if(isBatam  && menit >= 13*60 && menit <= 14*60+5) return "masuk"; // SIANG Batam 13:00-14:05
+  if(!isBatam && menit >= 14*60 && menit <= 15*60+5) return "masuk"; // SIANG 14:00-15:05
+  return "pulang"; // Di luar semua window
 }
 
+// Terlambat = masuk di atas jam tepat tapi masih dalam window
+// Dikecualikan: Airport Jambi & Manado
 function isLate(cabang, jsDate){
   if(LATE_EXEMPT.includes(cabang)) return false;
   if(!jsDate) return false;
   const menit = getWIBMenit(cabang, jsDate);
   const isBatam = cabang==="ID Rifim Airport Batam";
-  
-  // PAGI: terlambat jika > 07:05 dan masih dalam window PAGI (< 08:00)
-  if(menit > 7*60+5 && menit <= 8*60) return true;
-  // MIDDLE: terlambat jika > 11:00 dan masih dalam window MIDDLE (< 12:00)
-  if(menit > 11*60 && menit <= 12*60) return true;
-  // SIANG Batam: terlambat jika > 14:05 (< 15:00)
-  if(isBatam && menit > 14*60+5 && menit <= 15*60) return true;
-  // SIANG: terlambat jika > 15:05 (< 16:00)
-  if(!isBatam && menit > 15*60+5 && menit <= 16*60) return true;
+
+  // PAGI: terlambat jika > 07:00 s.d. 07:05
+  if(menit > 7*60   && menit <= 7*60+5)  return true;
+  // MIDDLE: terlambat jika > 11:00 s.d. 11:05
+  if(menit > 11*60  && menit <= 11*60+5) return true;
+  // SIANG Batam: terlambat jika > 14:00 s.d. 14:05
+  if(isBatam  && menit > 14*60 && menit <= 14*60+5) return true;
+  // SIANG: terlambat jika > 15:00 s.d. 15:05
+  if(!isBatam && menit > 15*60 && menit <= 15*60+5) return true;
   return false;
 }
 
 function getShiftInfo(cabang){
   const isBatam=cabang==="ID Rifim Airport Batam";
   const isWITA=WITA_CABANG.includes(cabang);
-  const tz=isWITA?" (WITA)":"";
-  if(isBatam) return "PAGI 07:05 | MIDDLE 11:00 | SIANG 14:05"+tz;
-  return "PAGI 07:05 | MIDDLE 11:00 | SIANG 15:05"+tz;
+  if(isWITA){
+    // Tampilkan dalam WITA (+1 jam dari WIB)
+    if(isBatam) return "PAGI 07:00-08:05 | MIDDLE 11:00-12:05 | SIANG WITA 14:00-15:05";
+    return "PAGI 07:00-08:05 | MIDDLE 11:00-12:05 | SIANG WITA 15:00-16:05";
+  }
+  if(isBatam) return "PAGI 06:00-07:05 | MIDDLE 10:00-11:05 | SIANG 13:00-14:05";
+  return "PAGI 06:00-07:05 | MIDDLE 10:00-11:05 | SIANG 14:00-15:05";
 }
 
 // ─── App state ────────────────────────────────────────────
@@ -1199,6 +1218,7 @@ function showApp(){
   document.getElementById("loginScr").classList.remove("on");
   document.getElementById("app").classList.add("on");
   refreshUserUI();loadDash();buildMoreMenu();buildCabang();buildPwList();
+  startAutoRefresh(); // poin 17: auto-refresh data
 }
 async function doLogin(){
   const nm=document.getElementById("selUser").value;
@@ -1238,6 +1258,8 @@ function refreshUserUI(){
     e.textContent=av;
     e.style.background="var(--clr-primary-dim)";
   });
+  // Update hak akses UI
+  updateAccessUI();
   const rls={owner:"👑 Owner",editor:"✏️ Admin Editor",admin:"🟢 Admin",staff:"👤 Staff"};
   st("dashNm",CU.nama);st("dashRl",CU.jabatan+" · "+CU.cabang);
   st("moreNm",CU.nama);st("moreRl",(rls[CU.role]||"👤")+" · "+CU.jabatan);
@@ -1277,8 +1299,9 @@ function goPage(key,bnIdx){
   if(key==="more")buildMoreMenu();
 }
 function fabAct(){
-  if(curPg==="att")submitAbs();
-  else if(curPg==="jd")genJadwal();
+  if(curPg==="att") submitAbs();
+  // Jadwal: FAB tetap bisa generate untuk kemudahan
+  else if(curPg==="jd") { if(canEdit()) genJadwal(); else alert("Hanya Nabilla dan Owner!"); }
 }
 
 // ─── Clock ────────────────────────────────────────────────
@@ -1311,6 +1334,25 @@ function updateGPSStatus(){
 }
 function gpsBox(txt,cls){const e=g("gpsBox");if(!e)return;e.textContent=txt;e.className="gps-box "+cls;}
 function onCabChange(){updateGPSStatus();updateShiftTxt();}
+
+// ─── HAK AKSES UI ────────────────────────────────────────
+// Sembunyikan/tampilkan tombol berdasarkan role
+function updateAccessUI(){
+  const isEd = canEdit();
+  // Jadwal: sembunyikan row tombol bila bukan editor/owner
+  const jdRow = g("jdBtnRow");
+  if(jdRow) jdRow.style.display = isEd ? "flex" : "none";
+  // Tombol Sync DB Staff
+  const syncBtn = g("btnSyncS");
+  if(syncBtn) syncBtn.style.display = isEd ? "flex" : "none";
+  // Tombol Reset di rekap
+  document.querySelectorAll("[onclick='resetAbsensi()']")
+    .forEach(el=>el.style.display=isEd?"":"none");
+  document.querySelectorAll("[onclick='resetRekap()']")
+    .forEach(el=>el.style.display=isEd?"":"none");
+  document.querySelectorAll("[onclick='resetJadwal()']")
+    .forEach(el=>el.style.display=isEd?"":"none");
+}
 function updateShiftTxt(){
   const cab=g("selCab")?.value;
   if(!cab){st("shiftTxt","Pilih cabang untuk melihat shift");st("absSh","—");return;}
@@ -1446,6 +1488,8 @@ async function submitAbs(){
     g("btnTP").className="btn-tonal ripple-host";
     alert_(g("alSub"),"","");
     showSuc(CU.nama,cab,wkt,finalTipe,late);
+    // Auto-update dashboard dan rekap (poin 14)
+    setTimeout(()=>{ if(curPg==="home")loadDash(); },1000);
   }catch(e){alert_(g("alSub"),"❌ Gagal: "+e.message,"er");}
   fab.textContent="🚀";fab.disabled=false;
 }
@@ -1460,8 +1504,10 @@ function hideSuc(){g("sucOv").classList.remove("on");goPage("home",0);}
 // ─── Dashboard ────────────────────────────────────────────
 async function loadDash(){
   const today=new Date().toISOString().slice(0,10);
+  const list=g("dashList");
+  if(list) list.innerHTML='<div style="padding:16px;text-align:center;color:var(--txt-sec);font-size:12px;">⏳ Memuat...</div>';
   try{
-    if(!db){g("dashList").innerHTML='<div style="padding:16px;color:#FF5252;text-align:center;">Firebase tidak tersedia — cek koneksi</div>';return;}
+    if(!db){if(list)list.innerHTML='<div style="padding:16px;color:#FF5252;text-align:center;">Firebase tidak tersedia</div>';return;}
     const snap=await db.collection("absensi").where("tanggal","==",today).get();
     const rows=snap.docs.map(d=>d.data());
     const hadir=rows.filter(r=>r.status!=="terlambat").length;
@@ -1472,18 +1518,22 @@ async function loadDash(){
     st("dPot","Rp "+totalPot.toLocaleString("id-ID")); // poin 7
     const list=g("dashList");
     if(!rows.length){list.innerHTML='<div style="padding:24px;text-align:center;color:var(--txt-sec);font-size:13px;">Belum ada kehadiran hari ini</div>';return;}
-    list.innerHTML=rows.slice(0,25).map(r=>`
-      <div class="list-item">
+    list.innerHTML=rows.slice(0,25).map(r=>{
+      const isPulang=r.tipe==="pulang";
+      const chipCls=isPulang?"chip-info":r.status==="hadir"?"chip-ok":r.status==="terlambat"?"chip-warn":"chip-err";
+      const chipTxt=isPulang?"Pulang":r.status||"hadir";
+      return `<div class="list-item">
         <div class="l-av">${r.nama[0]}</div>
         <div class="l-main">
           <div class="l-title">${r.nama}</div>
-          <div class="l-sub">${r.cabang} · ${r.tipe||"masuk"}</div>
+          <div class="l-sub">${(r.cabang||"").replace("ID Rifim Airport ","✈ ").replace("ID Rifim ","🏢 ")}</div>
         </div>
         <div class="l-trail">
-          <div class="chip ${r.status==="hadir"?"chip-ok":r.status==="terlambat"?"chip-warn":"chip-err"}" style="margin-bottom:3px;">${r.status}</div>
-          <div style="font-size:11px;font-family:'Google Sans Mono',monospace;color:var(--txt-sec);">${r.waktu||"—"}${r.potongan?"<b style='color:#FF6F00'> -Rp10k</b>":""}</div>
+          <div class="chip ${chipCls}" style="margin-bottom:3px;">${chipTxt}</div>
+          <div style="font-size:11px;font-family:'Google Sans Mono',monospace;color:var(--txt-sec);">${r.waktu||"—"}${r.potongan?" 🔴-10k":""}</div>
         </div>
-      </div>`).join("");
+      </div>`;
+    }).join("");
   }catch(e){console.log("dash:",e.message);}
 }
 
@@ -1522,7 +1572,7 @@ function renderJadwal(list){
     const cells=days.map((_,di)=>{
       const sh=jadwal[s.nama][di]||"PAGI";
       const at=att[s.nama][di]||"";
-      const cls=sh==="PAGI"?"sp":sh==="SIANG"?"ss":"sl";
+      const cls=sh==="PAGI"?"sp":sh==="MIDDLE"?"sm":sh==="SIANG"?"ss":"sl";
       const pill=isE?`<div class="s-pill ${cls}" onclick="cycleShift('${esc(s.nama)}',${di})" style="cursor:pointer;">${sh}</div>`:
         `<div class="s-pill ${cls}" style="cursor:default;">${sh}</div>`;
       const dots=isE?`<div class="att-dots">
@@ -1546,7 +1596,7 @@ function renderJadwal(list){
 function cycleShift(nama,day){
   if(!canEdit()){alert("Hanya Nabilla dan Owner!");return;}
   if(!jadwal[nama])jadwal[nama]={};
-  const opts=["PAGI","SIANG","LIBUR"];const cur=jadwal[nama][day]||"PAGI";
+  const opts=["PAGI","MIDDLE","SIANG","LIBUR"];const cur=jadwal[nama][day]||"PAGI";
   const next=opts[(opts.indexOf(cur)+1)%opts.length];
   const rule=JD_RULES.find(r=>r.a===nama||r.b===nama);
   if(rule&&next!=="LIBUR"){
@@ -1604,6 +1654,67 @@ function runGenJadwal(list){
     }
   });
   saveJadwal(); // poin 1: simpan ke localStorage
+}
+
+// ─── RESET FUNCTIONS (hanya Nabilla & Owner) ─────────────
+async function resetAbsensi(){
+  if(!canEdit()){alert("Hanya Nabilla dan Owner yang bisa reset!");return;}
+  if(!confirm("⚠️ HAPUS SEMUA data absensi hari ini?\nData di Firestore akan terhapus permanen!"))return;
+  if(!db){alert("Firebase tidak tersedia");return;}
+  const today=new Date().toISOString().slice(0,10);
+  try{
+    const snap=await db.collection("absensi").where("tanggal","==",today).get();
+    const batch=db.batch();
+    snap.docs.forEach(d=>batch.delete(d.ref));
+    await batch.commit();
+    st("dTS","—");st("dH","0");st("dB","—");st("dTL","0");st("dPot","Rp 0");
+    const list=g("dashList");
+    if(list)list.innerHTML='<div style="padding:24px;text-align:center;color:var(--txt-sec);">Data absensi hari ini telah direset</div>';
+    alert("✅ Data absensi hari ini berhasil dihapus!");
+    loadDash();
+  }catch(e){alert("❌ Reset gagal: "+e.message);}
+}
+
+function resetJadwal(){
+  if(!canEdit()){alert("Hanya Nabilla dan Owner yang bisa reset!");return;}
+  if(!confirm("⚠️ Reset jadwal minggu ini?\nSemua shift akan dikosongkan."))return;
+  jadwal={};att={};
+  saveJadwal();
+  loadJadwal();
+  alert("✅ Jadwal berhasil direset!");
+}
+
+function resetRekap(){
+  if(!canEdit()){alert("Hanya Nabilla dan Owner yang bisa reset!");return;}
+  if(!confirm("⚠️ Reset tampilan rekap?\n(Data di Firebase tidak terhapus)"))return;
+  lastRekapData=[];
+  st("rH","0");st("rT","0");st("rA","0");st("rP","0%");st("rPot","Rp 0");
+  const tbody=g("rkTblBody");
+  if(tbody)tbody.innerHTML='<tr><td colspan="7" style="padding:24px;text-align:center;color:var(--txt-sec);">Klik Filter untuk tampilkan data</td></tr>';
+  const expRow=g("rkExportRow");
+  if(expRow)expRow.style.display="none";
+  alert_(g("alRk"),"✅ Tampilan rekap direset","ok");
+}
+
+// ─── SAVE JADWAL (poin 12) ──────────────────────────────
+function doSaveJadwal(){
+  if(!canEdit()){alert("Hanya Nabilla dan Owner!");return;}
+  saveJadwal();
+  alert("✅ Jadwal tersimpan!");
+}
+
+// ─── BUAT PDF JADWAL (poin 13) ──────────────────────────
+// Sudah ada di exportJadwalPDF() - wrapper
+function buatPDFJadwal(){ exportJadwalPDF(); }
+
+// ─── AUTO UPDATE (poin 17) ──────────────────────────────
+// Auto check setiap 5 menit untuk refresh data real-time
+let autoRefreshTimer=null;
+function startAutoRefresh(){
+  if(autoRefreshTimer)clearInterval(autoRefreshTimer);
+  autoRefreshTimer=setInterval(()=>{
+    if(curPg==="home")loadDash();
+  },5*60*1000); // 5 menit
 }
 
 function genJadwal(){
@@ -1960,13 +2071,25 @@ function buildPwList(){
   const sel=g("pwSel");if(sel){sel.innerHTML="";STAFF.filter(u=>u.role!=="owner").forEach(u=>{const o=document.createElement("option");o.value=u.nama;o.textContent=u.nama;sel.appendChild(o);});}
 }
 function savePassword(){
-  if(!canEdit()){alert("Hanya Nabilla dan Owner!");return;}
-  const nm=g("pwSel")?.value,pw=g("pwNew")?.value.trim();
-  if(!nm||!pw){alert_(g("alPw"),"⚠️ Pilih staff dan isi password!","wn");return;}
-  if(pw.length<6){alert_(g("alPw"),"⚠️ Minimal 6 karakter!","wn");return;}
-  const u=STAFF.find(s=>s.nama===nm);if(!u){alert_(g("alPw"),"❌ Staff tidak ditemukan","er");return;}
-  u.pw=pw;savePW();g("pwNew").value="";
-  alert_(g("alPw"),`✅ Password ${nm} berhasil diubah!`,"ok");buildPwList();
+  if(!canEdit()){alert("Hanya Nabilla dan Owner yang bisa mengubah password!");return;}
+  const selEl=g("pwSel");
+  const pwEl=g("pwNew");
+  if(!selEl||!pwEl){alert("Error: Form tidak ditemukan");return;}
+  const nm=selEl.value.trim();
+  const pw=pwEl.value.trim();
+  if(!nm){alert_(g("alPw"),"⚠️ Pilih nama staff dulu!","wn");return;}
+  if(!pw){alert_(g("alPw"),"⚠️ Isi password baru!","wn");return;}
+  if(pw.length<6){alert_(g("alPw"),"⚠️ Password minimal 6 karakter!","wn");return;}
+  // Cari staff di STAFF array
+  const u=STAFF.find(s=>s.nama===nm);
+  if(!u){alert_(g("alPw"),"❌ Staff '"+nm+"' tidak ditemukan di sistem","er");return;}
+  // Update password
+  u.pw=pw;
+  savePW(); // simpan ke localStorage
+  pwEl.value=""; // clear field
+  alert_(g("alPw"),"✅ Password "+nm+" berhasil diubah! Silakan informasikan ke staff.","ok");
+  buildPwList(); // refresh list
+  console.log("Password changed for:", nm);
 }
 
 // ─── Error reporting (poin 9) ────────────────────────────
