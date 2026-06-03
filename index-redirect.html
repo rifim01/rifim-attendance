@@ -1,0 +1,23 @@
+<!-- ══ RIFIM ERP — GitHub Pages Loading Fix ══ -->
+<!-- File ini memastikan semua asset dan script dimuat dengan path yang benar untuk GitHub Pages -->
+<!-- Redirect ke index.html dengan base path yang tepat -->
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RIFIM ERP - Loading...</title>
+  <script>
+    // Set base href untuk GitHub Pages subdirectory
+    const base = document.createElement('base');
+    base.href = '/rifim-attendance/';
+    document.head.appendChild(base);
+  </script>
+</head>
+<body>
+  <script>
+    // Redirect ke index.html
+    window.location.href = '/rifim-attendance/index.html';
+  </script>
+</body>
+</html>
