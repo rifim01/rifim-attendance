@@ -1305,9 +1305,9 @@ function updateGPSStatus(){
   const dist=haverM(gLat,gLng,ap.lat,ap.lng);
   const ds=dist<1000?dist.toFixed(0)+"m":(dist/1000).toFixed(2)+"km";
   st("gDst",ds);
-  if(dist<=ap.r)const tzDisp=WITA_CABANG.includes(cab)?" · WITA":"";
-  gpsBox("✅ Dalam Radius Bandara · "+ds+tzDisp,"gps-ok");
-  else gpsBox(`❌ Di Luar Radius · ${ds} dari bandara`,"gps-no");
+  const tzDisp=WITA_CABANG.includes(cab)?" · WITA":"";
+  if(dist<=ap.r){gpsBox("✅ Dalam Radius Bandara · "+ds+tzDisp,"gps-ok");}
+  else{gpsBox("❌ Di Luar Radius · "+ds+" dari bandara","gps-no");}
 }
 function gpsBox(txt,cls){const e=g("gpsBox");if(!e)return;e.textContent=txt;e.className="gps-box "+cls;}
 function onCabChange(){updateGPSStatus();updateShiftTxt();}
