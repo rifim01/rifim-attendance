@@ -106,37 +106,46 @@ body{
 #splash::before{
   content:'';position:absolute;inset:0;
   background:url('assets/bg.jpg') center center/cover no-repeat;
-  opacity:.06;pointer-events:none;
+  opacity:.18;pointer-events:none;
 }
 .spl-ring{
-  position:relative;width:96px;height:96px;
+  position:relative;width:110px;height:110px;
   animation:spl-ring-in .7s cubic-bezier(.34,1.56,.64,1) .2s both;
 }
+/* Ring animasi di belakang logo */
+.spl-ring::before{
+  content:'';position:absolute;inset:-6px;border-radius:34px;
+  background:conic-gradient(from 0deg, var(--clr-primary) 0%, transparent 60%);
+  animation:spl-ring-spin 3s linear infinite;opacity:.5;
+}
+@keyframes spl-ring-spin{to{transform:rotate(360deg);}}
 @keyframes spl-ring-in{from{transform:scale(0) rotate(-90deg);opacity:0}to{transform:scale(1) rotate(0);opacity:1}}
 .spl-icon{
-  width:96px;height:96px;border-radius:28px;
+  width:110px;height:110px;border-radius:30px;
   background:var(--clr-primary);
   display:flex;align-items:center;justify-content:center;overflow:hidden;
-  box-shadow:0 12px 40px rgba(229,57,53,.45);
+  box-shadow:0 12px 48px rgba(229,57,53,.55), 0 0 0 1px rgba(229,57,53,.3);
+  position:relative;z-index:1;
 }
-.spl-icon img{width:100%;height:100%;object-fit:cover;border-radius:26px;}
+.spl-icon img{width:100%;height:100%;object-fit:cover;border-radius:28px;}
 .spl-title{
   font-family:'Google Sans',sans-serif;
-  font-size:30px;font-weight:700;letter-spacing:3px;
-  margin-top:26px;color:var(--txt-pri);
+  font-size:32px;font-weight:700;letter-spacing:4px;
+  margin-top:28px;color:#fff;
   animation:spl-txt .5s ease .75s both;
+  text-shadow:0 2px 20px rgba(229,57,53,.4);
 }
 .spl-sub{
-  font-size:11px;color:var(--txt-sec);letter-spacing:2.5px;
-  margin-top:6px;
+  font-size:11px;color:rgba(255,255,255,.55);letter-spacing:3px;
+  margin-top:8px;text-transform:uppercase;
   animation:spl-txt .5s ease .9s both;
 }
 @keyframes spl-txt{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
 .spl-bar-wrap{
   position:absolute;bottom:0;left:0;right:0;height:3px;
-  background:rgba(255,255,255,.06);overflow:hidden;
+  background:rgba(255,255,255,.08);overflow:hidden;
 }
-.spl-bar{height:100%;background:var(--clr-primary);animation:spl-load 2.6s ease forwards;}
+.spl-bar{height:100%;background:linear-gradient(90deg, var(--clr-primary), #FF8A80);animation:spl-load 2.6s ease forwards;}
 @keyframes spl-load{0%{width:0%;opacity:.8}60%{width:75%;opacity:1}100%{width:100%;opacity:1}}
 #splash.exit{animation:spl-exit .35s ease forwards;}
 @keyframes spl-exit{to{opacity:0;pointer-events:none;visibility:hidden;}}
@@ -150,24 +159,40 @@ body{
 #loginScr::before{
   content:'';position:fixed;inset:0;z-index:-1;
   background:url('assets/bg.jpg') center center/cover no-repeat;
-  opacity:.08;pointer-events:none;
+  opacity:.18;pointer-events:none;
+}
+#loginScr::after{
+  content:'';position:fixed;inset:0;z-index:-1;
+  background:radial-gradient(ellipse at top, rgba(229,57,53,.12) 0%, transparent 65%),
+             radial-gradient(ellipse at bottom, rgba(229,57,53,.08) 0%, transparent 65%);
+  pointer-events:none;
 }
 #loginScr.on{display:block;}
 .lgn-wrap{max-width:400px;margin:0 auto;padding:0 20px;display:flex;flex-direction:column;align-items:center;min-height:80vh;justify-content:center;}
 .lgn-brand{
-  width:88px;height:88px;border-radius:26px;
+  width:100px;height:100px;border-radius:28px;
   background:var(--clr-primary);overflow:hidden;
-  box-shadow:0 10px 36px rgba(229,57,53,.4);
+  box-shadow:0 12px 40px rgba(229,57,53,.5), 0 0 0 3px rgba(229,57,53,.3);
   margin-bottom:20px;
+  position:relative;
 }
-.lgn-brand img{width:100%;height:100%;object-fit:cover;}
-.lgn-brand-fb{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-family:'Google Sans';font-size:32px;font-weight:700;color:#fff;}
-.lgn-h{font-family:'Google Sans';font-size:28px;font-weight:700;text-align:center;letter-spacing:.5px;}
-.lgn-p{font-size:12px;color:var(--txt-sec);text-align:center;margin-top:5px;letter-spacing:.5px;}
+.lgn-brand::before{
+  content:'';position:absolute;inset:-8px;border-radius:36px;
+  background:conic-gradient(from 0deg, rgba(229,57,53,.6) 0%, transparent 50%);
+  animation:spl-ring-spin 4s linear infinite;z-index:-1;
+}
+.lgn-brand img{width:100%;height:100%;object-fit:cover;border-radius:26px;}
+.lgn-brand-fb{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-family:'Google Sans';font-size:34px;font-weight:700;color:#fff;}
+.lgn-h{font-family:'Google Sans';font-size:30px;font-weight:700;text-align:center;letter-spacing:1px;text-shadow:0 2px 16px rgba(229,57,53,.25);}
+.lgn-p{font-size:11px;color:rgba(255,255,255,.45);text-align:center;margin-top:5px;letter-spacing:1.5px;text-transform:uppercase;}
 .lgn-card{
   width:100%;margin-top:28px;
-  background:var(--srf-1);border-radius:var(--r-xl);
-  border:1px solid var(--out-var);padding:22px 20px;
+  background:rgba(20,20,30,.85);
+  backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);
+  border-radius:var(--r-xl);
+  border:1px solid rgba(229,57,53,.2);
+  padding:24px 22px;
+  box-shadow:0 8px 40px rgba(0,0,0,.5), 0 0 0 1px rgba(255,255,255,.04) inset;
 }
 .field-lbl{font-size:10px;font-weight:700;letter-spacing:1.2px;color:var(--txt-sec);text-transform:uppercase;margin-bottom:7px;display:block;}
 .md-sel,.md-inp{
@@ -185,14 +210,15 @@ body{
 .inp-eye{position:absolute;right:2px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--txt-sec);cursor:pointer;width:44px;height:44px;display:flex;align-items:center;justify-content:center;font-size:17px;border-radius:50%;}
 .btn-filled{
   width:100%;height:52px;border:none;border-radius:var(--r-md);
-  background:var(--clr-primary);color:#fff;
+  background:linear-gradient(135deg, #E53935 0%, #B71C1C 100%);
+  color:#fff;
   font-family:'Google Sans';font-size:15px;font-weight:700;
   cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;
-  box-shadow:0 4px 16px rgba(229,57,53,.4);
+  box-shadow:0 4px 20px rgba(229,57,53,.45), 0 1px 0 rgba(255,255,255,.1) inset;
   transition:box-shadow .2s,transform .1s;
   margin-top:4px;position:relative;overflow:hidden;
 }
-.btn-filled:hover{box-shadow:0 6px 22px rgba(229,57,53,.5);}
+.btn-filled:hover{box-shadow:0 8px 28px rgba(229,57,53,.55);transform:translateY(-1px);}
 .btn-filled:active{transform:scale(.98);}
 .btn-filled:disabled{opacity:.45;pointer-events:none;}
 .lgn-err{
@@ -211,16 +237,18 @@ body{
 #app::before{
   content:'';position:fixed;inset:0;z-index:-1;
   background:url('assets/bg.jpg') center center/cover no-repeat;
-  opacity:.04;pointer-events:none;
+  opacity:.10;pointer-events:none;
 }
 
 /* ══ TOP APP BAR ════════════════════════════════════════ */
 .topbar{
   flex-shrink:0;height:var(--topbar-h);
-  background:var(--srf-0);
-  border-bottom:1px solid var(--out-var);
+  background:rgba(10,10,20,.90);
+  backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+  border-bottom:1px solid rgba(229,57,53,.18);
   display:flex;align-items:center;padding:0 6px 0 16px;gap:8px;
   position:relative;z-index:10;
+  box-shadow:0 2px 16px rgba(0,0,0,.3);
 }
 .tb-title-wrap{flex:1;min-width:0;}
 .tb-title{font-family:'Google Sans';font-size:19px;font-weight:700;line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
@@ -256,17 +284,32 @@ body{
 .pg.on{display:block;}
 @keyframes pg-in{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
 
+/* ══ HERO GRADIENT TOP ══════════════════════════════════ */
+#content::before{
+  content:'';position:sticky;top:0;left:0;right:0;
+  height:80px;display:block;flex-shrink:0;
+  background:linear-gradient(to bottom, rgba(229,57,53,.05) 0%, transparent 100%);
+  pointer-events:none;margin-bottom:-80px;
+}
+
+/* ══ SECTION HEADER accent ═══════════════════════════════ */
+.sec-hdr .sec-lbl::before{
+  content:'';display:inline-block;
+  width:3px;height:12px;border-radius:2px;
+  background:var(--clr-primary);
+  margin-right:8px;vertical-align:middle;
+}
+
 /* ══ BOTTOM NAV ══════════════════════════════════════════ */
 .bnav{
   position:fixed;bottom:0;left:0;right:0;z-index:30;
   height:calc(var(--nav-h) + var(--sfi));
   padding-bottom:var(--sfi);
-  background:var(--srf-0);
-  border-top:1px solid var(--out-var);
+  background:rgba(9,9,16,.92);
+  backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);
+  border-top:1px solid rgba(229,57,53,.15);
   display:flex;align-items:flex-start;padding-top:8px;
-  box-shadow:0 -4px 20px rgba(0,0,0,.4);
-  backdrop-filter:blur(20px);
-  -webkit-backdrop-filter:blur(20px);
+  box-shadow:0 -4px 24px rgba(0,0,0,.5), 0 -1px 0 rgba(229,57,53,.1);
 }
 .bn-btn{
   flex:1;border:none;background:none;
@@ -297,14 +340,15 @@ body{
   position:fixed;right:18px;
   bottom:calc(var(--nav-h) + var(--sfi) + 14px);
   z-index:25;
-  width:56px;height:56px;border-radius:18px;border:none;
-  background:var(--clr-primary);color:#fff;font-size:24px;
+  width:58px;height:58px;border-radius:18px;border:none;
+  background:linear-gradient(135deg, #E53935, #B71C1C);
+  color:#fff;font-size:26px;
   display:flex;align-items:center;justify-content:center;
   cursor:pointer;
-  box-shadow:var(--e3),0 4px 18px var(--clr-primary-glow);
+  box-shadow:var(--e3), 0 6px 24px rgba(229,57,53,.55), 0 0 0 2px rgba(229,57,53,.25);
   transition:.25s cubic-bezier(.34,1.56,.64,1);
   animation:fab-in .5s cubic-bezier(.34,1.56,.64,1) 1.2s both;
-  position:fixed;overflow:hidden;
+  overflow:hidden;
 }
 @keyframes fab-in{from{transform:scale(0);opacity:0}to{transform:scale(1);opacity:1}}
 #fab:active{transform:scale(.9);}
@@ -313,8 +357,14 @@ body{
 /* ══ COMPONENTS ══════════════════════════════════════════ */
 
 /* Card */
-.card{background:var(--srf-1);border-radius:var(--r-lg);border:1px solid var(--out-var);overflow:hidden;margin:8px 16px;}
-.card.fill{background:var(--srf-2);border:none;}
+.card{
+  background:rgba(20,20,30,.75);
+  backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+  border-radius:var(--r-lg);border:1px solid rgba(255,255,255,.07);
+  overflow:hidden;margin:8px 16px;
+  box-shadow:0 4px 20px rgba(0,0,0,.25);
+}
+.card.fill{background:rgba(26,26,38,.8);border:none;}
 .card.outline{background:transparent;border-color:var(--out);}
 
 /* Section header */
@@ -326,8 +376,11 @@ body{
 .stats-row::-webkit-scrollbar{display:none;}
 .stat-chip{
   flex-shrink:0;min-width:100px;
-  background:var(--srf-1);border:1px solid var(--out-var);
+  background:rgba(20,20,35,.8);
+  backdrop-filter:blur(8px);
+  border:1px solid rgba(255,255,255,.08);
   border-radius:var(--r-md);padding:14px 14px 12px;
+  box-shadow:0 2px 12px rgba(0,0,0,.3);
 }
 .stat-val{font-family:'Google Sans';font-size:28px;font-weight:700;line-height:1;}
 .stat-lbl{font-size:11px;color:var(--txt-sec);margin-top:4px;font-weight:500;}
@@ -571,7 +624,7 @@ body{
 
   <!-- Top Bar -->
   <div class="topbar">
-    <div style="width:32px;height:32px;border-radius:9px;overflow:hidden;flex-shrink:0;margin-right:6px;">
+    <div style="width:36px;height:36px;border-radius:10px;overflow:hidden;flex-shrink:0;margin-right:6px;box-shadow:0 2px 10px rgba(229,57,53,.4);">
       <img src="assets/logo.png" style="width:100%;height:100%;object-fit:cover;" onerror="this.style.display='none'"/>
     </div>
     <div class="tb-title-wrap">
@@ -890,14 +943,15 @@ function initFirebase() {
 const MO=["Jan","Feb","Mar","Apr","Mei","Jun","Jul","Agu","Sep","Okt","Nov","Des"];
 const HR=["MIN","SEN","SEL","RAB","KAM","JUM","SAB"];
 const AIRPORTS={
-  "ID Rifim Airport Batam":      {lat:1.1222699737600552,  lng:104.11830538258901, r:500,   admin:false},
-  "ID Rifim Airport Jambi":      {lat:-1.636867558115533,  lng:103.6442494672467,  r:500,   admin:false},
-  "ID Rifim Airport Balikpapan": {lat:-1.267625979363085,  lng:116.89423472491762, r:500,   admin:false},
-  "ID Rifim Airport Manado":     {lat:1.550165772441465,   lng:124.9254933960822,  r:500,   admin:false},
-  "ID Rifim Airport Pekanbaru":  {lat:0.46454514194723073, lng:101.44817503840943, r:500,   admin:false},
-  "ID Rifim Batam":              {lat:1.1211,              lng:104.0402,           r:2000,  admin:false},
-  "ID Rifim Jambi Luar":         {lat:-1.6500,             lng:103.6300,           r:2000,  admin:false},
-  "Admin":                       {lat:0,                   lng:0,                  r:999999,admin:true}
+  // Koordinat presisi tinggi sesuai lokasi actual
+  "ID Rifim Airport Batam":      {lat:1.1222699737600552,   lng:104.11830538258901,  r:500,    admin:false, tz:"WIB"},
+  "ID Rifim Airport Jambi":      {lat:-1.636867558115533,   lng:103.6442494672467,   r:500,    admin:false, tz:"WIB"},
+  "ID Rifim Airport Balikpapan": {lat:-1.267625979363085,   lng:116.89423472491762,  r:500,    admin:false, tz:"WITA"},
+  "ID Rifim Airport Manado":     {lat:1.550165772441465,    lng:124.9254933960822,   r:500,    admin:false, tz:"WITA"},
+  "ID Rifim Airport Pekanbaru":  {lat:0.46454514194723073,  lng:101.44817503840943,  r:500,    admin:false, tz:"WIB"},
+  "ID Rifim Batam":              {lat:1.1211,               lng:104.0402,            r:2000,   admin:false, tz:"WIB"},
+  "ID Rifim Jambi Luar":         {lat:-1.6500,              lng:103.6300,            r:2000,   admin:false, tz:"WIB"},
+  "Admin":                       {lat:0,                    lng:0,                   r:999999, admin:true,  tz:"WIB"}
 };
 const JD_RULES=[
   {cabang:"ID Rifim Airport Jambi",a:"Audra Agung pratama",b:"Dwi Fitrianti"},
@@ -910,7 +964,7 @@ const JD_RULES=[
 // ─── Staff list ───────────────────────────────────────────
 let STAFF=[
   {nama:"Nabilla",              pw:"rifim2024",jabatan:"Admin Editor",  cabang:"Admin",                       id:"RIF0139",role:"editor"},
-  {nama:"govin 2",              pw:"rifim2024",jabatan:"Admin",         cabang:"Admin",                       id:"RIF0143",role:"admin"},
+  {nama:"Govinda",              pw:"rifim2024",jabatan:"Admin",         cabang:"Admin",                       id:"RIF0143",role:"admin"},
   {nama:"febriany sandra",      pw:"rifim2024",jabatan:"Admin",         cabang:"Admin",                       id:"RIF0147",role:"admin"},
   {nama:"Audra Agung pratama",  pw:"rifim2024",jabatan:"Staff Konter",  cabang:"ID Rifim Airport Jambi",      id:"RIF0125",role:"staff"},
   {nama:"Putri Amalia",         pw:"rifim2024",jabatan:"Koordinator",   cabang:"ID Rifim Airport Jambi",      id:"RIF0126",role:"staff"},
@@ -937,23 +991,67 @@ let STAFF=[
   {nama:"Owner / Bobby",        pw:"owner2024",jabatan:"Direktur Utama",cabang:"Pusat",                      id:"OWN001", role:"owner"},
 ];
 
-// ─── Shift rules (poin 5,6) ──────────────────────────────
-const SHIFT_JAM={PAGI:{h:7,m:5},MIDDLE:{h:11,m:0},SIANG:{h:15,m:5},SIANG_BATAM:{h:14,m:5}};
+// ─── Shift & Time Zone rules ─────────────────────────────
+// WITA cabang: Balikpapan & Manado (+1 jam dari WIB)
+const WITA_CABANG=["ID Rifim Airport Balikpapan","ID Rifim Airport Manado"];
 const LATE_EXEMPT=["ID Rifim Airport Jambi","ID Rifim Airport Manado"];
-function isLate(cabang,jsDate){
-  if(LATE_EXEMPT.includes(cabang))return false;
-  if(!jsDate)return false;
-  const menit=jsDate.getHours()*60+jsDate.getMinutes();
-  const isBatam=cabang==="ID Rifim Airport Batam";
-  let batas;
-  if(menit<11*60)batas=SHIFT_JAM.PAGI;
-  else if(menit<14*60)batas=SHIFT_JAM.MIDDLE;
-  else batas=isBatam?SHIFT_JAM.SIANG_BATAM:SHIFT_JAM.SIANG;
-  return menit>batas.h*60+batas.m;
+
+// Jam masuk shift (WIB basis) — Batam SIANG = 14:05
+const SHIFTS={
+  PAGI:       {mulai:{h:7,m:5},  tutup:{h:8,m:0}},
+  MIDDLE:     {mulai:{h:11,m:0}, tutup:{h:12,m:0}},
+  SIANG:      {mulai:{h:15,m:5}, tutup:{h:16,m:0}},
+  SIANG_BATAM:{mulai:{h:14,m:5}, tutup:{h:15,m:0}},
+};
+
+// Konversi waktu lokal ke WIB-equivalent
+function getWIBMenit(cabang, jsDate){
+  let h=jsDate.getHours(), m=jsDate.getMinutes();
+  // WITA lebih cepat 1 jam dari WIB → kurangi 1 jam untuk samakan basis
+  if(WITA_CABANG.includes(cabang)) h = h - 1;
+  return h*60 + m;
 }
-function getShiftLabel(cabang){
+
+// Tentukan tipe absen berdasarkan jam
+function getTipeAbsen(cabang, jsDate){
+  const menit = getWIBMenit(cabang, jsDate);
+  const isBatam = cabang==="ID Rifim Airport Batam";
+  
+  // Window PAGI: 07:05 - 08:00
+  if(menit >= 7*60+5 && menit <= 8*60) return "masuk";
+  // Window MIDDLE: 11:00 - 12:00
+  if(menit >= 11*60 && menit <= 12*60) return "masuk";
+  // Window SIANG Batam: 14:05 - 15:00
+  if(isBatam && menit >= 14*60+5 && menit <= 15*60) return "masuk";
+  // Window SIANG: 15:05 - 16:00
+  if(!isBatam && menit >= 15*60+5 && menit <= 16*60) return "masuk";
+  // Di luar jam kerja = Absen Pulang
+  return "pulang";
+}
+
+function isLate(cabang, jsDate){
+  if(LATE_EXEMPT.includes(cabang)) return false;
+  if(!jsDate) return false;
+  const menit = getWIBMenit(cabang, jsDate);
+  const isBatam = cabang==="ID Rifim Airport Batam";
+  
+  // PAGI: terlambat jika > 07:05 dan masih dalam window PAGI (< 08:00)
+  if(menit > 7*60+5 && menit <= 8*60) return true;
+  // MIDDLE: terlambat jika > 11:00 dan masih dalam window MIDDLE (< 12:00)
+  if(menit > 11*60 && menit <= 12*60) return true;
+  // SIANG Batam: terlambat jika > 14:05 (< 15:00)
+  if(isBatam && menit > 14*60+5 && menit <= 15*60) return true;
+  // SIANG: terlambat jika > 15:05 (< 16:00)
+  if(!isBatam && menit > 15*60+5 && menit <= 16*60) return true;
+  return false;
+}
+
+function getShiftInfo(cabang){
   const isBatam=cabang==="ID Rifim Airport Batam";
-  return ["PAGI 07:05","MIDDLE 11:00","SIANG "+(isBatam?"14:05":"15:05")];
+  const isWITA=WITA_CABANG.includes(cabang);
+  const tz=isWITA?" (WITA)":"";
+  if(isBatam) return "PAGI 07:05 | MIDDLE 11:00 | SIANG 14:05"+tz;
+  return "PAGI 07:05 | MIDDLE 11:00 | SIANG 15:05"+tz;
 }
 
 // ─── App state ────────────────────────────────────────────
@@ -1051,9 +1149,16 @@ function populateDropdowns(){
   // User login selector
   const su=document.getElementById("selUser");
   if(su){
+    su.innerHTML=""; // clear dulu
     const blank=document.createElement("option");blank.value="";blank.textContent="— Pilih nama Anda —";su.appendChild(blank);
-    STAFF.forEach(u=>{const o=document.createElement("option");o.value=u.nama;o.textContent=u.nama+" — "+u.jabatan;su.appendChild(o);});
-    su.value=""; // kosongkan default
+    // Sort by cabang then nama
+    const sorted=[...STAFF].sort((a,b)=>a.cabang.localeCompare(b.cabang)||a.nama.localeCompare(b.nama));
+    sorted.forEach(u=>{
+      const o=document.createElement("option");o.value=u.nama;
+      o.textContent=u.nama+" ("+u.jabatan+")";
+      su.appendChild(o);
+    });
+    su.value="";
   }
   // Cabang selects
   const cabs=Object.keys(AIRPORTS);
@@ -1200,19 +1305,27 @@ function updateGPSStatus(){
   const dist=haverM(gLat,gLng,ap.lat,ap.lng);
   const ds=dist<1000?dist.toFixed(0)+"m":(dist/1000).toFixed(2)+"km";
   st("gDst",ds);
-  if(dist<=ap.r)gpsBox(`✅ Dalam Radius Bandara · ${ds}`,"gps-ok");
+  if(dist<=ap.r)const tzDisp=WITA_CABANG.includes(cab)?" · WITA":"";
+  gpsBox("✅ Dalam Radius Bandara · "+ds+tzDisp,"gps-ok");
   else gpsBox(`❌ Di Luar Radius · ${ds} dari bandara`,"gps-no");
 }
 function gpsBox(txt,cls){const e=g("gpsBox");if(!e)return;e.textContent=txt;e.className="gps-box "+cls;}
 function onCabChange(){updateGPSStatus();updateShiftTxt();}
 function updateShiftTxt(){
-  const cab=g("selCab")?.value;const now=new Date();const h=now.getHours();
+  const cab=g("selCab")?.value;
   if(!cab){st("shiftTxt","Pilih cabang untuk melihat shift");st("absSh","—");return;}
   if(cab==="Admin"){st("shiftTxt","Jam Kerja Admin — Bebas shift bandara");st("absSh","🏢 Admin");return;}
-  const isBatam=cab==="ID Rifim Airport Batam";
-  const sh=h<12?"PAGI 07:05":(isBatam?"SIANG 14:05":"SIANG 15:05");
-  st("shiftTxt","Shift "+sh+(h>=7&&h<12?" · Pagi aktif":h>=12?" · Siang aktif":""));
-  st("absSh","⏰ "+sh.split(" ")[0]);
+  const now=new Date();
+  const ap=AIRPORTS[cab];
+  const tzLabel=ap?.tz||"WIB";
+  const isWITA=WITA_CABANG.includes(cab);
+  // Auto-detect tipe absen saat ini
+  const autoTipe=getTipeAbsen(cab,now);
+  const shiftInfo=getShiftInfo(cab);
+  st("shiftTxt",shiftInfo);
+  st("absSh",autoTipe==="masuk"?"🌅 Masuk":"🌆 Pulang");
+  // Auto-set tipe absen
+  setType(autoTipe);
 }
 function haverM(a,b,c,d){const R=6371000,r=x=>x*Math.PI/180,dl=r(c-a),do_=r(d-b),x=Math.sin(dl/2)**2+Math.cos(r(a))*Math.cos(r(c))*Math.sin(do_/2)**2;return R*2*Math.atan2(Math.sqrt(x),Math.sqrt(1-x));}
 
@@ -1283,12 +1396,18 @@ async function submitAbs(){
   try{
     const fid=await doUpload();
     const now=new Date();
-    const wkt=now.toLocaleTimeString("id-ID",{hour:"2-digit",minute:"2-digit"});
-    const late=absTipe==="masuk"&&!ap?.admin&&isLate(cab,now); // poin 5+6
-    const potongan=late?10000:0; // poin 7
+    const wktBase=now.toLocaleTimeString("id-ID",{hour:"2-digit",minute:"2-digit"});
+    // Auto-detect tipe absen berdasarkan jam (poin 5)
+    const autoTipe = ap?.admin ? absTipe : getTipeAbsen(cab, now);
+    const finalTipe = autoTipe; // gunakan auto-detect
+    const late = finalTipe==="masuk" && !ap?.admin && isLate(cab, now);
+    const potongan = late ? 10000 : 0;
+    // Info timezone untuk display
+    const tzInfo = WITA_CABANG.includes(cab) ? " (WITA)" : " (WIB)";
+    const wkt = now.toLocaleTimeString("id-ID",{hour:"2-digit",minute:"2-digit"}) + tzInfo;
     if(!db) throw new Error("Firebase tidak tersedia — cek koneksi internet");
     await db.collection("absensi").add({
-      nama:CU.nama,jabatan:CU.jabatan,cabang:cab,tipe:absTipe,
+      nama:CU.nama,jabatan:CU.jabatan,cabang:cab,tipe:finalTipe,
       lat:gLat,lng:gLng,akurasi:gAcc,gpsValid:validGPS,jarak:Math.round(dist),
       waktu:wkt,status:late?"terlambat":"hadir",potongan,fotoId:fid||"",
       timestamp:firebase.firestore.FieldValue.serverTimestamp(),
@@ -1307,7 +1426,7 @@ async function submitAbs(){
           timestamp:now.toLocaleString("id-ID"),
           namaSPG:CU.nama,
           bandara:cab,
-          tipeAbsen:absTipe,
+          tipeAbsen:finalTipe,
           koordinatGPS:gLat.toFixed(6)+","+gLng.toFixed(6),
           statusJarak:validGPS?"Dalam Radius ("+Math.round(dist)+"m)":"Di Luar Radius ("+Math.round(dist)+"m)",
           buktiFoto:fid?"https://drive.google.com/file/d/"+fid+"/view":""
@@ -1326,7 +1445,7 @@ async function submitAbs(){
     g("btnUpl").disabled=true;g("btnTP").disabled=true;
     g("btnTP").className="btn-tonal ripple-host";
     alert_(g("alSub"),"","");
-    showSuc(CU.nama,cab,wkt,absTipe,late);
+    showSuc(CU.nama,cab,wkt,finalTipe,late);
   }catch(e){alert_(g("alSub"),"❌ Gagal: "+e.message,"er");}
   fab.textContent="🚀";fab.disabled=false;
 }
