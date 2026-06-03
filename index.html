@@ -2202,7 +2202,7 @@ window.addEventListener("unhandledrejection",e=>{
 // ─── Utils ────────────────────────────────────────────────
 function g(id){return document.getElementById(id);}
 function st(id,val){const e=g(id);if(e)e.textContent=val;}
-function esc(s){return s.replace(/'/g,"\\'").replace(/"/g,'\\"');}
+function esc(s){return String(s).replace(/\\/g,"\\\\").replace(/'/g,"\\'").replace(/"/g,'\\"');}
 function alert_(el,msg,type){
   if(!el)return;const m={ok:"alert-ok",er:"alert-er",in:"alert-in",wn:"alert-wn"};
   if(!msg){el.classList.remove("on");return;}
