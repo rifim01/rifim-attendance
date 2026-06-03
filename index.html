@@ -1970,6 +1970,9 @@ async function exportRekapSheet(){
 function exportRekapPDF(){
   const bln=g("rkBln")?.value||"";
   const cab=g("rkCab")?.value||"Semua";
+  const escHtml=s=>String(s).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[m]));
+  const blnSafe=escHtml(bln);
+  const cabSafe=escHtml(cab);
   const pw=window.open("","_blank");
   const tbl=g("rkTbl");
   if(!tbl){alert("Filter dulu!");return;}
@@ -1982,7 +1985,7 @@ function exportRekapPDF(){
     +"td{padding:6px;border:1px solid #e2e8f0;font-size:9px;}"
     +"@media print{@page{size:A4;margin:10mm;}}</style></head><body>"
     +"<h2>REKAP KEHADIRAN \u2014 RIFIM ERP</h2>"
-    +"<p style='color:#64748b;font-size:9px;'>Periode: "+bln+" | Cabang: "+cab+" | Dicetak: "+new Date().toLocaleString("id-ID")+"</p>"
+    +"<p style='color:#64748b;font-size:9px;'>Periode: "+blnSafe+" | Cabang: "+cabSafe+" | Dicetak: "+new Date().toLocaleString("id-ID")+"</p>"
     +tbl.outerHTML
     +"<scri"+"pt>"+autoprint+"</scri"+"pt>"
     +"</body></html>";
