@@ -1,0 +1,27 @@
+# GitHub Pages Configuration for RIFIM ERP
+# This ensures proper deployment and avoids Jekyll conflicts
+
+theme: null
+plugins: []
+
+# Force HTTPS
+enforce_ssl: true
+
+# Site settings
+title: RIFIM ERP - Attendance System
+description: PT. Rifim International Gemilang Airport Operations System
+url: https://rifim01.github.io/rifim-attendance
+
+# Build settings
+markdown: kramdown
+exclude:
+  - node_modules
+  - .git
+  - .gitignore
+  - README.md
+  - CHANGELOG.md
+
+# Include files that might be processed
+include:
+  - .htaccess
+  - .nojekyll
