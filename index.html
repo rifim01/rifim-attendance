@@ -1009,18 +1009,40 @@ const WITA_CABANG=["ID Rifim Airport Balikpapan","ID Rifim Airport Manado"];
 const LATE_EXEMPT=["ID Rifim Airport Jambi","ID Rifim Airport Manado"];
 
 // Jam masuk shift (WIB basis) — Batam SIANG = 14:05
-// SHIFT WINDOW (WIB basis):
-// PAGI:        06:00 - 07:05  (1j 5m window)
-// MIDDLE:      10:00 - 11:05  (1j 5m window)
-// SIANG:       14:00 - 15:05  (1j 5m window)
-// SIANG BATAM: 13:00 - 14:05  (1j 5m window)
-// WITA (Balikpapan & Manado): jam dikurangi 1 untuk samakan ke WIB
-const SHIFTS={
+// ═══════════════════════════════════════════════════
+// SHIFT WINDOWS (WIB basis) — PT. Rifim International
+//
+// JAM MASUK:
+//   PAGI:        06:00 – 07:05
+//   MIDDLE:      10:00 – 11:05
+//   SIANG:       14:00 – 15:05
+//   SIANG BATAM: 13:00 – 14:05
+//
+// JAM PULANG:
+//   PAGI:        15:00 – 16:05
+//   MIDDLE:      19:00 – 20:05
+//   SIANG:       21:00 – 23:15
+//   SIANG BATAM: 21:00 – 23:15
+//
+// SELAIN jam masuk & pulang → "Jam Khusus" (dicatat tapi tidak dihitung terlambat)
+// Terlambat dikecualikan: Airport Jambi & Manado
+// WITA (Balikpapan & Manado): jam dikurangi 1 sebelum cek
+// ═══════════════════════════════════════════════════
+
+const SHIFTS_MASUK={
   PAGI:       {mulai:{h:6,  m:0}, tutup:{h:7,  m:5}},
   MIDDLE:     {mulai:{h:10, m:0}, tutup:{h:11, m:5}},
   SIANG:      {mulai:{h:14, m:0}, tutup:{h:15, m:5}},
   SIANG_BATAM:{mulai:{h:13, m:0}, tutup:{h:14, m:5}},
 };
+const SHIFTS_PULANG={
+  PAGI:       {mulai:{h:15, m:0}, tutup:{h:16, m:5}},
+  MIDDLE:     {mulai:{h:19, m:0}, tutup:{h:20, m:5}},
+  SIANG:      {mulai:{h:21, m:0}, tutup:{h:23, m:15}},
+  SIANG_BATAM:{mulai:{h:21, m:0}, tutup:{h:23, m:15}},
+};
+// Alias lama tetap tersedia untuk kompatibilitas
+const SHIFTS = SHIFTS_MASUK;
 
 // Konversi waktu lokal ke WIB-equivalent
 function getWIBMenit(cabang, jsDate){
@@ -1031,24 +1053,56 @@ function getWIBMenit(cabang, jsDate){
 }
 
 // Tentukan tipe absen berdasarkan jam (WIB basis)
+// Hasil: "masuk" | "pulang" | "khusus"
 function getTipeAbsen(cabang, jsDate){
   const menit = getWIBMenit(cabang, jsDate);
   const isBatam = cabang==="ID Rifim Airport Batam";
-  
-  if(menit >= 6*60    && menit <= 7*60+5)  return "masuk"; // PAGI  06:00-07:05
-  if(menit >= 10*60   && menit <= 11*60+5) return "masuk"; // MIDDLE 10:00-11:05
+  const isAdmin = cabang==="Admin";
+
+  if(isAdmin) return "masuk"; // Admin bebas jam
+
+  // ── WINDOW MASUK ──
+  if(menit >= 6*60  && menit <= 7*60+5)  return "masuk"; // PAGI  06:00-07:05
+  if(menit >= 10*60 && menit <= 11*60+5) return "masuk"; // MIDDLE 10:00-11:05
   if(isBatam  && menit >= 13*60 && menit <= 14*60+5) return "masuk"; // SIANG Batam 13:00-14:05
   if(!isBatam && menit >= 14*60 && menit <= 15*60+5) return "masuk"; // SIANG 14:00-15:05
-  return "pulang"; // Di luar semua window
+
+  // ── WINDOW PULANG ──
+  if(menit >= 15*60 && menit <= 16*60+5) return "pulang"; // PAGI Pulang 15:00-16:05
+  if(menit >= 19*60 && menit <= 20*60+5) return "pulang"; // MIDDLE Pulang 19:00-20:05
+  if(menit >= 21*60 && menit <= 23*60+15) return "pulang"; // SIANG Pulang 21:00-23:15
+
+  // ── DI LUAR SEMUA WINDOW → JAM KHUSUS ──
+  return "khusus";
 }
 
-// Terlambat = masuk di atas jam tepat tapi masih dalam window
-// Dikecualikan: Airport Jambi & Manado
+// Helper: nama shift berdasarkan jam masuk
+function getShiftNama(cabang, jsDate){
+  const menit = getWIBMenit(cabang, jsDate);
+  const isBatam = cabang==="ID Rifim Airport Batam";
+  if(menit >= 6*60  && menit <= 7*60+5)  return "PAGI";
+  if(menit >= 10*60 && menit <= 11*60+5) return "MIDDLE";
+  if(isBatam  && menit >= 13*60 && menit <= 14*60+5) return "SIANG";
+  if(!isBatam && menit >= 14*60 && menit <= 15*60+5) return "SIANG";
+  if(menit >= 15*60 && menit <= 16*60+5) return "PAGI (Pulang)";
+  if(menit >= 19*60 && menit <= 20*60+5) return "MIDDLE (Pulang)";
+  if(menit >= 21*60 && menit <= 23*60+15) return "SIANG (Pulang)";
+  return "Jam Khusus";
+}
+
+// Terlambat = masuk setelah jam tepat tapi masih dalam window
+// Dikecualikan dari potongan: Airport Jambi & Airport Manado
 function isLate(cabang, jsDate){
   if(LATE_EXEMPT.includes(cabang)) return false;
   if(!jsDate) return false;
   const menit = getWIBMenit(cabang, jsDate);
   const isBatam = cabang==="ID Rifim Airport Batam";
+  const isAdmin = cabang==="Admin";
+  if(isAdmin) return false;
+
+  // Hanya cek terlambat untuk jam MASUK (bukan pulang/khusus)
+  const tipe = getTipeAbsen(cabang, jsDate);
+  if(tipe !== "masuk") return false;
 
   // PAGI: terlambat jika > 07:00 s.d. 07:05
   if(menit > 7*60   && menit <= 7*60+5)  return true;
@@ -1062,15 +1116,26 @@ function isLate(cabang, jsDate){
 }
 
 function getShiftInfo(cabang){
-  const isBatam=cabang==="ID Rifim Airport Batam";
-  const isWITA=WITA_CABANG.includes(cabang);
+  const isBatam = cabang==="ID Rifim Airport Batam";
+  const isWITA  = WITA_CABANG.includes(cabang);
+  const menit   = isWITA ? getWIBMenit(cabang, new Date()) : new Date().getHours()*60+new Date().getMinutes();
+  const tipe    = getTipeAbsen(cabang, new Date());
+
+  let info = "";
   if(isWITA){
-    // Tampilkan dalam WITA (+1 jam dari WIB)
-    if(isBatam) return "PAGI 07:00-08:05 | MIDDLE 11:00-12:05 | SIANG WITA 14:00-15:05";
-    return "PAGI 07:00-08:05 | MIDDLE 11:00-12:05 | SIANG WITA 15:00-16:05";
+    // Tampilkan dalam WITA (+1 jam)
+    info = "Masuk: PAGI 07-08:05 | MIDDLE 11-12:05 | SIANG 15-16:05";
+    info += " | Pulang: PAGI 16-17:05 | MIDDLE 20-21:05 | SIANG 22-24:15";
+  } else if(isBatam){
+    info = "Masuk: PAGI 06-07:05 | MIDDLE 10-11:05 | SIANG 13-14:05";
+    info += " | Pulang: PAGI 15-16:05 | MIDDLE 19-20:05 | SIANG 21-23:15";
+  } else {
+    info = "Masuk: PAGI 06-07:05 | MIDDLE 10-11:05 | SIANG 14-15:05";
+    info += " | Pulang: PAGI 15-16:05 | MIDDLE 19-20:05 | SIANG 21-23:15";
   }
-  if(isBatam) return "PAGI 06:00-07:05 | MIDDLE 10:00-11:05 | SIANG 13:00-14:05";
-  return "PAGI 06:00-07:05 | MIDDLE 10:00-11:05 | SIANG 14:00-15:05";
+  // Tambah status saat ini
+  const statusNow = tipe==="masuk"?"🌅 Window Masuk":tipe==="pulang"?"🌆 Window Pulang":"⏰ Jam Khusus";
+  return statusNow + " | " + info;
 }
 
 // ─── App state ────────────────────────────────────────────
@@ -1365,9 +1430,11 @@ function updateShiftTxt(){
   const autoTipe=getTipeAbsen(cab,now);
   const shiftInfo=getShiftInfo(cab);
   st("shiftTxt",shiftInfo);
-  st("absSh",autoTipe==="masuk"?"🌅 Masuk":"🌆 Pulang");
-  // Auto-set tipe absen
-  setType(autoTipe);
+  const nowTipe=getTipeAbsen(cab,new Date());
+  const label=nowTipe==="masuk"?"🌅 Masuk":nowTipe==="pulang"?"🌆 Pulang":"⏰ Khusus";
+  st("absSh",label);
+  // Auto-set tipe absen (masuk/pulang saja — khusus tetap masuk default)
+  setType(nowTipe==="pulang"?"pulang":"masuk");
 }
 function haverM(a,b,c,d){const R=6371000,r=x=>x*Math.PI/180,dl=r(c-a),do_=r(d-b),x=Math.sin(dl/2)**2+Math.cos(r(a))*Math.cos(r(c))*Math.sin(do_/2)**2;return R*2*Math.atan2(Math.sqrt(x),Math.sqrt(1-x));}
 
@@ -1439,19 +1506,25 @@ async function submitAbs(){
     const fid=await doUpload();
     const now=new Date();
     const wktBase=now.toLocaleTimeString("id-ID",{hour:"2-digit",minute:"2-digit"});
-    // Auto-detect tipe absen berdasarkan jam (poin 5)
-    const autoTipe = ap?.admin ? absTipe : getTipeAbsen(cab, now);
-    const finalTipe = autoTipe; // gunakan auto-detect
-    const late = finalTipe==="masuk" && !ap?.admin && isLate(cab, now);
+    // Auto-detect tipe absen berdasarkan jam
+    const autoTipe = ap?.admin ? "masuk" : getTipeAbsen(cab, now);
+    const finalTipe = autoTipe; // "masuk" | "pulang" | "khusus"
+    const late = (finalTipe==="masuk") && !ap?.admin && isLate(cab, now);
     const potongan = late ? 10000 : 0;
+    const shiftNama = ap?.admin ? "Admin" : getShiftNama(cab, now);
     // Info timezone untuk display
     const tzInfo = WITA_CABANG.includes(cab) ? " (WITA)" : " (WIB)";
-    const wkt = now.toLocaleTimeString("id-ID",{hour:"2-digit",minute:"2-digit"}) + tzInfo;
+    const wktBase = now.toLocaleTimeString("id-ID",{hour:"2-digit",minute:"2-digit"});
+    const wkt = wktBase + tzInfo;
     if(!db) throw new Error("Firebase tidak tersedia — cek koneksi internet");
     await db.collection("absensi").add({
-      nama:CU.nama,jabatan:CU.jabatan,cabang:cab,tipe:finalTipe,
+      nama:CU.nama,jabatan:CU.jabatan,cabang:cab,
+      tipe:finalTipe,         // masuk / pulang / khusus
+      shift:shiftNama,        // PAGI / MIDDLE / SIANG / Jam Khusus
       lat:gLat,lng:gLng,akurasi:gAcc,gpsValid:validGPS,jarak:Math.round(dist),
-      waktu:wkt,status:late?"terlambat":"hadir",potongan,fotoId:fid||"",
+      waktu:wkt,
+      status:finalTipe==="khusus"?"khusus":late?"terlambat":"hadir",
+      potongan,fotoId:fid||"",
       timestamp:firebase.firestore.FieldValue.serverTimestamp(),
       tanggal:now.toISOString().slice(0,10)
     });
@@ -1469,6 +1542,7 @@ async function submitAbs(){
           namaSPG:CU.nama,
           bandara:cab,
           tipeAbsen:finalTipe,
+          shift:shiftNama,
           koordinatGPS:gLat.toFixed(6)+","+gLng.toFixed(6),
           statusJarak:validGPS?"Dalam Radius ("+Math.round(dist)+"m)":"Di Luar Radius ("+Math.round(dist)+"m)",
           buktiFoto:fid?"https://drive.google.com/file/d/"+fid+"/view":""
@@ -1519,9 +1593,10 @@ async function loadDash(){
     const list=g("dashList");
     if(!rows.length){list.innerHTML='<div style="padding:24px;text-align:center;color:var(--txt-sec);font-size:13px;">Belum ada kehadiran hari ini</div>';return;}
     list.innerHTML=rows.slice(0,25).map(r=>{
-      const isPulang=r.tipe==="pulang";
-      const chipCls=isPulang?"chip-info":r.status==="hadir"?"chip-ok":r.status==="terlambat"?"chip-warn":"chip-err";
-      const chipTxt=isPulang?"Pulang":r.status||"hadir";
+      const isPulang = r.tipe==="pulang";
+      const isKhusus = r.tipe==="khusus"||r.status==="khusus";
+      const chipCls  = isPulang?"chip-info":isKhusus?"chip-dim":r.status==="hadir"?"chip-ok":r.status==="terlambat"?"chip-warn":"chip-err";
+      const chipTxt  = isPulang?"Pulang":isKhusus?"Khusus":r.status||"hadir";
       return `<div class="list-item">
         <div class="l-av">${r.nama[0]}</div>
         <div class="l-main">
@@ -1783,7 +1858,12 @@ async function doFilterRekap(){
     });
     rows.forEach(r=>{
       if(!agg[r.nama])agg[r.nama]={nama:r.nama,cabang:r.cabang,H:0,T:0,A:0,pot:0};
-      if(r.tipe==="masuk"||!r.tipe){
+      if(r.status==="khusus"||r.tipe==="khusus"){
+        // Jam khusus tidak dihitung H/T/A
+      } else if(r.tipe==="pulang"){
+        // Absen pulang tidak dihitung H/T
+      } else {
+        // Absen masuk
         if(r.status==="terlambat"){agg[r.nama].T++;agg[r.nama].pot+=(r.potongan||10000);}
         else agg[r.nama].H++;
       }
