@@ -1,31 +1,16 @@
-// RIFIM ERP Service Worker v6 - 2026-06-04
-// Force clear ALL old caches
-const VER = 'rifim-20260604-v6';
+// Lightweight Service Worker
+const CACHE_NAME='rifim-lite-v1';
 
-self.addEventListener('install', () => {
+self.addEventListener('install',event=>{
   self.skipWaiting();
-  console.log('[SW] Install v6');
 });
 
-self.addEventListener('activate', e => {
-  e.waitUntil(
-    caches.keys().then(keys => {
-      console.log('[SW] Clearing caches:', keys);
-      return Promise.all(keys.map(k => caches.delete(k)));
-    }).then(() => {
-      console.log('[SW] All caches cleared');
-      return self.clients.claim();
-    })
-  );
+self.addEventListener('activate',event=>{
+  event.waitUntil(clients.claim());
 });
 
-// Network only - no caching untuk dev
-self.addEventListener('fetch', e => {
-  if(e.request.method !== 'GET') return;
-  // Skip chrome-extension
-  if(!e.request.url.startsWith('http')) return;
-  // Network first, no cache
-  e.respondWith(
-    fetch(e.request).catch(() => new Response('', {status: 204}))
+self.addEventListener('fetch',event=>{
+  event.respondWith(
+    fetch(event.request).catch(()=>caches.match(event.request))
   );
 });

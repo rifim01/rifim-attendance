@@ -188,7 +188,7 @@ body{
 .lgn-card{
   width:100%;margin-top:28px;
   background:rgba(20,20,30,.85);
-  backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);
+  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
   border-radius:var(--r-xl);
   border:1px solid rgba(229,57,53,.2);
   padding:24px 22px;
@@ -244,7 +244,7 @@ body{
 .topbar{
   flex-shrink:0;height:var(--topbar-h);
   background:rgba(10,10,20,.90);
-  backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+  backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
   border-bottom:1px solid rgba(229,57,53,.18);
   display:flex;align-items:center;padding:0 6px 0 16px;gap:8px;
   position:relative;z-index:10;
@@ -306,7 +306,7 @@ body{
   height:calc(var(--nav-h) + var(--sfi));
   padding-bottom:var(--sfi);
   background:rgba(9,9,16,.92);
-  backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);
+  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
   border-top:1px solid rgba(229,57,53,.15);
   display:flex;align-items:flex-start;padding-top:8px;
   box-shadow:0 -4px 24px rgba(0,0,0,.5), 0 -1px 0 rgba(229,57,53,.1);
@@ -1505,7 +1505,6 @@ async function submitAbs(){
   try{
     const fid=await doUpload();
     const now=new Date();
-    const wktBase=now.toLocaleTimeString("id-ID",{hour:"2-digit",minute:"2-digit"});
     // Auto-detect tipe absen berdasarkan jam
     const autoTipe = ap?.admin ? "masuk" : getTipeAbsen(cab, now);
     const finalTipe = autoTipe; // "masuk" | "pulang" | "khusus"
@@ -1818,7 +1817,16 @@ function exportJadwalPDF(){
     +"<p style='color:#64748b;font-size:9px;'>Minggu: "+wl+" | Cabang: "+cabF+" | "+new Date().toLocaleString("id-ID")+"</p>"
     +tblHTML
     +"<scri"+"pt>"+autoprint+"</scri"+"pt>"
-    +"</body></html>";
+    +"<script>
+window.addEventListener("load",()=>{
+  const splash=document.getElementById("splash");
+  if(splash){
+    splash.classList.add("exit");
+    setTimeout(()=>{splash.style.display="none";},300);
+  }
+});
+</script>
+</body></html>";
   pw.document.write(html);pw.document.close();
 }
 
@@ -1988,7 +1996,16 @@ function exportRekapPDF(){
     +"<p style='color:#64748b;font-size:9px;'>Periode: "+blnSafe+" | Cabang: "+cabSafe+" | Dicetak: "+new Date().toLocaleString("id-ID")+"</p>"
     +tbl.outerHTML
     +"<scri"+"pt>"+autoprint+"</scri"+"pt>"
-    +"</body></html>";
+    +"<script>
+window.addEventListener("load",()=>{
+  const splash=document.getElementById("splash");
+  if(splash){
+    splash.classList.add("exit");
+    setTimeout(()=>{splash.style.display="none";},300);
+  }
+});
+</script>
+</body></html>";
   pw.document.write(html);pw.document.close();
 }
 
@@ -2232,6 +2249,15 @@ if("serviceWorker" in navigator){
     .then(reg=>{console.log("SW registered v3:",reg.scope);reqPushPerm();})
     .catch(e=>console.warn("SW:",e));
 }
+</script>
+<script>
+window.addEventListener("load",()=>{
+  const splash=document.getElementById("splash");
+  if(splash){
+    splash.classList.add("exit");
+    setTimeout(()=>{splash.style.display="none";},300);
+  }
+});
 </script>
 </body>
 </html>

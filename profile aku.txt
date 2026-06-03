@@ -1,0 +1,19 @@
+aku adalah pemilik dari PT.Rifim Gemilang yang bergerak di bisnis Vendor aplikasi Maxim di Bandara bandara Di Indonesia,aku bekerja sama resmi dengan PT.Teknologi Perdana Indonesia yg memiliki Lisensi Resmi aplikasi Maxim di Indonesia,saat ini Rifim bekerja sama dengan beberapa bandara di Indonesia yaitu :
+1. Bandara Jambi : Kerjasama dengan Angkasa Pura Indonesia jumlah karyawan 2 staff dan 1 Kordinator
+2. Bandara pekanbaru : bekerja sama dengan Puskopau dan Jumlah karyawan :  staff dan 1 kordinator 
+3. Bandara Batam : Bekerja sama dengan PT. BIB dan Jumlah Karyawan : 7 staff dan 1 kordinator
+4. Bandara Balikpapan : Bekerja sama dengan Primkopau dan Jumlah karyawan : 2 staff dan 1 kordinator
+5, Bandara Manado : Bekerja sama dengan Koperasi Mahkota dan Jumlah Karyawan : 3 staff dan 1 kordinator
+
+rencana kerja sama di Masa depan :
+1. Bandara Makasar
+2. Bandara Soeta : Khusus mengelola SDM Pickup Point
+
+Posisi Rifim di Bandara lebih tepatnya melayani setiap Penumpang di Kedatangan yg menggunakan Aplikasi Maxim dan Menawarkan kepada Penumpang untuk menggunakan Aplikasi maxim,dan di setiap Bandara2 yg sudah Kerjasama kami menggunakan Armada dan pengemudi dari Pihak Primkopau,Puskopau dan Armada Maxim Reguler,setiap orderan dari Kawasan bandaralanjtykan dilakukan geofencing agar pemesanan tersebut hanya untuk Pengemudi Rifim yg memiliki akun maxim Id Rifim,dari setiap orderan tersebut Rifim<Pihak bandara dan maxim Mendapatkan fee dengan nominal yang berbeda2 di setiap bandara yang lgsg dipotong dari saldo di akun pengemudi dengan jumlah yang berbeda didapatkan oleh oihak bandara dan Maxim,Pemasukan Rifim yaitu :
+1. fee Potongan Order
+2. Iuran Wajib Pengemudi
+3. Fee 5000 dari setiap Pengisian saldo Pengemudi
+4. Pembagian persentase 45% dari jumlah pemotongan 12% dari Tarif yg dibayarkan Penumpang kepada Pengemudi
+
+Rifim Memiliki Admin yg bekerja melakukan Tugas Pemotongan dan Pengisian Saldo,Admin juga Mengurus administrasi yang berkaitan dengan Vendor Rifim.
+rifim harusnya sudah punya aplikasi administrasi untuk menjadi Perusahaan Profesional,karna aku ingin perusahaan ini berkembang dan besar meskipun aku tidak punya bantuan financial dari manapun dan tidak bisa hutang ke pihak bank dll krna masalah BI Cheking..lanjutkan di claude
