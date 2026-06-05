@@ -26,36 +26,40 @@
   PT. Rifim International Gemilang
 ──────────────────────────────────────────────────────────*/
 :root{
-  /* MD3 Baseline */
+  /* RIFIM: Merah · Biru Langit · Kuning */
   --clr-primary:#E53935;
   --clr-primary-dim:rgba(229,57,53,.15);
-  --clr-primary-glow:rgba(229,57,53,.35);
+  --clr-primary-glow:rgba(229,57,53,.40);
+  --clr-sky:#29B6F6;
+  --clr-sky-dim:rgba(41,182,246,.15);
+  --clr-gold:#FFD600;
+  --clr-gold-dim:rgba(255,214,0,.14);
   --clr-on-primary:#fff;
   --clr-secondary:#FF8A80;
-  --clr-tertiary:#FF6F00;
+  --clr-tertiary:#FFD600;
 
-  /* Surface ramp */
-  --srf-bg:#090910;
-  --srf-0:#0F0F17;
-  --srf-1:#14141E;
-  --srf-2:#1A1A25;
-  --srf-3:#20202D;
-  --srf-4:#252533;
+  /* Surface ramp — dark blue-tinted */
+  --srf-bg:#06080F;
+  --srf-0:#0B0E18;
+  --srf-1:#10141F;
+  --srf-2:#161B28;
+  --srf-3:#1C2232;
+  --srf-4:#22293C;
 
   /* Text */
-  --txt-pri:#F1EFF8;
-  --txt-sec:#A8A4B8;
-  --txt-dis:#5A5770;
+  --txt-pri:#E8EEFF;
+  --txt-sec:#8A9BBD;
+  --txt-dis:#404D6A;
 
-  /* Outline */
-  --out-var:rgba(255,255,255,.07);
-  --out:rgba(255,255,255,.13);
+  /* Outline — biru subtle */
+  --out-var:rgba(41,182,246,.09);
+  --out:rgba(41,182,246,.16);
 
   /* Semantic */
   --clr-ok:#00E676;
-  --clr-warn:#FFD740;
+  --clr-warn:#FFD600;
   --clr-err:#FF5252;
-  --clr-info:#40C4FF;
+  --clr-info:#29B6F6;
 
   /* Elevation */
   --e1:0 1px 3px rgba(0,0,0,.45),0 1px 2px rgba(0,0,0,.3);
@@ -243,9 +247,9 @@ body{
 /* ══ TOP APP BAR ════════════════════════════════════════ */
 .topbar{
   flex-shrink:0;height:var(--topbar-h);
-  background:rgba(10,10,20,.90);
+  background:rgba(7,9,16,.92);
   backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
-  border-bottom:1px solid rgba(229,57,53,.18);
+  border-bottom:1px solid rgba(41,182,246,.22);
   display:flex;align-items:center;padding:0 6px 0 16px;gap:8px;
   position:relative;z-index:10;
   box-shadow:0 2px 16px rgba(0,0,0,.3);
@@ -305,11 +309,11 @@ body{
   position:fixed;bottom:0;left:0;right:0;z-index:30;
   height:calc(var(--nav-h) + var(--sfi));
   padding-bottom:var(--sfi);
-  background:rgba(9,9,16,.92);
+  background:rgba(7,9,16,.93);
   backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);
-  border-top:1px solid rgba(229,57,53,.15);
+  border-top:1px solid rgba(41,182,246,.18);
   display:flex;align-items:flex-start;padding-top:8px;
-  box-shadow:0 -4px 24px rgba(0,0,0,.5), 0 -1px 0 rgba(229,57,53,.1);
+  box-shadow:0 -4px 24px rgba(0,0,0,.5), 0 -1px 0 rgba(41,182,246,.12);
 }
 .bn-btn{
   flex:1;border:none;background:none;
@@ -324,9 +328,9 @@ body{
   position:relative;overflow:hidden;
 }
 .bn-btn:active .bn-pill{transform:scale(.88);}
-.bn-btn.on .bn-pill{background:rgba(229,57,53,.18);width:68px;}
+.bn-btn.on .bn-pill{background:rgba(41,182,246,.18);width:68px;}
 .bn-lbl{font-size:11px;font-weight:500;color:var(--txt-sec);transition:.15s;line-height:1;}
-.bn-btn.on .bn-lbl{color:var(--clr-primary);font-weight:700;}
+.bn-btn.on .bn-lbl{color:var(--clr-sky);font-weight:700;}
 .bn-badge{
   position:absolute;top:0;right:10px;
   width:8px;height:8px;border-radius:50%;
@@ -558,6 +562,51 @@ body{
   .bnav,.topbar,.sft-bar,#content{max-width:560px;margin-left:auto;margin-right:auto;}
   .bnav{left:50%;transform:translateX(-50%);border-radius:28px 28px 0 0;}
   #fab{right:calc(50% - 280px + 18px);}
+}
+/* ══ DESKTOP LAYOUT (poin 6) ══════════════════════════════ */
+@media(min-width:960px){
+  /* Sidebar di kiri untuk desktop */
+  #app{flex-direction:row!important;}
+  .sft-bar{display:none;}
+  .topbar{
+    position:fixed;left:0;top:0;bottom:0;width:220px;
+    height:100vh!important;flex-direction:column;
+    align-items:flex-start;padding:24px 16px;gap:6px;
+    border-bottom:none!important;border-right:1px solid rgba(229,57,53,.18)!important;
+    backdrop-filter:blur(16px);z-index:10;
+  }
+  .tb-logo{width:52px;height:52px;border-radius:14px;margin-bottom:8px;}
+  .tb-titles{flex:0!important;}
+  .tb-title{font-size:16px!important;}
+  .tb-sub{font-size:10px!important;}
+  .tb-right{margin-left:0!important;flex-direction:column;align-items:flex-start;gap:8px;margin-top:auto;}
+  .clk-pill{font-size:11px;}
+  #content{
+    margin-left:220px!important;max-width:none!important;
+    height:100vh;padding-bottom:16px!important;
+  }
+  .bnav{
+    position:fixed;left:0;top:200px;width:220px;height:auto!important;
+    flex-direction:column;padding:8px 10px;border-top:none!important;
+    border-right:1px solid rgba(229,57,53,.18)!important;
+    border-radius:0!important;box-shadow:none!important;
+    background:transparent!important;backdrop-filter:none!important;
+    left:0;transform:none!important;
+  }
+  .bn-btn{flex-direction:row;gap:12px;padding:10px 12px;border-radius:14px;justify-content:flex-start;}
+  .bn-pill{width:36px!important;height:36px!important;border-radius:10px;font-size:18px;}
+  .bn-btn.on .bn-pill{background:var(--clr-primary-dim)!important;width:36px!important;}
+  .bn-lbl{font-size:13px!important;font-weight:500;}
+  .bn-btn.on .bn-lbl{font-weight:700;}
+  .bn-btn.on{background:rgba(229,57,53,.08);border-radius:14px;}
+  #fab{right:24px;bottom:24px;}
+  /* Content desktop: 2 column untuk dashboard */
+  #pgHome .stats-row{justify-content:flex-start;}
+  .pg.on{max-width:900px;}
+}
+@media(min-width:1200px){
+  .topbar,.bnav{width:240px;}
+  #content{margin-left:240px!important;}
 }
 @keyframes lp{0%,100%{opacity:1}50%{opacity:.3}}
 </style>
@@ -858,6 +907,48 @@ body{
       <div id="alRk" class="alert" style="margin:8px 16px;"></div>
     </div>
 
+    <!-- ▌PAGE: MINGGUAN (7 hari per cabang) ▌ -->
+    <div class="pg" id="pgMgg">
+      <div class="pg-pad">
+        <div style="padding:8px 16px;display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
+          <select class="inp" style="flex:1;min-width:160px;font-size:12px;" id="mggCab" onchange="loadMgg()">
+            <option value="">— Pilih Cabang —</option>
+          </select>
+          <input type="date" class="inp" style="flex:1;min-width:130px;font-size:12px;" id="mggTgl"/>
+          <button class="btn-tonal cam-btn-inactive ripple-host" onclick="loadMgg()" style="height:44px;padding:0 14px;border-radius:var(--r-sm);font-size:12px;flex-shrink:0;">🔄 Refresh</button>
+        </div>
+        <div id="alMgg" class="alert"></div>
+        <!-- Stats Mingguan -->
+        <div class="stats-row">
+          <div class="stat-chip"><div class="stat-val" id="mggH" style="color:var(--clr-ok)">0</div><div class="stat-lbl">Hadir</div></div>
+          <div class="stat-chip"><div class="stat-val" id="mggT" style="color:var(--clr-warn)">0</div><div class="stat-lbl">Terlambat</div></div>
+          <div class="stat-chip"><div class="stat-val" id="mggPot" style="color:#FF6F00;font-size:16px;">Rp 0</div><div class="stat-lbl">Potongan</div></div>
+        </div>
+        <!-- Tabel 7 hari -->
+        <div class="card" style="overflow-x:auto;">
+          <table style="width:100%;border-collapse:collapse;min-width:480px;">
+            <thead>
+              <tr style="background:var(--srf-2);">
+                <th style="padding:9px 12px;font-size:10px;font-weight:700;color:var(--txt-sec);text-align:left;letter-spacing:.8px;">NAMA STAFF</th>
+                <th style="padding:9px 8px;font-size:10px;color:var(--clr-ok);text-align:center;">H</th>
+                <th style="padding:9px 8px;font-size:10px;color:var(--clr-warn);text-align:center;">T</th>
+                <th style="padding:9px 8px;font-size:10px;color:var(--clr-err);text-align:center;">A</th>
+                <th style="padding:9px 8px;font-size:10px;color:#FF6F00;text-align:center;">POTONGAN</th>
+              </tr>
+            </thead>
+            <tbody id="mggBody">
+              <tr><td colspan="5" style="padding:24px;text-align:center;color:var(--txt-sec);font-size:13px;">Pilih cabang untuk tampilkan data 7 hari</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <!-- Detail per tanggal -->
+        <div class="sec-hdr"><div class="sec-lbl">Detail 7 Hari Terakhir</div></div>
+        <div class="card" id="mggDetail">
+          <div style="padding:20px;text-align:center;color:var(--txt-sec);font-size:13px;">Pilih cabang dulu</div>
+        </div>
+      </div>
+    </div>
+
     <!-- ▌PAGE: MORE ▌ -->
     <div class="pg" id="pgMore">
       <div class="card" style="margin:12px 16px 8px;">
@@ -913,7 +1004,8 @@ body{
     <button class="bn-btn ripple-host" id="bn1" onclick="goPage('att',1)"><div class="bn-pill">📍</div><div class="bn-lbl">Absensi</div><div class="bn-badge" id="bnB1"></div></button>
     <button class="bn-btn ripple-host" id="bn2" onclick="goPage('jd',2)"><div class="bn-pill">📅</div><div class="bn-lbl">Jadwal</div></button>
     <button class="bn-btn ripple-host" id="bn3" onclick="goPage('rk',3)"><div class="bn-pill">📊</div><div class="bn-lbl">Rekap</div></button>
-    <button class="bn-btn ripple-host" id="bn4" onclick="goPage('more',4)"><div class="bn-pill">⋯</div><div class="bn-lbl">Lainnya</div></button>
+    <button class="bn-btn ripple-host" id="bn4" onclick="goPage('mgg',4)"><div class="bn-pill">📅</div><div class="bn-lbl">Mingguan</div></button>
+    <button class="bn-btn ripple-host" id="bn5" onclick="goPage('more',5)"><div class="bn-pill">⋯</div><div class="bn-lbl">Lainnya</div></button>
   </nav>
 
   <!-- FAB -->
@@ -1009,18 +1101,40 @@ const WITA_CABANG=["ID Rifim Airport Balikpapan","ID Rifim Airport Manado"];
 const LATE_EXEMPT=["ID Rifim Airport Jambi","ID Rifim Airport Manado"];
 
 // Jam masuk shift (WIB basis) — Batam SIANG = 14:05
-// SHIFT WINDOW (WIB basis):
-// PAGI:        06:00 - 07:05  (1j 5m window)
-// MIDDLE:      10:00 - 11:05  (1j 5m window)
-// SIANG:       14:00 - 15:05  (1j 5m window)
-// SIANG BATAM: 13:00 - 14:05  (1j 5m window)
-// WITA (Balikpapan & Manado): jam dikurangi 1 untuk samakan ke WIB
-const SHIFTS={
+// ═══════════════════════════════════════════════════
+// SHIFT WINDOWS (WIB basis) — PT. Rifim International
+//
+// JAM MASUK:
+//   PAGI:        06:00 – 07:05
+//   MIDDLE:      10:00 – 11:05
+//   SIANG:       14:00 – 15:05
+//   SIANG BATAM: 13:00 – 14:05
+//
+// JAM PULANG:
+//   PAGI:        15:00 – 16:05
+//   MIDDLE:      19:00 – 20:05
+//   SIANG:       21:00 – 23:15
+//   SIANG BATAM: 21:00 – 23:15
+//
+// SELAIN jam masuk & pulang → "Jam Khusus" (dicatat tapi tidak dihitung terlambat)
+// Terlambat dikecualikan: Airport Jambi & Manado
+// WITA (Balikpapan & Manado): jam dikurangi 1 sebelum cek
+// ═══════════════════════════════════════════════════
+
+const SHIFTS_MASUK={
   PAGI:       {mulai:{h:6,  m:0}, tutup:{h:7,  m:5}},
   MIDDLE:     {mulai:{h:10, m:0}, tutup:{h:11, m:5}},
   SIANG:      {mulai:{h:14, m:0}, tutup:{h:15, m:5}},
   SIANG_BATAM:{mulai:{h:13, m:0}, tutup:{h:14, m:5}},
 };
+const SHIFTS_PULANG={
+  PAGI:       {mulai:{h:15, m:0}, tutup:{h:16, m:5}},
+  MIDDLE:     {mulai:{h:19, m:0}, tutup:{h:20, m:5}},
+  SIANG:      {mulai:{h:21, m:0}, tutup:{h:23, m:15}},
+  SIANG_BATAM:{mulai:{h:21, m:0}, tutup:{h:23, m:15}},
+};
+// Alias lama tetap tersedia untuk kompatibilitas
+const SHIFTS = SHIFTS_MASUK;
 
 // Konversi waktu lokal ke WIB-equivalent
 function getWIBMenit(cabang, jsDate){
@@ -1031,46 +1145,94 @@ function getWIBMenit(cabang, jsDate){
 }
 
 // Tentukan tipe absen berdasarkan jam (WIB basis)
+// Hasil: "masuk" | "terlambat_masuk" | "pulang" | "khusus"
 function getTipeAbsen(cabang, jsDate){
   const menit = getWIBMenit(cabang, jsDate);
   const isBatam = cabang==="ID Rifim Airport Batam";
-  
-  if(menit >= 6*60    && menit <= 7*60+5)  return "masuk"; // PAGI  06:00-07:05
-  if(menit >= 10*60   && menit <= 11*60+5) return "masuk"; // MIDDLE 10:00-11:05
+  const isAdmin = cabang==="Admin";
+
+  if(isAdmin) return "masuk"; // Admin bebas jam
+
+  // ── WINDOW MASUK TEPAT (hadir) ──
+  if(menit >= 6*60   && menit <= 7*60+5)  return "masuk"; // PAGI 06:00-07:05
+  if(menit >= 10*60  && menit <= 11*60+5) return "masuk"; // MIDDLE 10:00-11:05
   if(isBatam  && menit >= 13*60 && menit <= 14*60+5) return "masuk"; // SIANG Batam 13:00-14:05
   if(!isBatam && menit >= 14*60 && menit <= 15*60+5) return "masuk"; // SIANG 14:00-15:05
-  return "pulang"; // Di luar semua window
+
+  // ── WINDOW TERLAMBAT (masuk tapi lewat jam) ──
+  if(!LATE_EXEMPT.includes(cabang)){
+    if(menit > 7*60+5  && menit <= 7*60+45)  return "masuk"; // PAGI terlambat
+    if(menit > 11*60+5 && menit <= 11*60+45) return "masuk"; // MIDDLE terlambat
+    if(isBatam  && menit > 14*60+5 && menit <= 14*60+45) return "masuk"; // Batam terlambat
+    if(!isBatam && menit > 15*60+5 && menit <= 15*60+45) return "masuk"; // SIANG terlambat
+  }
+
+  // ── WINDOW PULANG ──
+  if(menit >= 15*60  && menit <= 16*60+5)  return "pulang"; // PAGI Pulang 15:00-16:05
+  if(menit >= 19*60  && menit <= 20*60+5)  return "pulang"; // MIDDLE Pulang 19:00-20:05
+  if(menit >= 21*60  && menit <= 23*60+15) return "pulang"; // SIANG Pulang 21:00-23:15
+
+  // ── DI LUAR SEMUA WINDOW → JAM KHUSUS ──
+  return "khusus";
 }
 
-// Terlambat = masuk di atas jam tepat tapi masih dalam window
-// Dikecualikan: Airport Jambi & Manado
+// Helper: nama shift berdasarkan jam masuk
+function getShiftNama(cabang, jsDate){
+  const menit = getWIBMenit(cabang, jsDate);
+  const isBatam = cabang==="ID Rifim Airport Batam";
+  if(menit >= 6*60  && menit <= 7*60+5)  return "PAGI";
+  if(menit >= 10*60 && menit <= 11*60+5) return "MIDDLE";
+  if(isBatam  && menit >= 13*60 && menit <= 14*60+5) return "SIANG";
+  if(!isBatam && menit >= 14*60 && menit <= 15*60+5) return "SIANG";
+  if(menit >= 15*60 && menit <= 16*60+5) return "PAGI (Pulang)";
+  if(menit >= 19*60 && menit <= 20*60+5) return "MIDDLE (Pulang)";
+  if(menit >= 21*60 && menit <= 23*60+15) return "SIANG (Pulang)";
+  return "Jam Khusus";
+}
+
+// Terlambat = masuk setelah jam tepat tapi masih dalam window
+// Dikecualikan dari potongan: Airport Jambi & Airport Manado
 function isLate(cabang, jsDate){
   if(LATE_EXEMPT.includes(cabang)) return false;
   if(!jsDate) return false;
   const menit = getWIBMenit(cabang, jsDate);
   const isBatam = cabang==="ID Rifim Airport Batam";
+  const isAdmin = cabang==="Admin";
+  if(isAdmin) return false;
 
-  // PAGI: terlambat jika > 07:00 s.d. 07:05
-  if(menit > 7*60   && menit <= 7*60+5)  return true;
-  // MIDDLE: terlambat jika > 11:00 s.d. 11:05
-  if(menit > 11*60  && menit <= 11*60+5) return true;
-  // SIANG Batam: terlambat jika > 14:00 s.d. 14:05
-  if(isBatam  && menit > 14*60 && menit <= 14*60+5) return true;
-  // SIANG: terlambat jika > 15:00 s.d. 15:05
-  if(!isBatam && menit > 15*60 && menit <= 15*60+5) return true;
+  // Terlambat = masuk SETELAH jam tepat (bukan window masuk)
+  // PAGI: terlambat jika > 07:05 s.d. 07:45 (07:01 = masih HADIR)
+  if(menit > 7*60+5  && menit <= 7*60+45)  return true;
+  // MIDDLE: terlambat jika > 11:05 s.d. 11:45
+  if(menit > 11*60+5 && menit <= 11*60+45) return true;
+  // SIANG Batam: terlambat jika > 14:05 s.d. 14:45
+  if(isBatam  && menit > 14*60+5 && menit <= 14*60+45) return true;
+  // SIANG: terlambat jika > 15:05 s.d. 15:45
+  if(!isBatam && menit > 15*60+5 && menit <= 15*60+45) return true;
   return false;
 }
 
 function getShiftInfo(cabang){
-  const isBatam=cabang==="ID Rifim Airport Batam";
-  const isWITA=WITA_CABANG.includes(cabang);
+  const isBatam = cabang==="ID Rifim Airport Batam";
+  const isWITA  = WITA_CABANG.includes(cabang);
+  const menit   = isWITA ? getWIBMenit(cabang, new Date()) : new Date().getHours()*60+new Date().getMinutes();
+  const tipe    = getTipeAbsen(cabang, new Date());
+
+  let info = "";
   if(isWITA){
-    // Tampilkan dalam WITA (+1 jam dari WIB)
-    if(isBatam) return "PAGI 07:00-08:05 | MIDDLE 11:00-12:05 | SIANG WITA 14:00-15:05";
-    return "PAGI 07:00-08:05 | MIDDLE 11:00-12:05 | SIANG WITA 15:00-16:05";
+    // Tampilkan dalam WITA (+1 jam)
+    info = "Masuk: PAGI 07-08:05 | MIDDLE 11-12:05 | SIANG 15-16:05";
+    info += " | Pulang: PAGI 16-17:05 | MIDDLE 20-21:05 | SIANG 22-24:15";
+  } else if(isBatam){
+    info = "Masuk: PAGI 06-07:05 | MIDDLE 10-11:05 | SIANG 13-14:05";
+    info += " | Pulang: PAGI 15-16:05 | MIDDLE 19-20:05 | SIANG 21-23:15";
+  } else {
+    info = "Masuk: PAGI 06-07:05 | MIDDLE 10-11:05 | SIANG 14-15:05";
+    info += " | Pulang: PAGI 15-16:05 | MIDDLE 19-20:05 | SIANG 21-23:15";
   }
-  if(isBatam) return "PAGI 06:00-07:05 | MIDDLE 10:00-11:05 | SIANG 13:00-14:05";
-  return "PAGI 06:00-07:05 | MIDDLE 10:00-11:05 | SIANG 14:00-15:05";
+  // Tambah status saat ini
+  const statusNow = tipe==="masuk"?"🌅 Window Masuk":tipe==="pulang"?"🌆 Window Pulang":"⏰ Jam Khusus";
+  return statusNow + " | " + info;
 }
 
 // ─── App state ────────────────────────────────────────────
@@ -1181,11 +1343,10 @@ function populateDropdowns(){
   }
   // Cabang selects
   const cabs=Object.keys(AIRPORTS);
-  ["selCab","jCab","rkCab","sfCab"].forEach(id=>{
+  ["selCab","jCab","rkCab","sfCab","mggCab"].forEach(id=>{
     const el=document.getElementById(id);if(!el)return;
     cabs.forEach(c=>{
       const o=document.createElement("option");o.value=c;
-      // Tampilkan nama lengkap dengan icon
       if(c.startsWith("ID Rifim Airport ")){
         o.textContent="✈️ "+c.replace("ID Rifim Airport ","")+" (Airport)";
       } else if(c==="Admin"){
@@ -1276,7 +1437,8 @@ const PG_META={
   att: {pg:"pgAtt", title:"Attendance",sub:"Selfie + Validasi GPS",    fab:"🚀",bn:1},
   jd:  {pg:"pgJd",  title:"Jadwal Shift",sub:"Jadwal kerja mingguan",  fab:"✨",bn:2},
   rk:  {pg:"pgRk",  title:"Rekap",sub:"Laporan kehadiran",             fab:null,bn:3},
-  more:{pg:"pgMore",title:"Lainnya",sub:"Menu & pengaturan",           fab:null,bn:4},
+  mgg: {pg:"pgMgg", title:"Absensi Mingguan",sub:"7 hari per cabang",  fab:null,bn:4},
+  more:{pg:"pgMore",title:"Lainnya",sub:"Menu & pengaturan",           fab:null,bn:5},
   staff:{pg:"pgStaff",title:"Data Staff",sub:"Master staff",            fab:null,bn:-1},
   cbng: {pg:"pgCbng",title:"Cabang",sub:"Info 7 cabang",               fab:null,bn:-1},
   pw:   {pg:"pgPw",  title:"Password",sub:"Keamanan akun",              fab:null,bn:-1},
@@ -1293,6 +1455,10 @@ function goPage(key,bnIdx){
   if(key==="home")loadDash();
   if(key==="att"){refreshUserUI();onCabChange();}
   if(key==="rk")loadRekap();
+  if(key==="mgg"){
+    // Set tanggal default ke hari ini
+    const tglEl=g("mggTgl");if(tglEl&&!tglEl.value)tglEl.value=new Date().toISOString().slice(0,10);
+  }
   if(key==="staff")renderStaff("","");
   if(key==="jd")loadJadwal();
   if(key==="pw")buildPwList();
@@ -1365,9 +1531,11 @@ function updateShiftTxt(){
   const autoTipe=getTipeAbsen(cab,now);
   const shiftInfo=getShiftInfo(cab);
   st("shiftTxt",shiftInfo);
-  st("absSh",autoTipe==="masuk"?"🌅 Masuk":"🌆 Pulang");
-  // Auto-set tipe absen
-  setType(autoTipe);
+  const nowTipe=getTipeAbsen(cab,new Date());
+  const label=nowTipe==="masuk"?"🌅 Masuk":nowTipe==="pulang"?"🌆 Pulang":"⏰ Khusus";
+  st("absSh",label);
+  // Auto-set tipe absen (masuk/pulang saja — khusus tetap masuk default)
+  setType(nowTipe==="pulang"?"pulang":"masuk");
 }
 function haverM(a,b,c,d){const R=6371000,r=x=>x*Math.PI/180,dl=r(c-a),do_=r(d-b),x=Math.sin(dl/2)**2+Math.cos(r(a))*Math.cos(r(c))*Math.sin(do_/2)**2;return R*2*Math.atan2(Math.sqrt(x),Math.sqrt(1-x));}
 
@@ -1439,19 +1607,25 @@ async function submitAbs(){
     const fid=await doUpload();
     const now=new Date();
     const wktBase=now.toLocaleTimeString("id-ID",{hour:"2-digit",minute:"2-digit"});
-    // Auto-detect tipe absen berdasarkan jam (poin 5)
-    const autoTipe = ap?.admin ? absTipe : getTipeAbsen(cab, now);
-    const finalTipe = autoTipe; // gunakan auto-detect
-    const late = finalTipe==="masuk" && !ap?.admin && isLate(cab, now);
+    // Auto-detect tipe absen berdasarkan jam
+    const autoTipe = ap?.admin ? "masuk" : getTipeAbsen(cab, now);
+    const finalTipe = autoTipe; // "masuk" | "pulang" | "khusus"
+    const late = (finalTipe==="masuk") && !ap?.admin && isLate(cab, now);
     const potongan = late ? 10000 : 0;
+    const shiftNama = ap?.admin ? "Admin" : getShiftNama(cab, now);
     // Info timezone untuk display
     const tzInfo = WITA_CABANG.includes(cab) ? " (WITA)" : " (WIB)";
-    const wkt = now.toLocaleTimeString("id-ID",{hour:"2-digit",minute:"2-digit"}) + tzInfo;
+    const wktBase = now.toLocaleTimeString("id-ID",{hour:"2-digit",minute:"2-digit"});
+    const wkt = wktBase + tzInfo;
     if(!db) throw new Error("Firebase tidak tersedia — cek koneksi internet");
     await db.collection("absensi").add({
-      nama:CU.nama,jabatan:CU.jabatan,cabang:cab,tipe:finalTipe,
+      nama:CU.nama,jabatan:CU.jabatan,cabang:cab,
+      tipe:finalTipe,         // masuk / pulang / khusus
+      shift:shiftNama,        // PAGI / MIDDLE / SIANG / Jam Khusus
       lat:gLat,lng:gLng,akurasi:gAcc,gpsValid:validGPS,jarak:Math.round(dist),
-      waktu:wkt,status:late?"terlambat":"hadir",potongan,fotoId:fid||"",
+      waktu:wkt,
+      status:finalTipe==="khusus"?"khusus":late?"terlambat":"hadir",
+      potongan,fotoId:fid||"",
       timestamp:firebase.firestore.FieldValue.serverTimestamp(),
       tanggal:now.toISOString().slice(0,10)
     });
@@ -1469,6 +1643,7 @@ async function submitAbs(){
           namaSPG:CU.nama,
           bandara:cab,
           tipeAbsen:finalTipe,
+          shift:shiftNama,
           koordinatGPS:gLat.toFixed(6)+","+gLng.toFixed(6),
           statusJarak:validGPS?"Dalam Radius ("+Math.round(dist)+"m)":"Di Luar Radius ("+Math.round(dist)+"m)",
           buktiFoto:fid?"https://drive.google.com/file/d/"+fid+"/view":""
@@ -1519,9 +1694,10 @@ async function loadDash(){
     const list=g("dashList");
     if(!rows.length){list.innerHTML='<div style="padding:24px;text-align:center;color:var(--txt-sec);font-size:13px;">Belum ada kehadiran hari ini</div>';return;}
     list.innerHTML=rows.slice(0,25).map(r=>{
-      const isPulang=r.tipe==="pulang";
-      const chipCls=isPulang?"chip-info":r.status==="hadir"?"chip-ok":r.status==="terlambat"?"chip-warn":"chip-err";
-      const chipTxt=isPulang?"Pulang":r.status||"hadir";
+      const isPulang = r.tipe==="pulang";
+      const isKhusus = r.tipe==="khusus"||r.status==="khusus";
+      const chipCls  = isPulang?"chip-info":isKhusus?"chip-dim":r.status==="hadir"?"chip-ok":r.status==="terlambat"?"chip-warn":"chip-err";
+      const chipTxt  = isPulang?"Pulang":isKhusus?"Khusus":r.status||"hadir";
       return `<div class="list-item">
         <div class="l-av">${r.nama[0]}</div>
         <div class="l-main">
@@ -1783,7 +1959,12 @@ async function doFilterRekap(){
     });
     rows.forEach(r=>{
       if(!agg[r.nama])agg[r.nama]={nama:r.nama,cabang:r.cabang,H:0,T:0,A:0,pot:0};
-      if(r.tipe==="masuk"||!r.tipe){
+      if(r.status==="khusus"||r.tipe==="khusus"){
+        // Jam khusus tidak dihitung H/T/A
+      } else if(r.tipe==="pulang"){
+        // Absen pulang tidak dihitung H/T
+      } else {
+        // Absen masuk
         if(r.status==="terlambat"){agg[r.nama].T++;agg[r.nama].pot+=(r.potongan||10000);}
         else agg[r.nama].H++;
       }
@@ -2090,6 +2271,98 @@ function savePassword(){
   alert_(g("alPw"),"✅ Password "+nm+" berhasil diubah! Silakan informasikan ke staff.","ok");
   buildPwList(); // refresh list
   console.log("Password changed for:", nm);
+}
+
+// ─── ABSENSI MINGGUAN (7 hari per cabang) ─────────────
+async function loadMgg(){
+  const cab = g("mggCab")?.value;
+  if(!cab){ alert_(g("alMgg"),"⚠️ Pilih cabang dulu!","wn"); return; }
+  if(!db){ alert_(g("alMgg"),"❌ Firebase tidak tersedia","er"); return; }
+
+  alert_(g("alMgg"),"⏳ Memuat data 7 hari...","in");
+
+  // Hitung 7 hari ke belakang
+  const tglInput = g("mggTgl")?.value;
+  const endDate = tglInput ? new Date(tglInput) : new Date();
+  const dates = [];
+  for(let i=6; i>=0; i--){
+    const d = new Date(endDate);
+    d.setDate(d.getDate() - i);
+    dates.push(d.toISOString().slice(0,10));
+  }
+
+  try{
+    const snap = await db.collection("absensi")
+      .where("cabang","==",cab)
+      .where("tanggal",">=",dates[0])
+      .where("tanggal","<=",dates[6])
+      .get();
+    const rows = snap.docs.map(d=>d.data());
+
+    // Aggregate per staff
+    const staffMap = {};
+    rows.forEach(r=>{
+      if(!staffMap[r.nama]) staffMap[r.nama]={nama:r.nama,H:0,T:0,pot:0,detail:{}};
+      const s=staffMap[r.nama];
+      if(r.tipe==="pulang"||r.tipe==="khusus") return; // skip non-masuk
+      if(r.status==="terlambat"){s.T++; s.pot+=(r.potongan||10000);}
+      else if(r.status==="hadir") s.H++;
+      if(!s.detail[r.tanggal]) s.detail[r.tanggal]=[];
+      s.detail[r.tanggal].push(r);
+    });
+
+    const staffList = Object.values(staffMap);
+    const tH = staffList.reduce((a,s)=>a+s.H,0);
+    const tT = staffList.reduce((a,s)=>a+s.T,0);
+    const tPot = staffList.reduce((a,s)=>a+s.pot,0);
+
+    st("mggH", tH);
+    st("mggT", tT);
+    st("mggPot", "Rp "+tPot.toLocaleString("id-ID"));
+
+    // Render tabel summary
+    const MO=["Jan","Feb","Mar","Apr","Mei","Jun","Jul","Agu","Sep","Okt","Nov","Des"];
+    const tbody = g("mggBody");
+    if(!staffList.length){
+      tbody.innerHTML='<tr><td colspan="5" style="padding:24px;text-align:center;color:var(--txt-sec);">Tidak ada data untuk cabang & periode ini</td></tr>';
+    } else {
+      tbody.innerHTML = staffList.map(s=>`
+        <tr style="border-bottom:1px solid var(--out-var);">
+          <td style="padding:10px 12px;font-size:13px;font-weight:500;">${s.nama}</td>
+          <td style="text-align:center;font-weight:700;color:var(--clr-ok);">${s.H}</td>
+          <td style="text-align:center;font-weight:700;color:var(--clr-warn);">${s.T}</td>
+          <td style="text-align:center;font-weight:700;color:var(--clr-err);">${Math.max(0,7-s.H-s.T)}</td>
+          <td style="text-align:center;font-size:12px;font-weight:600;color:${s.pot>0?"#FF6F00":"var(--txt-dis)"};">
+            ${s.pot>0?"Rp "+s.pot.toLocaleString("id-ID"):"—"}
+          </td>
+        </tr>`).join('');
+    }
+
+    // Render detail per tanggal
+    const detail = g("mggDetail");
+    const hari=["Min","Sen","Sel","Rab","Kam","Jum","Sab"];
+    detail.innerHTML = dates.map(tgl=>{
+      const dayRows = rows.filter(r=>r.tanggal===tgl);
+      const d = new Date(tgl+"T12:00:00");
+      const label = hari[d.getDay()]+" "+d.getDate()+" "+MO[d.getMonth()];
+      if(!dayRows.length) return `<div style="padding:8px 16px;border-bottom:1px solid var(--out-var);display:flex;justify-content:space-between;"><span style="font-size:12px;font-weight:600;">${label}</span><span style="font-size:11px;color:var(--txt-dis);">Tidak ada data</span></div>`;
+      return `<div style="border-bottom:1px solid var(--out-var);">
+        <div style="padding:8px 16px 4px;font-size:11px;font-weight:700;color:var(--txt-sec);">${label}</div>
+        ${dayRows.map(r=>`<div style="padding:5px 16px 5px 24px;display:flex;justify-content:space-between;align-items:center;">
+          <span style="font-size:12px;">${r.nama}</span>
+          <div style="display:flex;gap:6px;align-items:center;">
+            <span class="chip ${r.tipe==="pulang"?"chip-info":r.status==="hadir"?"chip-ok":r.status==="terlambat"?"chip-warn":"chip-dim"}" style="font-size:10px;">${r.tipe==="pulang"?"Pulang":r.status||"hadir"}</span>
+            <span style="font-size:11px;color:var(--txt-sec);">${r.waktu||""}</span>
+          </div>
+        </div>`).join("")}
+      </div>`;
+    }).join('');
+
+    alert_(g("alMgg"),"✅ "+rows.length+" record dari "+cab+" (7 hari)","ok");
+  }catch(e){
+    alert_(g("alMgg"),"❌ Error: "+e.message,"er");
+    console.error("loadMgg:",e);
+  }
 }
 
 // ─── Error reporting (poin 9) ────────────────────────────
