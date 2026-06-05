@@ -1776,7 +1776,21 @@ async function loadDash(){
   try{
     if(!db){if(list)list.innerHTML='<div style="padding:16px;color:#FF5252;text-align:center;">Firebase tidak tersedia</div>';return;}
     const snap=await db.collection("absensi").where("tanggal","==",today).get();
-    const rows=snap.docs.map(d=>d.data());
+const rows=snap.docs.map(d=>d.data());
+
+rows.sort((a,b)=>{
+
+  const ta = new Date(
+    `${today} ${a.waktu || "00:00"}`
+  ).getTime();
+
+  const tb = new Date(
+    `${today} ${b.waktu || "00:00"}`
+  ).getTime();
+
+  return tb - ta;
+
+});
     const hadir=rows.filter(r=>r.status!=="terlambat").length;
     const late=rows.filter(r=>r.status==="terlambat").length;
     const total=STAFF.filter(u=>u.role!=="owner").length;
