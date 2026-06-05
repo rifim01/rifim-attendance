@@ -1615,7 +1615,6 @@ async function submitAbs(){
     const shiftNama = ap?.admin ? "Admin" : getShiftNama(cab, now);
     // Info timezone untuk display
     const tzInfo = WITA_CABANG.includes(cab) ? " (WITA)" : " (WIB)";
-    const wktBase = now.toLocaleTimeString("id-ID",{hour:"2-digit",minute:"2-digit"});
     const wkt = wktBase + tzInfo;
     if(!db) throw new Error("Firebase tidak tersedia — cek koneksi internet");
     await db.collection("absensi").add({
