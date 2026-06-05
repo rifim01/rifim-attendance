@@ -559,9 +559,10 @@ body{
 .suc-meta{font-size:11px;color:var(--txt-sec);margin-top:4px;}
 
 /* ══ RESPONSIVE ══════════════════════════════════════════ */
-@media(min-width:600px){
+@media(min-width:600px) and (max-width:959px){
   .bnav,.topbar,.sft-bar,#content{max-width:560px;margin-left:auto;margin-right:auto;}
-  .bnav{left:50%;transform:translateX(-50%);border-radius:28px 28px 0 0;}
+  .bnav{left:0!important;transform:none!important;
+  border-radius:0!important;}
   #fab{right:calc(50% - 280px + 18px);}
 }
 /* ══ DESKTOP LAYOUT (poin 6) ══════════════════════════════ */
