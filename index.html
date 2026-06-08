@@ -1158,8 +1158,10 @@ const JD_RULES=[
   {cabang:"ID Rifim Airport Manado",a:"Jessica Item",b:"Jusni Kourow"}
 ];
 
-// ─── Staff list ───────────────────────────────────────────
-let STAFF=[
+// ─── Staff list (load dari Firebase) ──────────────────────
+let STAFF = [];
+
+const STAFF_FALLBACK = [
   {nama:"Nabilla",              pw:"rifim2024",jabatan:"Admin Editor",  cabang:"Admin",                       id:"RIF0139",role:"editor"},
   {nama:"Govinda",              pw:"rifim2024",jabatan:"Admin",         cabang:"Admin",                       id:"RIF0143",role:"admin"},
   {nama:"febriany sandra",      pw:"rifim2024",jabatan:"Admin",         cabang:"Admin",                       id:"RIF0147",role:"admin"},
@@ -1187,6 +1189,32 @@ let STAFF=[
   {nama:"Jeien Johana Rambi",   pw:"rifim2024",jabatan:"Pickup Point",  cabang:"ID Rifim Airport Manado",     id:"RIF0138",role:"staff"},
   {nama:"Owner / Bobby",        pw:"owner2024",jabatan:"Direktur Utama",cabang:"Pusat",                      id:"OWN001", role:"owner"},
 ];
+
+async function loadStaffFromFirebase() {
+  try {
+    const res = await fetch("https://gen-lang-client-0837778946.firebaseio.com/staff.json");
+    const data = await res.json();
+    
+    if (data && Array.isArray(data) && data.length > 0) {
+      STAFF = data.map(s => ({
+        id: s.id || "",
+        nama: s.nama || "",
+        pw: "rifim2024",
+        jabatan: s.jabatan || "",
+        cabang: s.cabang || "",
+        role: s.jabatan ? (s.jabatan.toLowerCase().includes("admin") ? "admin" : "staff") : "staff"
+      }));
+      console.log("✅ Loaded " + STAFF.length + " staff dari Firebase");
+      return true;
+    } else {
+      console.warn("⚠️ Firebase staff empty, fallback");
+      return false;
+    }
+  } catch (error) {
+    console.error("Firebase load error:", error);
+    return false;
+  }
+}
 
 // ─── Shift & Time Zone rules ─────────────────────────────
 // WITA cabang: Balikpapan & Manado (+1 jam dari WIB)
@@ -1351,9 +1379,21 @@ document.addEventListener("pointerdown",e=>{
 });
 
 // ─── Boot ─────────────────────────────────────────────────
-window.addEventListener("DOMContentLoaded",()=>{
+async function bootApp(){
+  console.log("🚀 Booting RIFIM ERP...");
+  
   // Init Firebase (must be first)
   initFirebase();
+  
+  // Load staff dari Firebase dengan fallback
+  const staffLoaded = await loadStaffFromFirebase();
+  if (!staffLoaded) {
+    console.warn("⚠️ Using fallback staff list");
+    STAFF = STAFF_FALLBACK;
+  }
+  
+  console.log("✅ Boot complete: STAFF loaded " + STAFF.length);
+  
   loadPW();populateDropdowns();startClock();startGPS();
   // Restore wkStart dari storage
   const savedWk=lsGet("rifim_wkstart");
@@ -1383,7 +1423,9 @@ window.addEventListener("DOMContentLoaded",()=>{
   if(auth) {
     auth.onAuthStateChanged(()=>{ safeProceed(); });
   }
-});
+}
+
+window.addEventListener("DOMContentLoaded", bootApp);
 
 function loadPW(){try{const s=lsGet("rifim_pw");if(s)STAFF.forEach(u=>{if(s[u.nama])u.pw=s[u.nama];});}catch{}}
 function savePW(){const s={};STAFF.forEach(u=>s[u.nama]=u.pw);lsSet("rifim_pw",s);}
